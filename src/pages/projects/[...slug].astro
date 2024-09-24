@@ -6,6 +6,7 @@ import FormattedDate from "@components/FormattedDate.astro";
 import { readingTime } from "@lib/utils";
 import BackToPrev from "@components/BackToPrev.astro";
 import Link from "@components/Link.astro";
+import Breadcrumbs from "@components/Breadcrumbs.astro";
 
 export async function getStaticPaths() {
   const projects = (await getCollection("projects"))
@@ -24,8 +25,14 @@ const { Content } = await project.render();
 
 <PageLayout title={project.data.title} description={project.data.description}>
   <Container>
-    <div>
-      <BackToPrev href="/projects"> Back to projects </BackToPrev>
+    <div class="space-y-2">
+      <BackToPrev href="/blog"> Back to projects </BackToPrev>
+      <Breadcrumbs
+        items={[
+          { href: "/projects", label: "Projects" },
+          { href: `/projects/${project.slug}`, label: project.data.title },
+        ]}
+      />
     </div>
     <div class="space-y-1 my-10">
       <div class="flex items-center gap-1.5">
