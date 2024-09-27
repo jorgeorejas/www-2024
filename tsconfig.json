@@ -2,9 +2,13 @@
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
     "strictNullChecks": true,
-    "baseUrl": ".",
+    "baseUrl": "/Users/jorgeorejas/Dev/www-2024",
     "paths": {
-      "@*": ["./src/*"]
-    }
+      "@*": [
+        "./src/*"
+      ]
+    },
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
   }
 }

@@ -22,7 +22,11 @@ const post = Astro.props;
 const { Content } = await post.render();
 ---
 
-<PageLayout title={post.data.title} description={post.data.description}>
+<PageLayout
+  title={post.data.title}
+  description={post.data.description}
+  ogImage={`/og/${post.slug}.png`}
+>
   <Container>
     <div class="space-y-2">
       <BackToPrev href="/blog"> Back to blog </BackToPrev>

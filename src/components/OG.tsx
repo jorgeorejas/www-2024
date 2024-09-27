@@ -1,0 +1,50 @@
+export default function OG(
+  title: string = "<Site Name> - Default Title",
+  description: string = "Default Description",
+) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+        height: "100%",
+        background: "#191919",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "relative",
+      }}
+    >
+      <h1
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          color: "white",
+          fontSize: "3rem",
+          width: "100%",
+          fontWeight: "bold",
+          fontFamily: "Atkinson, monospace",
+          overflow: "hidden",
+          padding: "2rem 4rem",
+        }}
+      >
+        {title}
+      </h1>
+      <p
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          color: "white",
+          fontSize: "1.5rem",
+          width: "100%",
+          fontWeight: "bold",
+          fontFamily: "Atkinson, monospace",
+          overflow: "hidden",
+          padding: "2rem 4rem",
+        }}
+      >
+        {description}
+      </p>
+    </div>
+  );
+}
