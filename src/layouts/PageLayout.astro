@@ -1,7 +1,7 @@
 ---
 import Head from "@components/Head.astro";
 import { SITE } from "@consts";
-
+import SpeedInsights from "@vercel/speed-insights/astro";
 type Props = {
   title: string;
   description: string;
@@ -21,6 +21,7 @@ const { title, description, ogImage } = Astro.props;
     />
   </head>
   <body>
+    <SpeedInsights />
     <main>
       <slot />
     </main>
