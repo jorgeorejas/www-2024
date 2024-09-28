@@ -3,7 +3,6 @@ title: "Ads Notifier"
 description: "Monitor your competitors Facebook ad strategies with AdsNotifier."
 date: "04/23/2024"
 demoURL: "https://adsnotifier.com"
-repoURL: "https://github.com/jorgeorejas/ads-notifier"
 ---
 
 ### AdsNotifier Project Overview
