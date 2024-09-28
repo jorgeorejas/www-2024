@@ -11,7 +11,7 @@ import vercel from "@astrojs/vercel/serverless";
 export default defineConfig({
   site: "https://astro-nano-demo.vercel.app",
   integrations: [mdx(), sitemap(), tailwind(), react()],
-  output: "server",
+  output: "hybrid",
   adapter: vercel({
     webAnalytics: { enabled: true },
   }),
