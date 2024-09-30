@@ -1,7 +1,7 @@
 ---
 title: "Building Startups, Building Your Legacy"
 description: "Use your startup as a foundation to shape the legacy and future you want to live in."
-date: "Mar 22 2024"
+date: "Sep 24 2024"
 ---
 
 Most people think of entrepreneurship as a way to make money. But that’s not enough. If you're just chasing money, you're missing the point. The real goal of entrepreneurship should be to create something that matters. Something that makes a difference in the world.
