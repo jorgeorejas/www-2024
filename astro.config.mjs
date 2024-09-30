@@ -9,10 +9,11 @@ import vercel from "@astrojs/vercel/serverless";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://astro-nano-demo.vercel.app",
+  site: "https://jorgeorejas.com",
   integrations: [mdx(), sitemap(), tailwind(), react()],
   output: "hybrid",
   adapter: vercel({
     webAnalytics: { enabled: true },
+    speedInsights: { enabled: true },
   }),
 });
