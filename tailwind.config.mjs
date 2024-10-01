@@ -9,6 +9,7 @@ export default {
       fontFamily: {
         sans: ["Inter", ...defaultTheme.fontFamily.sans],
         serif: ["Lora", ...defaultTheme.fontFamily.serif],
+        handwritten: ["Caveat Variable", ...defaultTheme.fontFamily.mono],
       },
     },
   },
