@@ -1,5 +1,5 @@
 ---
-title: "Ads Notifier"
+title: "AdsNotifier"
 description: "Monitor your competitors Facebook ad strategies with AdsNotifier."
 date: "04/23/2024"
 demoURL: "https://adsnotifier.com"
@@ -7,7 +7,11 @@ demoURL: "https://adsnotifier.com"
 
 ### AdsNotifier Project Overview
 
-**AdsNotifier** is a tool designed to help businesses monitor and analyze competitor Facebook ads in real-time. Its features include:
+**AdsNotifier** is a tool designed to help businesses monitor and analyze competitor Facebook ads in real-time.
+
+![Aramo](../../../../public/img/adsnotifier.png)
+
+Its features include:
 
 - Instant notifications when competitors launch new ad campaigns.
 - Insights into competitor ad performance (impressions, clicks, conversions).
