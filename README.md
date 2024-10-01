@@ -1,67 +1,87 @@
-![Astro Nano](_astro_nano.png)
+# Jorge Orejas Personal Website
 
-Astro Nano is a static, minimalist, lightweight, lightning fast portfolio and blog theme.
+This is the personal website of Jorge Orejas, built with Astro and deployed on Vercel.
 
-Built with Astro, Tailwind and Typescript, an no frameworks.
+## Technical Details
 
-It was designed as an even more minimal theme than my popular theme [Astro Sphere](https://github.com/markhorn-dev/astro-sphere)
+### Framework and Language
 
-## 🚀 Deploy your own
+- Astro
+- TypeScript
 
-[![Deploy with Vercel](_deploy_vercel.svg)](https://vercel.com/new/clone?repository-url=https://github.com/markhorn-dev/astro-nano) [![Deploy with Netlify](_deploy_netlify.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/markhorn-dev/astro-nano)
+### Styling
 
-## 📋 Features
+- Tailwind CSS
+- Custom CSS (global.css)
 
-- ✅ 100/100 Lighthouse performance
-- ✅ Responsive
-- ✅ Accessible
-- ✅ SEO-friendly
-- ✅ Typesafe
-- ✅ Minimal style
-- ✅ Light/Dark Theme
-- ✅ Animated UI
-- ✅ Tailwind styling
-- ✅ Auto generated sitemap
-- ✅ Auto generated RSS Feed
-- ✅ Markdown support
-- ✅ MDX Support (components in your markdown)
+### Content Management
 
-## 💯 Lighthouse score
+- Markdown files for blog posts, projects, and work experience
 
-![Astro Nano Lighthouse Score](_lighthouse.png)
+### Deployment
 
-## 🕊️ Lightweight
+- Vercel
 
-No frameworks or added bulk
+### Key Features
 
-## ⚡︎ Fast
+1. Blog
+2. Projects showcase
+3. Work experience
+4. Dynamic OG image generation
+5. RSS feed
+6. Dark mode support
 
-Rendered in ~40ms on localhost
+### Dependencies
 
-## 📄 Configuration
+- @astrojs/mdx
+- @astrojs/react
+- @astrojs/rss
+- @astrojs/sitemap
+- @astrojs/tailwind
+- @astrojs/vercel
+- @fontsource-variable/caveat
+- @fontsource/inter
+- @fontsource/lora
+- @tailwindcss/typography
+- @vercel/analytics
+- @vercel/speed-insights
+- astro-satori
+- clsx
+- react
+- react-dom
+- satori
+- sharp
+- tailwind-merge
 
-The blog posts on the demo serve as the documentation and configuration.
+### Development Tools
 
-## 💻 Commands
+- ESLint
+- Prettier
 
-All commands are run from the root of the project, from a terminal:
+## Project Structure
 
-Replace npm with your package manager of choice. `npm`, `pnpm`, `yarn`, `bun`, etc
+- `src/`: Source files
+  - `components/`: Reusable Astro components
+  - `content/`: Markdown files for blog posts, projects, and work experience
+  - `layouts/`: Page layouts
+  - `pages/`: Astro pages
+  - `styles/`: Global CSS
+  - `lib/`: Utility functions
+  - `consts.ts`: Constant values used throughout the project
+- `public/`: Static assets
 
-| Command                   | Action                                            |
-| :------------------------ | :------------------------------------------------ |
-| `npm install`             | Installs dependencies                             |
-| `npm run dev`             | Starts local dev server at `localhost:4321`       |
-| `npm run dev:network`     | Starts local dev server on local network          |
-| `npm run sync`            | Generates TypeScript types for all Astro modules. |
-| `npm run build`           | Build your production site to `./dist/`           |
-| `npm run preview`         | Preview your build locally, before deploying      |
-| `npm run preview:network` | Preview build on local network                    |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check`  |
-| `npm run astro -- --help` | Get help using the Astro CLI                      |
-| `npm run lint`            | Run ESLint                                        |
-| `npm run lint:fix`        | Auto-fix ESLint issues                            |
+## Blog Posts
 
-## 🏛️ License
+1. "Create Opportunities, Build Ideas"
+2. "Building Startups, Building Your Legacy"
 
-MIT
+## Setup and Development
+
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Run the development server: `npm run dev`
+4. Build for production: `npm run build`
+
+## Deployment
+
+The project is set up for deployment on Vercel. Push to the main branch to trigger a new deployment.
