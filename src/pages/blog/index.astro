@@ -7,8 +7,11 @@ import { BLOG } from "@consts";
 import BackToPrev from "@components/BackToPrev.astro";
 import Breadcrumbs from "@components/Breadcrumbs.astro";
 
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
 const data = (await getCollection("blog"))
-  .filter((post) => !post.data.draft)
+  .filter((post) => !post.data.draft && post.data.date <= today)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
 type Acc = {
