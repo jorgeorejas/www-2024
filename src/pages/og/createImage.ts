@@ -8,14 +8,9 @@ export async function SVG(component: JSX.Element) {
     height: 630,
     fonts: [
       {
-        name: "Atkinson",
-        data: await fs.readFile("./public/fonts/atkinson-bold.woff"),
+        name: "IBM Plex Mono",
+        data: await fs.readFile("./public/fonts/ibm-plex.woff"),
         weight: 600,
-      },
-      {
-        name: "Atkinson",
-        data: await fs.readFile("./public/fonts/atkinson-regular.woff"),
-        weight: 400,
       },
     ],
   });

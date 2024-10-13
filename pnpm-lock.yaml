@@ -32,6 +32,9 @@ importers:
       '@fontsource-variable/caveat':
         specifier: ^5.1.0
         version: 5.1.0
+      '@fontsource/ibm-plex-mono':
+        specifier: ^5.1.0
+        version: 5.1.0
       '@fontsource/inter':
         specifier: ^5.0.17
         version: 5.0.17
@@ -506,6 +509,9 @@ packages:
 
   '@fontsource-variable/caveat@5.1.0':
     resolution: {integrity: sha512-zLBtg14o5AHlJjsq7v4fpgot1XQDqJkMi9fAmbGO4rQHr9w5nxj9Zu3da85TyVP86tZ94rhFFeGhjMNvwgfaHw==}
+
+  '@fontsource/ibm-plex-mono@5.1.0':
+    resolution: {integrity: sha512-XKsZNyRCj6tz8zlatHmniSoLVephMD5GQG2sXgcaEb8DkUO+O61r28uTlIMEZuoZXtP4c4STvL+KUlJM5jZOEg==}
 
   '@fontsource/inter@5.0.17':
     resolution: {integrity: sha512-2meBGx1kt7u5LwzGc5Sz5rka6ZDrydg6nT3x6Wkt310vHXUchIywrO8pooWMzZdHYcyFY/cv4lEpJZgMD94bCg==}
@@ -4160,6 +4166,8 @@ snapshots:
   '@eslint/js@8.57.0': {}
 
   '@fontsource-variable/caveat@5.1.0': {}
+
+  '@fontsource/ibm-plex-mono@5.1.0': {}
 
   '@fontsource/inter@5.0.17': {}
 

@@ -9,6 +9,7 @@ export default {
       fontFamily: {
         sans: ["Inter", ...defaultTheme.fontFamily.sans],
         serif: ["Lora", ...defaultTheme.fontFamily.serif],
+        mono: ["IBM Plex Mono", ...defaultTheme.fontFamily.mono],
         handwritten: ["Caveat Variable", ...defaultTheme.fontFamily.mono],
       },
     },

@@ -23,7 +23,7 @@ export default function OG(
           fontSize: "3rem",
           width: "100%",
           fontWeight: "bold",
-          fontFamily: "Atkinson, monospace",
+          fontFamily: "IBM Plex Mono, monospace",
           overflow: "hidden",
           padding: "2rem 4rem",
         }}
@@ -38,7 +38,7 @@ export default function OG(
           fontSize: "1.5rem",
           width: "100%",
           fontWeight: "bold",
-          fontFamily: "Atkinson, monospace",
+          fontFamily: "IBM Plex Mono, monospace",
           overflow: "hidden",
           padding: "2rem 4rem",
         }}
