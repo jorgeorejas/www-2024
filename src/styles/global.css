@@ -54,11 +54,3 @@ article {
     @apply decoration-black/25 dark:decoration-white/50;
   }
 }
-
-html #back-to-top {
-  @apply opacity-0 pointer-events-none;
-}
-
-html.scrolled #back-to-top {
-  @apply opacity-100 pointer-events-auto;
-}
