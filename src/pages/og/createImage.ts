@@ -12,6 +12,11 @@ export async function SVG(component: JSX.Element) {
         data: await fs.readFile("./public/fonts/ibm-plex.woff"),
         weight: 600,
       },
+      {
+        name: "Rza Light",
+        data: await fs.readFile("./public/fonts/Rza-light.otf"),
+        weight: 600,
+      },
     ],
   });
 }

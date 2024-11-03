@@ -23,7 +23,7 @@ export default function OG(
           fontSize: "3rem",
           width: "100%",
           fontWeight: "bold",
-          fontFamily: "IBM Plex Mono, monospace",
+          fontFamily: "Rza Light, serif",
           overflow: "hidden",
           padding: "2rem 4rem",
         }}
