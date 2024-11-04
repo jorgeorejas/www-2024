@@ -1,5 +1,6 @@
 ---
 import Breadcrumbs from "./Breadcrumbs.astro";
+import Link from "./Link.astro";
 type Props = {
   breadCrumbsItems?: {
     href: string;
@@ -25,15 +26,15 @@ const { breadCrumbsItems, showNav = false } = Astro.props;
   </div>
   {
     showNav && (
-      <ul class="h-full pr-2 flex flex-row w-full md:w-auto md:flex-col justify-between content-between">
+      <ul class="h-full pr-2 flex flex-row w-full md:w-auto md:flex-col gap-2 md:gap-1 content-between">
         <li>
-          <a href="/blog">Blog</a>
+          <Link href="/blog">Blog</Link>
         </li>
         <li>
-          <a href="/projects">Projects</a>
+          <Link href="/projects">Projects</Link>
         </li>
         <li>
-          <a href="/blog">Work</a>
+          <Link href="/blog">Work</Link>
         </li>
       </ul>
     )
