@@ -29,7 +29,6 @@ const { Content } = await post.render();
   <Container>
     <div class="space-y-2">
       <Nav
-        showNav
         breadCrumbsItems={[
           { href: "/blog", label: "Blog" },
           { href: `/blog/${post.slug}`, label: post.data.title },

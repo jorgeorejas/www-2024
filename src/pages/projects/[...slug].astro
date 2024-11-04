@@ -26,7 +26,6 @@ const { Content } = await project.render();
   <Container>
     <div class="space-y-2">
       <Nav
-        showNav
         breadCrumbsItems={[
           { href: "/projects", label: "Projects" },
           { href: `/projects/${project.slug}`, label: project.data.title },
