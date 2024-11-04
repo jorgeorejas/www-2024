@@ -6,6 +6,7 @@ import ArrowCard from "@components/ArrowCard.astro";
 import Link from "@components/Link.astro";
 import { dateRange } from "@lib/utils";
 import { SITE, HOME, SOCIALS } from "@consts";
+import Nav from "@components/Nav.astro";
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 
@@ -37,9 +38,7 @@ const work = await Promise.all(
 
 <PageLayout title={HOME.TITLE} description={HOME.DESCRIPTION}>
   <Container>
-    <h4 class="font-semibold text-black font-serif dark:text-white">
-      Hi, I'm Jorge Orejas
-    </h4>
+    <Nav />
     <div class="space-y-16">
       <section>
         <article class="space-y-4">

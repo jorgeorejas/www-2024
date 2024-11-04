@@ -1,11 +1,10 @@
 ---
-import { type CollectionEntry, getCollection } from "astro:content";
-import PageLayout from "@layouts/PageLayout.astro";
 import Container from "@components/Container.astro";
 import FormattedDate from "@components/FormattedDate.astro";
+import Nav from "@components/Nav.astro";
+import PageLayout from "@layouts/PageLayout.astro";
 import { readingTime } from "@lib/utils";
-import BackToPrev from "@components/BackToPrev.astro";
-import Breadcrumbs from "@components/Breadcrumbs.astro";
+import { type CollectionEntry, getCollection } from "astro:content";
 
 export async function getStaticPaths() {
   const posts = (await getCollection("blog"))
@@ -29,9 +28,9 @@ const { Content } = await post.render();
 >
   <Container>
     <div class="space-y-2">
-      <BackToPrev href="/blog"> Back to blog </BackToPrev>
-      <Breadcrumbs
-        items={[
+      <Nav
+        showNav
+        breadCrumbsItems={[
           { href: "/blog", label: "Blog" },
           { href: `/blog/${post.slug}`, label: post.data.title },
         ]}
