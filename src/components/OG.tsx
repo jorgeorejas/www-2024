@@ -1,3 +1,5 @@
+import { SITE } from "@consts";
+
 export default function OG(
   title: string = "<Site Name> - Default Title",
   description: string = "Default Description",
@@ -58,7 +60,7 @@ export default function OG(
           padding: "2rem 4rem",
         }}
       >
-        By Jorge Orejas
+        By {SITE.NAME}
       </p>
     </div>
   );

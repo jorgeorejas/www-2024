@@ -2,6 +2,7 @@ import type { Site, Metadata, Socials } from "@types";
 
 export const SITE: Site = {
   NAME: "Jorge Orejas",
+  POSITION: "Developer & Entrepreneur",
   EMAIL: "soy@jorgeorejas.com",
   NUM_POSTS_ON_HOMEPAGE: 3,
   NUM_WORKS_ON_HOMEPAGE: 2,
@@ -32,7 +33,7 @@ export const PROJECTS: Metadata = {
 
 export const SOCIALS: Socials = [
   {
-    NAME: "twitter-x",
+    NAME: "x",
     HREF: "https://twitter.com/jorejasrojo",
   },
   {
