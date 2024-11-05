@@ -4,10 +4,10 @@ description: "Coding isn’t just technical; it’s deeply creative. Like artist
 date: "Nov 5 2024"
 ---
 
-Opportunities are not always handed to us. Sometimes, they don’t exist in the world we find ourselves in. But that doesn’t mean we should wait for them to appear. The most successful people don’t simply react to what’s around them; they shape the world to fit their vision.
+When people talk about creativity, they usually mean art, music, writing—things associated with images or emotions. But programming is just as creative, maybe even more so, because you’re creating something out of nothing, and the process involves a lot of the same steps artists use.
 
-Creating an opportunity is about identifying a gap or inefficiency, then positioning yourself to fill it. In some ways, it’s like building a bridge where there’s no road yet. Many of the most successful startups were born this way, because their founders saw something missing and made it. Airbnb didn’t just wait for the travel industry to change. They realized that people might prefer staying in homes rather than hotels, and they built the platform that made that possible.
+Coding starts with a blank screen, which is the programmer’s version of a blank canvas. Like an artist facing a blank canvas, a programmer faces a set of choices, an empty world with no inherent structure. Every line of code, every function, every loop, is a deliberate decision that brings some new function, some new form, into existence. And those choices are rarely linear or straightforward. Good code isn’t just efficient; it’s elegant, much like a well-designed building or a painting. There's a kind of flow to it, a structure that feels intuitive even though it’s built from abstract logic.
 
-The same holds true for ideas. You don’t have to wait for inspiration to strike; you can cultivate it by thinking through problems deeply, making connections between different fields, and staying curious about how things work. If something you need doesn’t exist yet, you can build it. Often, the best ideas come not from luck or sudden inspiration but from deliberate effort, working through versions, failures, and tweaks.
+In code, as in art, constraints can be useful. You work within the limits of your language, the performance of your hardware, the time you have. But within those limits, you can do almost anything, and the variety of what you can make is as vast as in any art form.
 
-Waiting means relying on others to set the pace. Instead, you can set your own pace by creating the very things you seek. It’s not just about being proactive; it’s about being a builder in a world full of consumers.
+People might not think of code as creative because it’s not visual or easy to understand, but the creativity is there. It’s just made of ideas, not images.
