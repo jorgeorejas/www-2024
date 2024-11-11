@@ -1,0 +1,45 @@
+---
+import Container from "@components/Container.astro";
+import Nav from "@components/Nav.astro";
+import Quote from "@components/Quote.astro";
+import PageLayout from "@layouts/PageLayout.astro";
+import { capitalizeFirstLetter } from "@lib/utils";
+import { type CollectionEntry, getCollection } from "astro:content";
+
+export async function getStaticPaths() {
+  const quotes = await getCollection("quotes");
+
+  return quotes.map((quote) => ({
+    params: { slug: quote.id },
+    props: quote,
+  }));
+}
+type Props = CollectionEntry<"quotes">;
+
+const quote = Astro.props;
+
+const quoteId = capitalizeFirstLetter(quote.id.replaceAll("-", " "));
+---
+
+<PageLayout
+  title={quoteId}
+  description={quote.data.description}
+  ogImage={`/og/${quote.slug}.png`}
+>
+  <Container>
+    <div class="space-y-2">
+      <Nav
+        breadCrumbsItems={[
+          { href: "/quotes", label: "Quotes" },
+          {
+            href: `/quotes/${quote.id}`,
+            label: quoteId,
+          },
+        ]}
+      />
+    </div>
+    <div class="flex h-full items-center justify-center">
+      <Quote quote={quote} />
+    </div>
+  </Container></PageLayout
+>

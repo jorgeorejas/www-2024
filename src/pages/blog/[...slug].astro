@@ -35,20 +35,20 @@ const { Content } = await post.render();
         ]}
       />
     </div>
-    <div class="space-y-2 my-10">
+    <div class="my-10 space-y-2">
       <div class="flex items-center gap-1.5">
-        <div class="font-base text-sm">
+        <div class="text-sm font-base">
           <FormattedDate date={post.data.date} />
         </div>
         &bull;
-        <div class="font-base text-sm">
+        <div class="text-sm font-base">
           {readingTime(post.body)}
         </div>
       </div>
-      <div class="text-2xl font-semibold font-serif text-black dark:text-white">
+      <div class="font-serif text-2xl font-semibold text-black dark:text-white">
         {post.data.title}
       </div>
-      <div class="border-b border-black/15 dark:border-white/20 pb-4">
+      <div class="pb-4 border-b border-black/15 dark:border-white/20">
         {post.data.description}
       </div>
     </div>

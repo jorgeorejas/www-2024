@@ -1,0 +1,26 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+type Quote = CollectionEntry<"quotes">;
+interface Props {
+  quote: Quote;
+}
+
+const { quote } = Astro.props;
+---
+
+<div class="pl-4 my-5 font-mono border-l-4 border-gray-300">
+  <p>{quote.data.content}</p>
+  <div class="mt-2 font-serif font-bold">
+    <span>
+      {quote.data.author}
+    </span>
+    {
+      quote.data.reference && (
+        <span class="italic text-gray-600">
+          ~ <a href={quote.data.reference.href}>{quote.data.reference.label}</a>
+        </span>
+      )
+    }
+  </div>
+</div>
