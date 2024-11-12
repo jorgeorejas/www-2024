@@ -1,3 +1,4 @@
+import { getCollection } from "astro:content";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -43,4 +44,18 @@ function capitalizeFirstLetter(val: string) {
   return String(val).charAt(0).toUpperCase() + String(val).slice(1);
 }
 
-export { cn, formatDate, readingTime, dateRange, capitalizeFirstLetter };
+async function getQuoteById(id: string) {
+  const quotes = await getCollection("quotes");
+  const quote = quotes.find((q) => q.id == id);
+
+  return quote;
+}
+
+export {
+  cn,
+  formatDate,
+  readingTime,
+  dateRange,
+  capitalizeFirstLetter,
+  getQuoteById,
+};

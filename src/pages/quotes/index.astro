@@ -1,0 +1,26 @@
+---
+import Container from "@components/Container.astro";
+import Nav from "@components/Nav.astro";
+import Quote from "@components/Quote.astro";
+import { WORK } from "@consts";
+import PageLayout from "@layouts/PageLayout.astro";
+import { getCollection } from "astro:content";
+
+const quotes = await getCollection("quotes");
+---
+
+<PageLayout title={WORK.TITLE} description={WORK.DESCRIPTION}>
+  <Container>
+    <div class="space-y-2">
+      <Nav breadCrumbsItems={[{ href: "/quotes", label: "Quotes" }]} />
+    </div>
+    <div class="my-10 space-y-10">
+      <div class="font-serif font-semibold text-black dark:text-white">
+        Quotes
+      </div>
+      <div class="flex flex-col space-y-4">
+        {quotes.map((entry) => <Quote quote={entry} />)}
+      </div>
+    </div>
+  </Container>
+</PageLayout>

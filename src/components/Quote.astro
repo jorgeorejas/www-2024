@@ -9,8 +9,8 @@ interface Props {
 const { quote } = Astro.props;
 ---
 
-<div class="pl-4 my-5 font-mono border-l-4 border-gray-300">
-  <p>{quote.data.content}</p>
+<div class="pl-4 my-5 font-mono border-l-2">
+  <q>{quote.data.content}</q>
   <div class="mt-2 font-serif font-bold">
     <span>
       {quote.data.author}
