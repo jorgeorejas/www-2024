@@ -11,7 +11,7 @@ const { items } = Astro.props;
 const allItems = [{ href: "/", label: "Home" }, ...items];
 ---
 
-<nav class="md:flex hidden" aria-label="Breadcrumb">
+<nav class="md:flex hidden print:hidden" aria-label="Breadcrumb">
   <ol class="inline-flex items-center space-x-1 md:space-x-3">
     {
       allItems.map((item, index) => (

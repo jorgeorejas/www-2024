@@ -19,8 +19,8 @@ body {
 body {
   @apply font-mono antialiased;
   @apply flex flex-col;
-  @apply bg-stone-100 dark:bg-stone-900;
-  @apply text-black/75 dark:text-white/75;
+  @apply bg-stone-100 print:bg-white dark:bg-stone-900;
+  @apply text-black/75 print:text-black dark:text-white/75;
 }
 
 header {
@@ -30,7 +30,7 @@ header {
 }
 
 main {
-  @apply flex-1 py-32;
+  @apply flex-1 py-32 print:py-4;
 }
 
 footer {
