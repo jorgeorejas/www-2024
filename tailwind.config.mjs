@@ -12,6 +12,9 @@ export default {
         mono: ["IBM Plex Mono", ...defaultTheme.fontFamily.mono],
         handwritten: ["Caveat Variable", ...defaultTheme.fontFamily.mono],
       },
+      colors: {
+        "international-orange": "#FF4F00",
+      },
     },
   },
   plugins: [require("@tailwindcss/typography")],
