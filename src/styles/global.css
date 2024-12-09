@@ -54,3 +54,7 @@ article {
     @apply decoration-black/25 dark:decoration-white/50;
   }
 }
+
+::selection {
+  @apply text-black bg-international-orange;
+}
