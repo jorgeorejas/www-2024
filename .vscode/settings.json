@@ -1,0 +1,13 @@
+{
+  // Config for VsCode Tailwind CSS IntelliSense extension for React
+
+  // Type hints for className and class attributes
+  "tailwindCSS.classAttributes": ["class", "className"],
+  // Type hints for variables and properties ending with *className
+  "tailwindCSS.experimental.classRegex": [
+    ["\\b\\w+[cC]lassName\\s*=\\s*[\"']([^\"']*)[\"']"],
+    ["\\b\\w+[cC]lassName\\s*=\\s*`([^`]*)`"],
+    ["[\\w]+[cC]lassName[\"']?\\s*:\\s*[\"']([^\"']*)[\"']"],
+    ["[\\w]+[cC]lassName[\"']?\\s*:\\s*`([^`]*)`"]
+  ]
+}
