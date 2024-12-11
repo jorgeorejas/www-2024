@@ -15,6 +15,9 @@ export default {
       colors: {
         "international-orange": "#FF4F00",
       },
+      margin: {
+        full: "100%",
+      },
     },
   },
   plugins: [require("@tailwindcss/typography")],

@@ -1,5 +1,6 @@
 ---
 import Container from "@components/Container.astro";
+import Correction from "@components/Correction.astro";
 import FormattedDate from "@components/FormattedDate.astro";
 import Link from "@components/Link.astro";
 import Nav from "@components/Nav.astro";
@@ -42,9 +43,19 @@ const { Content } = await project.render();
           {readingTime(project.body)}
         </div>
       </div>
-      <div class="text-2xl font-semibold text-black font-serif dark:text-white">
-        {project.data.title}
-      </div>
+      {
+        project.data.titleCorrection ? (
+          <Correction text={project.data.titleCorrection}>
+            <div class="text-2xl font-semibold font-serif text-black dark:text-white">
+              {project.data.title}
+            </div>
+          </Correction>
+        ) : (
+          <div class="text-2xl font-semibold font-serif text-black dark:text-white">
+            {project.data.title}
+          </div>
+        )
+      }
       {
         (project.data.demoURL || project.data.repoURL) && (
           <nav class=" flex gap-1">

@@ -56,5 +56,5 @@ article {
 }
 
 ::selection {
-  @apply text-black bg-international-orange;
+  @apply text-black bg-international-orange/80;
 }

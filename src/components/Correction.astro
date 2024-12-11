@@ -3,20 +3,28 @@ import { cn } from "@lib/utils";
 
 type Props = {
   color?: "blue" | "red" | "green" | "black" | "orange";
+  rotate?: boolean;
   text: string;
 };
 
-const { color = "blue", text } = Astro.props;
+const { color = "blue", rotate = false, text } = Astro.props;
 ---
 
-<span class="flex flex-col items-center">
+<span class="flex flex-col relative">
   <span
-    class={cn("font-handwritten", {
-      "text-international-orange": color === "orange",
-      "text-red-500": color === "red",
-      "text-green-700": color === "green",
-      "text-blue-800": color === "blue",
-    })}
+    class={cn(
+      "font-handwritten font-bold",
+      "absolute -top-4 whitespace-nowrap",
+      {
+        "-rotate-6": rotate,
+      },
+      {
+        "text-international-orange": color === "orange",
+        "text-red-500": color === "red",
+        "text-green-700": color === "green",
+        "text-blue-800": color === "blue",
+      },
+    )}
   >
     {text}
   </span>

@@ -1,0 +1,25 @@
+---
+title: "Aramo"
+titleCorrection: "Aramo V2"
+description: "Escape to destinations less than 4h away, no vacation days needed. Fly on friday be back by Monday, get more unforgettable experiences!"
+date: "10/22/2024"
+---
+
+**Aramo: Travel Without Losing Vacation Days**
+
+Have you ever wanted to escape for a weekend but felt overwhelmed by the planning?
+
+Aramo is the solution. We’re a travel platform designed to maximize your free time. We focus on destinations within 3 hours by plane or 4 hours by train, with departures on Friday afternoons and returns on Sunday evenings.
+
+Our unique offering:
+
+1. ⁠An annual calendar integrated with weekends and holidays in your city.
+2. ⁠Pre-selected destinations and hotels for a hassle-free experience.
+3. ⁠No date filters: discover travel opportunities all year round.
+4. ⁠Enhanced experiences for long weekends, making the most of holiday breaks.
+
+Aramo transforms weekends into mini-vacations, letting you explore new cities without sacrificing workdays.
+
+Imagine leaving work on Friday and having dinner in Rome that same evening, enjoying the entire weekend, and being back home Sunday, ready for work on Monday. That’s Aramo.
+
+With Aramo, we don’t just sell trips; we sell time and unforgettable experiences. Will you join us in revolutionizing weekend travel?
