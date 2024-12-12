@@ -5,12 +5,20 @@ type Props = {
   color?: "blue" | "red" | "green" | "black" | "orange";
   rotate?: boolean;
   text: string;
+  textClass?: string;
+  class?: string;
 };
 
-const { color = "blue", rotate = false, text } = Astro.props;
+const {
+  color = "blue",
+  rotate = false,
+  text,
+  textClass,
+  class: correctionClass = "",
+} = Astro.props;
 ---
 
-<span class="flex flex-col relative">
+<span class={cn("flex flex-col relative", correctionClass)}>
   <span
     class={cn(
       "font-handwritten font-bold",
@@ -24,6 +32,7 @@ const { color = "blue", rotate = false, text } = Astro.props;
         "text-green-700": color === "green",
         "text-blue-800": color === "blue",
       },
+      textClass,
     )}
   >
     {text}

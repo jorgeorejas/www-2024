@@ -36,7 +36,7 @@ const { Content } = await post.render();
         ]}
       />
     </div>
-    <div class="space-y-2 my-10">
+    <div class="space-y-4 my-10">
       <div class="flex items-center gap-1.5">
         <div class="font-base text-sm">
           <FormattedDate date={post.data.date} />
@@ -48,7 +48,10 @@ const { Content } = await post.render();
       </div>
       {
         post.data.titleCorrection ? (
-          <Correction text={post.data.titleCorrection}>
+          <Correction
+            text={post.data.titleCorrection}
+            textClass="text-2xl -top-6"
+          >
             <div class="text-2xl font-semibold font-serif text-black dark:text-white">
               {post.data.title}
             </div>
