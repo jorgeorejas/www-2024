@@ -6,6 +6,7 @@ html {
   overflow-y: scroll;
   color-scheme: light;
   background-image: url("/noise.svg");
+  background-repeat: repeat;
 }
 
 html.dark {
@@ -20,7 +21,7 @@ body {
 body {
   @apply font-mono antialiased;
   @apply flex flex-col;
-  @apply bg-stone-100 dark:bg-stone-900;
+  /* @apply bg-stone-100 dark:bg-stone-900; */
   @apply text-black/75 dark:text-white/75;
 }
 
