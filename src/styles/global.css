@@ -5,8 +5,7 @@
 html {
   overflow-y: scroll;
   color-scheme: light;
-  background-image: url("/noise.svg");
-  background-repeat: repeat;
+  background-color: #fafafa;
 }
 
 html.dark {
