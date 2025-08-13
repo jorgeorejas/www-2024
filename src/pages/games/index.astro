@@ -13,6 +13,14 @@ const games = (await getCollection("games"))
 // Static games list for games that have custom pages
 const staticGames = [
   {
+    title: "Klondike Solitaire",
+    description: "Classic Klondike Solitaire with Easy (1 card) and Hard (3 cards) difficulty modes.",
+    href: "/games/solitaire",
+    date: new Date("2025-08-13"),
+    difficulty: "Easy/Hard",
+    category: "Card Game"
+  },
+  {
     title: "Conway's Game of Life",
     description: "A mesmerizing cellular automaton where simple rules create complex, beautiful patterns.",
     href: "/games/game-of-life",
