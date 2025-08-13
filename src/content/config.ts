@@ -34,4 +34,17 @@ const projects = defineCollection({
   }),
 });
 
-export const collections = { blog, work, projects };
+const games = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string(),
+    titleCorrection: z.string().optional(),
+    description: z.string(),
+    date: z.coerce.date(),
+    draft: z.boolean().optional(),
+    difficulty: z.enum(["Easy", "Medium", "Hard"]).optional(),
+    category: z.string().optional(),
+  }),
+});
+
+export const collections = { blog, work, projects, games };

@@ -20,6 +20,11 @@ const projects = (await getCollection("projects"))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, SITE.NUM_PROJECTS_ON_HOMEPAGE);
 
+const games = (await getCollection("games"))
+  .filter((game) => !game.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, SITE.NUM_GAMES_ON_HOMEPAGE);
+
 const allwork = (await getCollection("work"))
   .sort(
     (a, b) =>
@@ -86,6 +91,29 @@ const work = await Promise.all(
             ))
           }
         </ul>
+      </section>
+
+      <section class="space-y-6">
+        <div class="flex flex-wrap gap-y-2 items-center justify-between">
+          <h5 class="font-semibold text-black font-serif dark:text-white">
+            Games
+          </h5>
+          <Link href="/games"> See all games </Link>
+        </div>
+        <ul class="flex flex-col gap-4">
+          {
+            games.map((game) => (
+              <li>
+                <ArrowCard entry={game} />
+              </li>
+            ))
+          }
+        </ul>
+        {games.length === 0 && (
+          <p class="text-sm text-black/50 dark:text-white/50">
+            Ad-free games coming soon! Made for grandma and everyone who just wants to play.
+          </p>
+        )}
       </section>
 
       <section class="space-y-6">

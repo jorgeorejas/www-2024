@@ -1,0 +1,30 @@
+---
+import Container from "@components/Container.astro";
+import Nav from "@components/Nav.astro";
+import PageLayout from "@layouts/PageLayout.astro";
+import GameOfLifeComponent from "@components/games/GameOfLife.tsx";
+---
+
+<PageLayout 
+  title="Conway's Game of Life" 
+  description="A mesmerizing cellular automaton where simple rules create complex, beautiful patterns."
+>
+  <Container>
+    <div class="space-y-2">
+      <Nav
+        breadCrumbsItems={[
+          { href: "/games", label: "Games" },
+          { href: "/games/game-of-life", label: "Conway's Game of Life" },
+        ]}
+      />
+    </div>
+    
+    <div class="my-10">
+      <div class="text-2xl font-semibold font-serif text-black dark:text-white mb-8">
+        Conway's Game of Life
+      </div>
+      
+      <GameOfLifeComponent client:only="react" />
+    </div>
+  </Container>
+</PageLayout>
