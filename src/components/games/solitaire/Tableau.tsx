@@ -2,24 +2,30 @@ import React from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import Card from './Card';
 import type { Card as CardType, DragData, DropData } from './types';
-import { getMovableSequence } from './utils';
+import { getMovableSequence, canPlaceOnTableau } from './utils';
 
 interface TableauProps {
   tableau: CardType[][];
   onCardSelect?: (card: CardType, dragData: DragData) => void;
   onCardDrop?: (targetIndex: number) => void;
   selectedCardId?: string;
+  isDragging?: boolean;
+  draggedCard?: CardType | null;
+  isEasyMode?: boolean;
 }
 
 const Tableau: React.FC<TableauProps> = ({
   tableau,
   onCardSelect,
   onCardDrop,
-  selectedCardId
+  selectedCardId,
+  isDragging = false,
+  draggedCard = null,
+  isEasyMode = false
 }) => {
   return (
     <div className="flex flex-col items-center gap-4">
-      <div className="text-xs text-stone select-none-500 dark:text-stone-400 font-mono select-none font-medium">
+      <div className="text-xs text-stone-500 dark:text-stone-400 font-mono select-none font-medium">
         Tableau
       </div>
       
@@ -33,6 +39,9 @@ const Tableau: React.FC<TableauProps> = ({
             onCardSelect={onCardSelect}
             onCardDrop={onCardDrop}
             selectedCardId={selectedCardId}
+            isDragging={isDragging}
+            draggedCard={draggedCard}
+            isEasyMode={isEasyMode}
           />
           ))}
         </div>
@@ -47,6 +56,9 @@ interface TableauColumnProps {
   onCardSelect?: (card: CardType, dragData: DragData) => void;
   onCardDrop?: (targetIndex: number) => void;
   selectedCardId?: string;
+  isDragging?: boolean;
+  draggedCard?: CardType | null;
+  isEasyMode?: boolean;
 }
 
 const TableauColumn: React.FC<TableauColumnProps> = ({
@@ -54,7 +66,10 @@ const TableauColumn: React.FC<TableauColumnProps> = ({
   colIndex,
   onCardSelect,
   onCardDrop,
-  selectedCardId
+  selectedCardId,
+  isDragging = false,
+  draggedCard = null,
+  isEasyMode = false
 }) => {
   const { isOver, setNodeRef } = useDroppable({
     id: `tableau-${colIndex}`,
@@ -66,6 +81,10 @@ const TableauColumn: React.FC<TableauColumnProps> = ({
 
   const isEmpty = pile.length === 0;
   const CARD_OFFSET = 18; // Smaller offset for mobile, will use responsive spacing
+  
+  // Check if this tableau column can accept the dragged card (only in easy mode)
+  const canAcceptDraggedCard = isEasyMode && isDragging && draggedCard && canPlaceOnTableau(draggedCard, pile);
+  const shouldHighlight = canAcceptDraggedCard && !isOver;
 
   return (
     <div 
@@ -83,6 +102,7 @@ const TableauColumn: React.FC<TableauColumnProps> = ({
             cursor-pointer
             transition-all duration-200
             ${isOver ? 'border-stone-400 bg-stone-50 dark:bg-stone-800/20' : ''}
+            ${shouldHighlight ? 'border-green-400 bg-green-50 dark:bg-green-900/20 shadow-lg' : ''}
           `}
           style={{ aspectRatio: '2/3' }}
           onClick={() => onCardDrop?.(colIndex)}
@@ -145,6 +165,17 @@ const TableauColumn: React.FC<TableauColumnProps> = ({
               />
             );
           })}
+          
+          {/* Highlight zone indicator for valid drops in easy mode */}
+          {shouldHighlight && (
+            <div 
+              className="absolute inset-x-0 rounded-lg border-2 border-green-400 bg-green-50 dark:bg-green-900/20 w-full h-24 max-w-16 shadow-lg"
+              style={{
+                top: `${pile.length * CARD_OFFSET}px`,
+                aspectRatio: '2/3'
+              }}
+            />
+          )}
           
           {/* Drop zone indicator for non-empty piles */}
           {isOver && (

@@ -2,19 +2,26 @@ import React from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import Card from './Card';
 import type { Card as CardType, DropData } from './types';
+import { canPlaceOnFoundation } from './utils';
 
 interface FoundationProps {
   foundations: CardType[][];
   onCardDrop?: (targetIndex: number) => void;
+  isDragging?: boolean;
+  draggedCard?: CardType | null;
+  isEasyMode?: boolean;
 }
 
 const Foundation: React.FC<FoundationProps> = ({
   foundations,
-  onCardDrop
+  onCardDrop,
+  isDragging = false,
+  draggedCard = null,
+  isEasyMode = false
 }) => {
   return (
     <div className="flex flex-col items-center gap-4">
-      <div className="text-xs text-stone select-none-500 dark:text-stone-400 font-mono select-none font-medium">
+      <div className="text-xs text-stone-500 dark:text-stone-400 font-mono select-none font-medium">
         Foundations
       </div>
       
@@ -25,6 +32,9 @@ const Foundation: React.FC<FoundationProps> = ({
             foundation={foundation} 
             index={index}
             onCardDrop={onCardDrop}
+            isDragging={isDragging}
+            draggedCard={draggedCard}
+            isEasyMode={isEasyMode}
           />
         ))}
       </div>
@@ -36,12 +46,18 @@ interface FoundationPileProps {
   foundation: CardType[];
   index: number;
   onCardDrop?: (targetIndex: number) => void;
+  isDragging?: boolean;
+  draggedCard?: CardType | null;
+  isEasyMode?: boolean;
 }
 
 const FoundationPile: React.FC<FoundationPileProps> = ({
   foundation,
   index,
-  onCardDrop
+  onCardDrop,
+  isDragging = false,
+  draggedCard = null,
+  isEasyMode = false
 }) => {
   const { isOver, setNodeRef } = useDroppable({
     id: `foundation-${index}`,
@@ -52,6 +68,10 @@ const FoundationPile: React.FC<FoundationPileProps> = ({
   });
 
   const topCard = foundation.length > 0 ? foundation[foundation.length - 1] : null;
+  
+  // Check if this foundation can accept the dragged card (only in easy mode)
+  const canAcceptDraggedCard = isEasyMode && isDragging && draggedCard && canPlaceOnFoundation(draggedCard, foundation);
+  const shouldHighlight = canAcceptDraggedCard && !isOver;
 
   return (
     <div 
@@ -70,6 +90,7 @@ const FoundationPile: React.FC<FoundationPileProps> = ({
               flex items-center justify-center
               transition-all duration-200
               ${isOver ? 'border-stone-400 bg-stone-50 dark:bg-stone-800/20' : ''}
+              ${shouldHighlight ? 'border-green-400 bg-green-50 dark:bg-green-900/20 shadow-lg' : ''}
             `}
             style={{ aspectRatio: '2/3' }}
           >
@@ -90,6 +111,7 @@ const FoundationPile: React.FC<FoundationPileProps> = ({
             transition-all duration-200
             ${isOver ? 'scale-105' : ''}
             ${!topCard ? 'opacity-0' : ''}
+            ${shouldHighlight ? 'ring-2 ring-green-400 ring-offset-2' : ''}
           `}
         />
         

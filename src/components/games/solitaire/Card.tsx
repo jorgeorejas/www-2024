@@ -61,7 +61,7 @@ const Card: React.FC<CardProps> = ({
           rounded-lg
           ${className}
         `}
-        style={{ aspectRatio: '2/3', ...style, ...dragStyle }}
+        style={{ aspectRatio: "2/3", ...style, ...dragStyle }}
         onClick={onClick}
       />
     );
@@ -83,10 +83,11 @@ const Card: React.FC<CardProps> = ({
           cursor-pointer
           transition-all duration-200
           hover:shadow-md
+          shadow
           ${className}
         `}
         onClick={onClick}
-        style={{ aspectRatio: '2/3', ...style, ...dragStyle }}
+        style={{ aspectRatio: "2/3", ...style, ...dragStyle }}
         {...(draggable ? { ...listeners, ...attributes } : {})}
       >
         <div className="w-full h-full flex items-center justify-center">
@@ -110,22 +111,27 @@ const Card: React.FC<CardProps> = ({
         cursor-pointer
         transition-all duration-200
         hover:shadow-lg hover:scale-105
+        shadow
         ${isSelected ? "ring-2 ring-stone-500 ring-offset-2" : ""}
         ${className}
       `}
       onClick={onClick}
-      style={{ aspectRatio: '2/3', ...style, ...dragStyle }}
+      style={{ aspectRatio: "2/3", ...style, ...dragStyle }}
       {...(draggable ? { ...listeners, ...attributes } : {})}
     >
       <div className="p-1 h-full flex flex-col justify-between">
         {/* Top left rank and suit */}
-        <div className={`text-xs font-mono select-none font-bold leading-none ${colorClass}`}>
+        <div
+          className={`text-xs font-mono select-none font-bold leading-none ${colorClass}`}
+        >
           <div>{displayRank}</div>
           <div>{SUIT_SYMBOLS[card.suit]}</div>
         </div>
 
         {/* Center suit symbol */}
-        <div className={`text-2xl font-mono select-none text-center leading-none ${colorClass}`}>
+        <div
+          className={`text-2xl font-mono select-none text-center leading-none ${colorClass}`}
+        >
           {SUIT_SYMBOLS[card.suit]}
         </div>
 
