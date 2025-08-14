@@ -19,12 +19,12 @@ const Tableau: React.FC<TableauProps> = ({
 }) => {
   return (
     <div className="flex flex-col items-center gap-4">
-      <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+      <div className="text-xs text-stone select-none-500 dark:text-stone-400 font-mono select-none font-medium">
         Tableau
       </div>
       
-      <div className="w-full overflow-x-auto">
-        <div className="flex gap-1 sm:gap-2 justify-center min-w-max px-4">
+      <div className="w-full">
+        <div className="flex gap-1 justify-center w-full">
           {tableau.map((pile, colIndex) => (
           <TableauColumn
             key={colIndex}
@@ -70,23 +70,24 @@ const TableauColumn: React.FC<TableauColumnProps> = ({
   return (
     <div 
       ref={setNodeRef}
-      className="flex flex-col items-center min-h-32"
+      className="flex flex-col items-center min-h-32 flex-1"
     >
       {isEmpty ? (
         // Empty pile - only Kings can be placed
         <div 
           className={`
-            w-12 h-18 sm:w-16 sm:h-24 
-            border-2 border-dashed border-gray-300 dark:border-gray-600 
+            w-full h-24 max-w-16 
+            border-2 border-dashed border-stone-300 dark:border-stone-600 
             rounded-lg 
             flex items-center justify-center
             cursor-pointer
             transition-all duration-200
-            ${isOver ? 'border-green-400 bg-green-50 dark:bg-green-900/20' : ''}
+            ${isOver ? 'border-stone-400 bg-stone-50 dark:bg-stone-800/20' : ''}
           `}
+          style={{ aspectRatio: '2/3' }}
           onClick={() => onCardDrop?.(colIndex)}
         >
-          <div className="text-gray-400 dark:text-gray-500 text-xs font-medium">
+          <div className="text-stone-400 dark:text-stone-500 text-xs font-mono select-none font-medium">
             King
           </div>
         </div>
@@ -134,7 +135,7 @@ const TableauColumn: React.FC<TableauColumnProps> = ({
                   ${cardIndex > 0 ? 'absolute' : 'relative'}
                   transition-all duration-200
                   ${!card.faceUp ? 'hover:scale-105' : ''}
-                  ${isInSelectedSequence ? 'ring-2 ring-blue-400 ring-opacity-75' : ''}
+                  ${isInSelectedSequence ? 'ring-2 ring-stone-400 ring-opacity-75' : ''}
                 `}
                 style={
                   cardIndex > 0
@@ -148,9 +149,10 @@ const TableauColumn: React.FC<TableauColumnProps> = ({
           {/* Drop zone indicator for non-empty piles */}
           {isOver && (
             <div 
-              className="absolute inset-x-0 rounded-lg border-2 border-green-400 bg-green-100/20 dark:bg-green-400/20 w-12 h-18 sm:w-16 sm:h-24"
+              className="absolute inset-x-0 rounded-lg border-2 border-stone-400 bg-stone-100/20 dark:bg-stone-400/20 w-full h-24 max-w-16"
               style={{
-                top: `${pile.length * CARD_OFFSET}px`
+                top: `${pile.length * CARD_OFFSET}px`,
+                aspectRatio: '2/3'
               }}
             />
           )}
@@ -158,7 +160,7 @@ const TableauColumn: React.FC<TableauColumnProps> = ({
       )}
       
       {/* Column stats */}
-      <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+      <div className="mt-2 text-xs font-mono select-none text-stone-500 dark:text-stone-400">
         {pile.length > 0 && `${pile.length} cards`}
         {pile.length === 0 && 'Empty'}
       </div>

@@ -237,7 +237,7 @@ const SolitaireGame: React.FC = () => {
 
   return (
     <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div className="w-full max-w-7xl mx-auto p-4 space-y-6">
+      <div className="w-full max-w-7xl mx-auto p-4 space-y-6 select-none">
         <GameControls
           difficulty={gameState.difficulty}
           moves={gameState.moves}
@@ -254,12 +254,14 @@ const SolitaireGame: React.FC = () => {
           onFoundationDrop={handleFoundationClick}
           onTableauDrop={handleTableauClick}
           selectedCardId={selectedCard?.card.id}
+          isDragging={!!activeId}
+          draggedCard={draggedCard}
         />
         
         {/* Selected Card Info */}
         {selectedCard && !activeId && (
-          <div className="mt-4 p-3 bg-blue-100 dark:bg-blue-900/50 border border-blue-300 dark:border-blue-700 rounded-lg">
-            <p className="text-sm text-blue-800 dark:text-blue-200">
+          <div className="mt-4 p-3 bg-stone-100 dark:bg-stone-800/50 border border-stone-300 dark:border-stone-600 rounded-lg">
+            <p className="text-sm font-mono select-none text-stone-800 dark:text-stone-200">
               Selected: <span className="font-medium">{selectedCard.card.rank === 1 ? 'A' : selectedCard.card.rank === 11 ? 'J' : selectedCard.card.rank === 12 ? 'Q' : selectedCard.card.rank === 13 ? 'K' : selectedCard.card.rank}</span>
               <span className="ml-1">
                 {selectedCard.card.suit === 'hearts' ? '♥' : 
@@ -267,11 +269,11 @@ const SolitaireGame: React.FC = () => {
                  selectedCard.card.suit === 'clubs' ? '♣' : '♠'}
               </span>
               {selectedCard.dragData.cardSequence && selectedCard.dragData.cardSequence.length > 1 && (
-                <span className="ml-2 px-2 py-1 bg-blue-200 dark:bg-blue-800 rounded text-xs font-medium">
+                <span className="ml-2 px-2 py-1 bg-stone-200 dark:bg-stone-700 rounded text-xs font-medium">
                   +{selectedCard.dragData.cardSequence.length - 1} more
                 </span>
               )}
-              <span className="ml-2 text-blue-600 dark:text-blue-300">
+              <span className="ml-2 text-stone-600 dark:text-stone-400">
                 - Click a valid location to move or drag the {selectedCard.dragData.cardSequence && selectedCard.dragData.cardSequence.length > 1 ? 'sequence' : 'card'}
               </span>
             </p>

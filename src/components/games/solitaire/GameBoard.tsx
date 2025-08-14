@@ -2,7 +2,7 @@ import React from 'react';
 import StockWaste from './StockWaste';
 import Foundation from './Foundation';
 import Tableau from './Tableau';
-import type { GameState, DragData } from './types';
+import type { GameState, DragData, Card } from './types';
 
 interface GameBoardProps {
   gameState: GameState;
@@ -12,6 +12,8 @@ interface GameBoardProps {
   onFoundationDrop?: (targetIndex: number) => void;
   onTableauDrop?: (targetIndex: number) => void;
   selectedCardId?: string;
+  isDragging?: boolean;
+  draggedCard?: Card | null;
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({
@@ -21,7 +23,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
   onTableauCardSelect,
   onFoundationDrop,
   onTableauDrop,
-  selectedCardId
+  selectedCardId,
+  isDragging = false,
+  draggedCard = null
 }) => {
   return (
     <div className="w-full max-w-6xl mx-auto space-y-8">
@@ -38,6 +42,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
         <Foundation
           foundations={gameState.foundations}
           onCardDrop={onFoundationDrop}
+          isDragging={isDragging}
+          draggedCard={draggedCard}
+          isEasyMode={gameState.difficulty === 'easy'}
         />
       </div>
       
@@ -47,6 +54,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
         onCardSelect={onTableauCardSelect}
         onCardDrop={onTableauDrop}
         selectedCardId={selectedCardId}
+        isDragging={isDragging}
+        draggedCard={draggedCard}
+        isEasyMode={gameState.difficulty === 'easy'}
       />
     </div>
   );

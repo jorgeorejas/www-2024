@@ -21,10 +21,10 @@ const StockWaste: React.FC<StockWasteProps> = ({
   const hasStock = stock.length > 0;
 
   return (
-    <div className="flex gap-2 sm:gap-4">
+    <div className="flex gap-4">
       {/* Stock Pile */}
       <div className="flex flex-col items-center gap-2">
-        <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+        <div className="text-xs text-stone select-none-500 dark:text-stone-400 font-mono select-none font-medium">
           Stock
         </div>
         <Card
@@ -37,7 +37,7 @@ const StockWaste: React.FC<StockWasteProps> = ({
           `}
         />
         {hasStock && (
-          <div className="text-xs text-gray-500 dark:text-gray-400">
+          <div className="text-xs font-mono select-none text-stone-500 dark:text-stone-400">
             {stock.length} cards
           </div>
         )}
@@ -45,7 +45,7 @@ const StockWaste: React.FC<StockWasteProps> = ({
       
       {/* Waste Pile */}
       <div className="flex flex-col items-center gap-2">
-        <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+        <div className="text-xs text-stone select-none-500 dark:text-stone-400 font-mono select-none font-medium">
           Waste
         </div>
         <Card
@@ -73,7 +73,7 @@ const StockWaste: React.FC<StockWasteProps> = ({
           className="transition-all duration-200"
         />
         {waste.length > 0 && (
-          <div className="text-xs text-gray-500 dark:text-gray-400">
+          <div className="text-xs font-mono select-none text-stone-500 dark:text-stone-400">
             {waste.length} cards
           </div>
         )}

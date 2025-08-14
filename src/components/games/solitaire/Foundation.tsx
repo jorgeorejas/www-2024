@@ -14,11 +14,11 @@ const Foundation: React.FC<FoundationProps> = ({
 }) => {
   return (
     <div className="flex flex-col items-center gap-4">
-      <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+      <div className="text-xs text-stone select-none-500 dark:text-stone-400 font-mono select-none font-medium">
         Foundations
       </div>
       
-      <div className="flex gap-1 sm:gap-2">
+      <div className="flex gap-2">
         {foundations.map((foundation, index) => (
           <FoundationPile 
             key={index} 
@@ -61,16 +61,19 @@ const FoundationPile: React.FC<FoundationPileProps> = ({
       <div className="relative">
         {/* Foundation base (shows when empty) */}
         {!topCard && (
-          <div className={`
-            absolute inset-0 
-            w-12 h-18 sm:w-16 sm:h-24 
-            border-2 border-dashed border-gray-300 dark:border-gray-600 
-            rounded-lg 
-            flex items-center justify-center
-            transition-all duration-200
-            ${isOver ? 'border-green-400 bg-green-50 dark:bg-green-900/20' : ''}
-          `}>
-            <div className="text-gray-400 dark:text-gray-500 text-lg">
+          <div 
+            className={`
+              absolute inset-0 
+              w-full h-24 max-w-16 
+              border-2 border-dashed border-stone-300 dark:border-stone-600 
+              rounded-lg 
+              flex items-center justify-center
+              transition-all duration-200
+              ${isOver ? 'border-stone-400 bg-stone-50 dark:bg-stone-800/20' : ''}
+            `}
+            style={{ aspectRatio: '2/3' }}
+          >
+            <div className="text-stone-400 dark:text-stone-500 text-lg select-none">
               {index === 0 && '♠'}
               {index === 1 && '♥'}
               {index === 2 && '♦'}
@@ -92,12 +95,12 @@ const FoundationPile: React.FC<FoundationPileProps> = ({
         
         {/* Drop zone overlay */}
         {isOver && (
-          <div className="absolute inset-0 rounded-lg border-2 border-green-400 bg-green-100/20 dark:bg-green-400/20" />
+          <div className="absolute inset-0 rounded-lg border-2 border-stone-400 bg-stone-100/20 dark:bg-stone-400/20" />
         )}
       </div>
       
       {foundation.length > 0 && (
-        <div className="text-xs text-gray-500 dark:text-gray-400">
+        <div className="text-xs font-mono select-none text-stone-500 dark:text-stone-400">
           {foundation.length}/13
         </div>
       )}

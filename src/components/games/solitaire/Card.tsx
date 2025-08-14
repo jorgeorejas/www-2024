@@ -56,12 +56,12 @@ const Card: React.FC<CardProps> = ({
     return (
       <div
         className={`
-          w-12 h-18 sm:w-16 sm:h-24
-          border-2 border-dashed border-gray-300 dark:border-gray-600
+          w-full h-24 max-w-16
+          border-2 border-dashed border-stone-300 dark:border-stone-600
           rounded-lg
           ${className}
         `}
-        style={{ ...style, ...dragStyle }}
+        style={{ aspectRatio: '2/3', ...style, ...dragStyle }}
         onClick={onClick}
       />
     );
@@ -76,9 +76,9 @@ const Card: React.FC<CardProps> = ({
       <div
         ref={draggable ? setNodeRef : undefined}
         className={`
-          w-12 h-18 sm:w-16 sm:h-24
-          bg-gradient-to-br from-blue-500 to-blue-700
-          border border-gray-300 dark:border-gray-600
+          w-full h-24 max-w-16
+          bg-gradient-to-br from-stone-600 to-stone-800
+          border border-stone-300 dark:border-stone-600
           rounded-lg
           cursor-pointer
           transition-all duration-200
@@ -86,11 +86,11 @@ const Card: React.FC<CardProps> = ({
           ${className}
         `}
         onClick={onClick}
-        style={{ ...style, ...dragStyle }}
+        style={{ aspectRatio: '2/3', ...style, ...dragStyle }}
         {...(draggable ? { ...listeners, ...attributes } : {})}
       >
         <div className="w-full h-full flex items-center justify-center">
-          <div className="text-xs text-white opacity-50 font-mono">
+          <div className="text-xs text-white opacity-50 font-mono select-none">
             ♠♥♦♣
           </div>
         </div>
@@ -103,35 +103,35 @@ const Card: React.FC<CardProps> = ({
     <div
       ref={draggable ? setNodeRef : undefined}
       className={`
-        w-12 h-18 sm:w-16 sm:h-24
-        bg-white dark:bg-gray-100
-        border border-gray-300 dark:border-gray-400
+        w-full h-24 max-w-16
+        bg-white dark:bg-stone-100
+        border border-stone-300 dark:border-stone-400
         rounded-lg
         cursor-pointer
         transition-all duration-200
         hover:shadow-lg hover:scale-105
-        ${isSelected ? "ring-2 ring-blue-500 ring-offset-2" : ""}
+        ${isSelected ? "ring-2 ring-stone-500 ring-offset-2" : ""}
         ${className}
       `}
       onClick={onClick}
-      style={{ ...style, ...dragStyle }}
+      style={{ aspectRatio: '2/3', ...style, ...dragStyle }}
       {...(draggable ? { ...listeners, ...attributes } : {})}
     >
       <div className="p-1 h-full flex flex-col justify-between">
         {/* Top left rank and suit */}
-        <div className={`text-xs font-bold leading-none ${colorClass}`}>
+        <div className={`text-xs font-mono select-none font-bold leading-none ${colorClass}`}>
           <div>{displayRank}</div>
           <div>{SUIT_SYMBOLS[card.suit]}</div>
         </div>
 
         {/* Center suit symbol */}
-        <div className={`text-2xl text-center leading-none ${colorClass}`}>
+        <div className={`text-2xl font-mono select-none text-center leading-none ${colorClass}`}>
           {SUIT_SYMBOLS[card.suit]}
         </div>
 
         {/* Bottom right rank and suit (rotated) */}
         <div
-          className={`text-xs font-bold leading-none ${colorClass} text-right transform rotate-180`}
+          className={`text-xs font-mono select-none font-bold leading-none ${colorClass} text-right transform rotate-180`}
         >
           <div>{displayRank}</div>
           <div>{SUIT_SYMBOLS[card.suit]}</div>
