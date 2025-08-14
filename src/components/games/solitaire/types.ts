@@ -21,6 +21,7 @@ export type DragData = {
   sourceType: 'tableau' | 'waste' | 'foundation';
   sourceIndex: number;
   cardIndex?: number; // For tableau cards
+  cardSequence?: Card[]; // For multi-card moves from tableau
 };
 
 export type DropData = {

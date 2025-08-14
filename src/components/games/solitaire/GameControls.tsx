@@ -19,7 +19,7 @@ const GameControls: React.FC<GameControlsProps> = ({
     <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
       {/* Game Title and Difficulty */}
       <div className="flex flex-col sm:flex-row items-center gap-4">
-        <h2 className="text-2xl font-serif font-semibold text-black dark:text-white">
+        <h2 className="text-xl sm:text-2xl font-serif font-semibold text-black dark:text-white">
           Klondike Solitaire
         </h2>
         

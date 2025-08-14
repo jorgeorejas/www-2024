@@ -1,6 +1,6 @@
 import React from 'react';
 import Card from './Card';
-import { Card as CardType, DragData } from './types';
+import type { Card as CardType, DragData } from './types';
 
 interface StockWasteProps {
   stock: CardType[];
@@ -21,7 +21,7 @@ const StockWaste: React.FC<StockWasteProps> = ({
   const hasStock = stock.length > 0;
 
   return (
-    <div className="flex gap-4">
+    <div className="flex gap-2 sm:gap-4">
       {/* Stock Pile */}
       <div className="flex flex-col items-center gap-2">
         <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">

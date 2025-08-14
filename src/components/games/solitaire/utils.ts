@@ -1,4 +1,4 @@
-import { Card, GameState } from './types';
+import type { Card, GameState } from './types';
 
 // Card utilities
 export const SUITS: Card['suit'][] = ['hearts', 'diamonds', 'clubs', 'spades'];
@@ -122,4 +122,54 @@ export const isRedCard = (card: Card): boolean => {
 // Get card color class for Tailwind
 export const getCardColorClass = (card: Card): string => {
   return isRedCard(card) ? 'text-red-500' : 'text-black dark:text-white';
+};
+
+// Check if a sequence of cards is valid (descending rank, alternating colors)
+export const isValidCardSequence = (cards: Card[]): boolean => {
+  if (cards.length <= 1) return true;
+  
+  for (let i = 0; i < cards.length - 1; i++) {
+    const currentCard = cards[i];
+    const nextCard = cards[i + 1];
+    
+    // Check if ranks are descending by 1
+    if (currentCard.rank !== nextCard.rank + 1) return false;
+    
+    // Check if colors alternate
+    const currentColor = SUIT_COLORS[currentCard.suit];
+    const nextColor = SUIT_COLORS[nextCard.suit];
+    if (currentColor === nextColor) return false;
+  }
+  
+  return true;
+};
+
+// Get the longest valid moveable sequence starting from a given card index
+export const getMovableSequence = (pile: Card[], startIndex: number): Card[] => {
+  if (startIndex >= pile.length) return [];
+  
+  const sequence: Card[] = [];
+  for (let i = startIndex; i < pile.length; i++) {
+    const card = pile[i];
+    if (!card.faceUp) break; // Stop at face-down cards
+    
+    sequence.push(card);
+    
+    // Check if the current sequence is still valid
+    if (!isValidCardSequence(sequence)) {
+      sequence.pop(); // Remove the invalid card
+      break;
+    }
+  }
+  
+  return sequence;
+};
+
+// Check if a card sequence can be placed on a tableau pile
+export const canPlaceSequenceOnTableau = (sequence: Card[], tableauPile: Card[]): boolean => {
+  if (sequence.length === 0) return false;
+  
+  // Use the first card of the sequence (the one being placed)
+  const firstCard = sequence[0];
+  return canPlaceOnTableau(firstCard, tableauPile);
 };

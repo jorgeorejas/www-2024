@@ -1,7 +1,7 @@
-import React from 'react';
-import { useDraggable } from '@dnd-kit/core';
-import { Card as CardType, DragData } from './types';
-import { SUIT_SYMBOLS, getCardDisplayRank, getCardColorClass } from './utils';
+import React from "react";
+import { useDraggable } from "@dnd-kit/core";
+import type { Card as CardType, DragData } from "./types";
+import { SUIT_SYMBOLS, getCardDisplayRank, getCardColorClass } from "./utils";
 
 interface CardProps {
   card: CardType | null;
@@ -12,19 +12,17 @@ interface CardProps {
   draggable?: boolean;
   dragData?: DragData;
   isSelected?: boolean;
-  isDragging?: boolean;
 }
 
 const Card: React.FC<CardProps> = ({
   card,
   faceUp = true,
   onClick,
-  className = '',
+  className = "",
   style,
   draggable = false,
   dragData,
   isSelected = false,
-  isDragging = false
 }) => {
   const {
     attributes,
@@ -33,9 +31,9 @@ const Card: React.FC<CardProps> = ({
     transform,
     isDragging: dndIsDragging,
   } = useDraggable({
-    id: card?.id || 'empty',
+    id: card?.id || "empty",
     data: dragData,
-    disabled: !draggable || !card?.faceUp
+    disabled: !draggable || !card?.faceUp,
   });
 
   const transformStyle = transform
@@ -44,17 +42,26 @@ const Card: React.FC<CardProps> = ({
       }
     : undefined;
 
+  // Disable native drag ghost - hide the original element when dragging
+  const dragStyle = dndIsDragging
+    ? {
+        ...transformStyle,
+        opacity: 0,
+        visibility: "hidden" as const,
+      }
+    : transformStyle;
+
   // Empty card slot
   if (!card) {
     return (
-      <div 
+      <div
         className={`
-          w-16 h-24 
-          border-2 border-dashed border-gray-300 dark:border-gray-600 
-          rounded-lg 
+          w-12 h-18 sm:w-16 sm:h-24
+          border-2 border-dashed border-gray-300 dark:border-gray-600
+          rounded-lg
           ${className}
-        `} 
-        style={style}
+        `}
+        style={{ ...style, ...dragStyle }}
         onClick={onClick}
       />
     );
@@ -66,21 +73,20 @@ const Card: React.FC<CardProps> = ({
   // Face-down card
   if (!faceUp || !card.faceUp) {
     return (
-      <div 
+      <div
         ref={draggable ? setNodeRef : undefined}
         className={`
-          w-16 h-24 
-          bg-gradient-to-br from-blue-500 to-blue-700 
-          border border-gray-300 dark:border-gray-600 
-          rounded-lg 
-          cursor-pointer 
+          w-12 h-18 sm:w-16 sm:h-24
+          bg-gradient-to-br from-blue-500 to-blue-700
+          border border-gray-300 dark:border-gray-600
+          rounded-lg
+          cursor-pointer
           transition-all duration-200
           hover:shadow-md
-          ${isDragging || dndIsDragging ? 'opacity-50 scale-105' : ''}
           ${className}
         `}
         onClick={onClick}
-        style={{ ...style, ...transformStyle }}
+        style={{ ...style, ...dragStyle }}
         {...(draggable ? { ...listeners, ...attributes } : {})}
       >
         <div className="w-full h-full flex items-center justify-center">
@@ -94,22 +100,21 @@ const Card: React.FC<CardProps> = ({
 
   // Face-up card
   return (
-    <div 
+    <div
       ref={draggable ? setNodeRef : undefined}
       className={`
-        w-16 h-24 
-        bg-white dark:bg-gray-100 
-        border border-gray-300 dark:border-gray-400 
-        rounded-lg 
-        cursor-pointer 
+        w-12 h-18 sm:w-16 sm:h-24
+        bg-white dark:bg-gray-100
+        border border-gray-300 dark:border-gray-400
+        rounded-lg
+        cursor-pointer
         transition-all duration-200
         hover:shadow-lg hover:scale-105
-        ${isSelected ? 'ring-2 ring-blue-500 ring-offset-2' : ''}
-        ${isDragging || dndIsDragging ? 'opacity-50 scale-110 z-50' : ''}
+        ${isSelected ? "ring-2 ring-blue-500 ring-offset-2" : ""}
         ${className}
       `}
       onClick={onClick}
-      style={{ ...style, ...transformStyle }}
+      style={{ ...style, ...dragStyle }}
       {...(draggable ? { ...listeners, ...attributes } : {})}
     >
       <div className="p-1 h-full flex flex-col justify-between">
@@ -118,14 +123,16 @@ const Card: React.FC<CardProps> = ({
           <div>{displayRank}</div>
           <div>{SUIT_SYMBOLS[card.suit]}</div>
         </div>
-        
+
         {/* Center suit symbol */}
         <div className={`text-2xl text-center leading-none ${colorClass}`}>
           {SUIT_SYMBOLS[card.suit]}
         </div>
-        
+
         {/* Bottom right rank and suit (rotated) */}
-        <div className={`text-xs font-bold leading-none ${colorClass} text-right transform rotate-180`}>
+        <div
+          className={`text-xs font-bold leading-none ${colorClass} text-right transform rotate-180`}
+        >
           <div>{displayRank}</div>
           <div>{SUIT_SYMBOLS[card.suit]}</div>
         </div>
