@@ -1,4 +1,3 @@
-import Card from "./card";
 import Tableau from "./tableau";
 import StockWaste from "./stock-waste";
 import Foundations from "./foundations";

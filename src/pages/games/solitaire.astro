@@ -1,9 +1,8 @@
 ---
 import Container from "@components/Container.astro";
+import SolitaireGame from "@components/games/solitaire";
 import Nav from "@components/Nav.astro";
 import PageLayout from "@layouts/PageLayout.astro";
-import SolitaireComponent from "@components/games/Solitaire.tsx";
-import SolitaireNew from "@components/games/solitaire-new";
 ---
 
 <PageLayout
@@ -21,8 +20,7 @@ import SolitaireNew from "@components/games/solitaire-new";
     </div>
 
     <div class="my-10">
-      <SolitaireNew client:load />
-      <SolitaireComponent client:only="react" />
+      <SolitaireGame client:load />
     </div>
   </Container>
 </PageLayout>

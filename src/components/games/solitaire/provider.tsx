@@ -1,5 +1,11 @@
-import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
-import type { GameState, Options, MoveHint } from './types.js';
+import React, {
+  createContext,
+  useContext,
+  useReducer,
+  useEffect,
+  useCallback,
+} from "react";
+import type { GameState, Options, MoveHint } from "./types.js";
 import {
   newGame,
   tick,
@@ -12,18 +18,20 @@ import {
   legalMoves,
   hint,
   autoMoveSafe,
+  autoMoveAny,
+  canAutoMove,
   undo,
   redo,
   setOptions,
   toSaveBlob,
   fromSaveBlob,
   SAVE_KEY,
-} from './engine.js';
+} from "./engine.js";
 
 interface SolitaireContextValue {
   gameState: GameState;
   isLoading: boolean;
-  
+
   // Game actions
   startNewGame: (seed?: string, options?: Partial<Options>) => void;
   draw: () => void;
@@ -36,11 +44,15 @@ interface SolitaireContextValue {
   undo: () => void;
   redo: () => void;
   updateOptions: (options: Partial<Options>) => void;
-  
+
   // Helpers
   getLegalMoves: () => MoveHint[];
   getHint: () => MoveHint | null;
-  
+
+  // Computed properties
+  canMoveWasteToFoundation: boolean;
+  canAutoMove: boolean;
+
   // Persistence
   saveGame: () => void;
   loadGame: () => boolean;
@@ -50,111 +62,123 @@ interface SolitaireContextValue {
 const SolitaireContext = createContext<SolitaireContextValue | null>(null);
 
 type GameAction =
-  | { type: 'SET_GAME_STATE'; payload: GameState }
-  | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'TICK' }
-  | { type: 'DRAW' }
-  | { type: 'RECYCLE' }
-  | { type: 'MOVE_WASTE_TO_FOUNDATION' }
-  | { type: 'MOVE_WASTE_TO_TABLEAU'; payload: { to: number } }
-  | { type: 'MOVE_TABLEAU_TO_FOUNDATION'; payload: { from: number } }
-  | { type: 'MOVE_TABLEAU_TO_TABLEAU'; payload: { from: number; to: number; count: number } }
-  | { type: 'AUTO_MOVE' }
-  | { type: 'UNDO' }
-  | { type: 'REDO' }
-  | { type: 'UPDATE_OPTIONS'; payload: Partial<Options> };
+  | { type: "SET_GAME_STATE"; payload: GameState }
+  | { type: "SET_LOADING"; payload: boolean }
+  | { type: "TICK" }
+  | { type: "DRAW" }
+  | { type: "RECYCLE" }
+  | { type: "MOVE_WASTE_TO_FOUNDATION" }
+  | { type: "MOVE_WASTE_TO_TABLEAU"; payload: { to: number } }
+  | { type: "MOVE_TABLEAU_TO_FOUNDATION"; payload: { from: number } }
+  | {
+      type: "MOVE_TABLEAU_TO_TABLEAU";
+      payload: { from: number; to: number; count: number };
+    }
+  | { type: "AUTO_MOVE" }
+  | { type: "UNDO" }
+  | { type: "REDO" }
+  | { type: "UPDATE_OPTIONS"; payload: Partial<Options> };
 
 interface GameStateWithLoading {
   gameState: GameState;
   isLoading: boolean;
 }
 
-function gameReducer(state: GameStateWithLoading, action: GameAction): GameStateWithLoading {
+function gameReducer(
+  state: GameStateWithLoading,
+  action: GameAction,
+): GameStateWithLoading {
   switch (action.type) {
-    case 'SET_GAME_STATE':
+    case "SET_GAME_STATE":
       return {
         ...state,
         gameState: action.payload,
         isLoading: false,
       };
-    
-    case 'SET_LOADING':
+
+    case "SET_LOADING":
       return {
         ...state,
         isLoading: action.payload,
       };
-    
-    case 'TICK':
+
+    case "TICK":
       return {
         ...state,
         gameState: tick(state.gameState),
       };
-    
-    case 'DRAW':
+
+    case "DRAW":
       return {
         ...state,
         gameState: autoMoveSafe(drawFromStock(state.gameState)),
       };
-    
-    case 'RECYCLE':
+
+    case "RECYCLE":
       return {
         ...state,
         gameState: autoMoveSafe(recycleStock(state.gameState)),
       };
-    
-    case 'MOVE_WASTE_TO_FOUNDATION':
+
+    case "MOVE_WASTE_TO_FOUNDATION":
       return {
         ...state,
         gameState: autoMoveSafe(moveWasteToFoundation(state.gameState)),
       };
-    
-    case 'MOVE_WASTE_TO_TABLEAU':
+
+    case "MOVE_WASTE_TO_TABLEAU":
       return {
         ...state,
-        gameState: autoMoveSafe(moveWasteToTableau(state.gameState, action.payload.to)),
+        gameState: autoMoveSafe(
+          moveWasteToTableau(state.gameState, action.payload.to),
+        ),
       };
-    
-    case 'MOVE_TABLEAU_TO_FOUNDATION':
+
+    case "MOVE_TABLEAU_TO_FOUNDATION":
       return {
         ...state,
-        gameState: autoMoveSafe(moveTableauToFoundation(state.gameState, action.payload.from)),
+        gameState: autoMoveSafe(
+          moveTableauToFoundation(state.gameState, action.payload.from),
+        ),
       };
-    
-    case 'MOVE_TABLEAU_TO_TABLEAU':
+
+    case "MOVE_TABLEAU_TO_TABLEAU":
       return {
         ...state,
-        gameState: autoMoveSafe(moveTableauToTableau(
-          state.gameState,
-          action.payload.from,
-          action.payload.to,
-          action.payload.count
-        )),
+        gameState: autoMoveSafe(
+          moveTableauToTableau(
+            state.gameState,
+            action.payload.from,
+            action.payload.to,
+            action.payload.count,
+          ),
+        ),
       };
-    
-    case 'AUTO_MOVE':
+
+    case "AUTO_MOVE":
       return {
         ...state,
-        gameState: autoMoveSafe(state.gameState),
+        gameState: autoMoveAny(state.gameState),
       };
-    
-    case 'UNDO':
+
+    case "UNDO":
       return {
         ...state,
         gameState: undo(state.gameState),
       };
-    
-    case 'REDO':
+
+    case "REDO":
       return {
         ...state,
         gameState: redo(state.gameState),
       };
-    
-    case 'UPDATE_OPTIONS':
+
+    case "UPDATE_OPTIONS":
       return {
         ...state,
         gameState: setOptions(state.gameState, action.payload),
       };
-    
+
     default:
       return state;
   }
@@ -166,10 +190,10 @@ interface SolitaireProviderProps {
   autoLoad?: boolean;
 }
 
-export function SolitaireProvider({ 
-  children, 
-  autoSave = true, 
-  autoLoad = true 
+export function SolitaireProvider({
+  children,
+  autoSave = true,
+  autoLoad = true,
 }: SolitaireProviderProps) {
   const [state, dispatch] = useReducer(gameReducer, {
     gameState: newGame(),
@@ -184,11 +208,11 @@ export function SolitaireProvider({
           const blob = toSaveBlob(gameState, Date.now());
           localStorage.setItem(SAVE_KEY, JSON.stringify(blob));
         } catch (error) {
-          console.warn('Failed to save game:', error);
+          console.warn("Failed to save game:", error);
         }
       }
     }, 200),
-    [autoSave]
+    [autoSave],
   );
 
   // Save game whenever state changes (debounced)
@@ -200,9 +224,13 @@ export function SolitaireProvider({
 
   // Timer effect
   useEffect(() => {
-    if (state.gameState.startedAt && !state.gameState.won && !state.gameState.lost) {
+    if (
+      state.gameState.startedAt &&
+      !state.gameState.won &&
+      !state.gameState.lost
+    ) {
       const interval = setInterval(() => {
-        dispatch({ type: 'TICK' });
+        dispatch({ type: "TICK" });
       }, 1000);
 
       return () => clearInterval(interval);
@@ -214,10 +242,10 @@ export function SolitaireProvider({
     if (autoLoad) {
       const loaded = loadGameFromStorage();
       if (!loaded) {
-        dispatch({ type: 'SET_LOADING', payload: false });
+        dispatch({ type: "SET_LOADING", payload: false });
       }
     } else {
-      dispatch({ type: 'SET_LOADING', payload: false });
+      dispatch({ type: "SET_LOADING", payload: false });
     }
   }, [autoLoad]);
 
@@ -227,11 +255,11 @@ export function SolitaireProvider({
       if (saved) {
         const json = JSON.parse(saved);
         const gameState = fromSaveBlob(json);
-        dispatch({ type: 'SET_GAME_STATE', payload: gameState });
+        dispatch({ type: "SET_GAME_STATE", payload: gameState });
         return true;
       }
     } catch (error) {
-      console.warn('Failed to load saved game:', error);
+      console.warn("Failed to load saved game:", error);
       localStorage.removeItem(SAVE_KEY);
     }
     return false;
@@ -243,30 +271,59 @@ export function SolitaireProvider({
 
     startNewGame: (seed?: string, options?: Partial<Options>) => {
       const gameState = newGame(seed, options);
-      dispatch({ type: 'SET_GAME_STATE', payload: gameState });
+      dispatch({ type: "SET_GAME_STATE", payload: gameState });
     },
 
-    draw: () => dispatch({ type: 'DRAW' }),
-    recycle: () => dispatch({ type: 'RECYCLE' }),
-    moveWasteToFoundation: () => dispatch({ type: 'MOVE_WASTE_TO_FOUNDATION' }),
-    moveWasteToTableau: (to: number) => dispatch({ type: 'MOVE_WASTE_TO_TABLEAU', payload: { to } }),
-    moveTableauToFoundation: (from: number) => dispatch({ type: 'MOVE_TABLEAU_TO_FOUNDATION', payload: { from } }),
-    moveTableauToTableau: (from: number, to: number, count: number) => 
-      dispatch({ type: 'MOVE_TABLEAU_TO_TABLEAU', payload: { from, to, count } }),
-    autoMove: () => dispatch({ type: 'AUTO_MOVE' }),
-    undo: () => dispatch({ type: 'UNDO' }),
-    redo: () => dispatch({ type: 'REDO' }),
-    updateOptions: (options: Partial<Options>) => dispatch({ type: 'UPDATE_OPTIONS', payload: options }),
+    draw: () => dispatch({ type: "DRAW" }),
+    recycle: () => dispatch({ type: "RECYCLE" }),
+    moveWasteToFoundation: () => dispatch({ type: "MOVE_WASTE_TO_FOUNDATION" }),
+    moveWasteToTableau: (to: number) =>
+      dispatch({ type: "MOVE_WASTE_TO_TABLEAU", payload: { to } }),
+    moveTableauToFoundation: (from: number) =>
+      dispatch({ type: "MOVE_TABLEAU_TO_FOUNDATION", payload: { from } }),
+    moveTableauToTableau: (from: number, to: number, count: number) =>
+      dispatch({
+        type: "MOVE_TABLEAU_TO_TABLEAU",
+        payload: { from, to, count },
+      }),
+    autoMove: () => dispatch({ type: "AUTO_MOVE" }),
+    undo: () => dispatch({ type: "UNDO" }),
+    redo: () => dispatch({ type: "REDO" }),
+    updateOptions: (options: Partial<Options>) =>
+      dispatch({ type: "UPDATE_OPTIONS", payload: options }),
 
     getLegalMoves: () => legalMoves(state.gameState),
     getHint: () => hint(state.gameState),
+
+    canMoveWasteToFoundation: (() => {
+      const wasteCard =
+        state.gameState.waste.length > 0
+          ? state.gameState.waste[state.gameState.waste.length - 1]
+          : null;
+
+      if (!wasteCard) return false;
+
+      const foundationTop =
+        state.gameState.foundations[wasteCard.suit][
+          state.gameState.foundations[wasteCard.suit].length - 1
+        ];
+
+      if (!foundationTop) return wasteCard.rank === 1;
+
+      return (
+        foundationTop.suit === wasteCard.suit &&
+        foundationTop.rank === wasteCard.rank - 1
+      );
+    })(),
+
+    canAutoMove: canAutoMove(state.gameState),
 
     saveGame: () => {
       try {
         const blob = toSaveBlob(state.gameState, Date.now());
         localStorage.setItem(SAVE_KEY, JSON.stringify(blob));
       } catch (error) {
-        console.error('Failed to save game:', error);
+        console.error("Failed to save game:", error);
       }
     },
 
@@ -287,7 +344,7 @@ export function SolitaireProvider({
 export function useSolitaire(): SolitaireContextValue {
   const context = useContext(SolitaireContext);
   if (!context) {
-    throw new Error('useSolitaire must be used within a SolitaireProvider');
+    throw new Error("useSolitaire must be used within a SolitaireProvider");
   }
   return context;
 }
@@ -295,10 +352,10 @@ export function useSolitaire(): SolitaireContextValue {
 // Utility function for debouncing
 function debounce<T extends (...args: any[]) => any>(
   func: T,
-  wait: number
+  wait: number,
 ): (...args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout | null = null;
-  
+
   return (...args: Parameters<T>) => {
     if (timeout) clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);
@@ -323,7 +380,10 @@ export function useGameStats() {
       H: gameState.foundations.H.length,
       D: gameState.foundations.D.length,
       C: gameState.foundations.C.length,
-      total: Object.values(gameState.foundations).reduce((sum, pile) => sum + pile.length, 0),
+      total: Object.values(gameState.foundations).reduce(
+        (sum, pile) => sum + pile.length,
+        0,
+      ),
     },
   };
 }

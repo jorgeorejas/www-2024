@@ -1,207 +1,107 @@
-import React from "react";
-import { useDroppable } from "@dnd-kit/core";
-import Card from "./Card";
-import type { Card as CardType, DragData, DropData } from "./types";
-import { getMovableSequence, canPlaceOnTableau } from "./utils";
+import Card from "./card";
+import { useSolitaire } from "./provider";
 
-interface TableauProps {
-  tableau: CardType[][];
-  onCardSelect?: (card: CardType, dragData: DragData) => void;
-  onCardDrop?: (targetIndex: number) => void;
-  selectedCardId?: string;
-  isDragging?: boolean;
-  draggedCard?: CardType | null;
-  isEasyMode?: boolean;
-}
+export default function Tableau() {
+  const {
+    gameState,
+    moveTableauToFoundation,
+    moveTableauToTableau,
+    moveWasteToTableau,
+  } = useSolitaire();
 
-const Tableau: React.FC<TableauProps> = ({
-  tableau,
-  onCardSelect,
-  onCardDrop,
-  selectedCardId,
-  isDragging = false,
-  draggedCard = null,
-  isEasyMode = false,
-}) => {
-  return (
-    <div className="flex flex-col items-center gap-4">
-      <div className="w-full">
-        <div className="flex gap-1 justify-center w-full">
-          {tableau.map((pile, colIndex) => (
-            <TableauColumn
-              key={colIndex}
-              pile={pile}
-              colIndex={colIndex}
-              onCardSelect={onCardSelect}
-              onCardDrop={onCardDrop}
-              selectedCardId={selectedCardId}
-              isDragging={isDragging}
-              draggedCard={draggedCard}
-              isEasyMode={isEasyMode}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
+  const handleCardClick = (columnIndex: number, cardIndex: number) => {
+    const tableau = gameState.tableaus[columnIndex];
+    const card = tableau[cardIndex];
 
-interface TableauColumnProps {
-  pile: CardType[];
-  colIndex: number;
-  onCardSelect?: (card: CardType, dragData: DragData) => void;
-  onCardDrop?: (targetIndex: number) => void;
-  selectedCardId?: string;
-  isDragging?: boolean;
-  draggedCard?: CardType | null;
-  isEasyMode?: boolean;
-}
+    // Only handle face-up cards
+    if (!card.faceUp) return;
 
-const TableauColumn: React.FC<TableauColumnProps> = ({
-  pile,
-  colIndex,
-  onCardSelect,
-  onCardDrop,
-  selectedCardId,
-  isDragging = false,
-  draggedCard = null,
-  isEasyMode = false,
-}) => {
-  const { isOver, setNodeRef } = useDroppable({
-    id: `tableau-${colIndex}`,
-    data: {
-      targetType: "tableau",
-      targetIndex: colIndex,
-    } as DropData,
-  });
+    // Double-click to auto-move to foundation
+    moveTableauToFoundation(columnIndex);
+  };
 
-  const isEmpty = pile.length === 0;
-  const CARD_OFFSET = 18; // Smaller offset for mobile, will use responsive spacing
+  const handleCardDragStart = (
+    e: React.DragEvent,
+    columnIndex: number,
+    cardIndex: number,
+  ) => {
+    const tableau = gameState.tableaus[columnIndex];
+    const card = tableau[cardIndex];
 
-  // Check if this tableau column can accept the dragged card (only in easy mode)
-  const canAcceptDraggedCard =
-    isEasyMode &&
-    isDragging &&
-    draggedCard &&
-    canPlaceOnTableau(draggedCard, pile);
-  const shouldHighlight = canAcceptDraggedCard && !isOver;
+    if (!card.faceUp) return;
+
+    // Calculate how many cards can be moved (valid sequence from this card to end)
+    const count = tableau.length - cardIndex;
+
+    // Store drag data
+    e.dataTransfer.setData("text/plain", "tableau");
+    e.dataTransfer.setData(
+      "application/json",
+      JSON.stringify({
+        fromColumn: columnIndex,
+        cardIndex,
+        count,
+        card,
+      }),
+    );
+  };
+
+  const handleWasteDrop = (targetColumn: number) => {
+    moveWasteToTableau(targetColumn);
+  };
 
   return (
-    <div
-      ref={setNodeRef}
-      className="flex flex-col items-center min-h-32 flex-1"
-    >
-      {/* Column stats */}
-      <div className="mt-2 text-xs font-mono select-none text-stone-500 dark:text-stone-400">
-        {pile.length > 0 && `${pile.length} cards`}
-        {pile.length === 0 && "Empty"}
-      </div>
-      {isEmpty ? (
-        // Empty pile - only Kings can be placed
+    <div className="grid grid-cols-7 col-span-7 gap-4">
+      {gameState.tableaus.map((tableau, columnIndex) => (
         <div
-          className={`
-            w-full h-24 max-w-16 
-            border-2 border-dashed border-stone-300 dark:border-stone-600 
-            rounded-lg 
-            flex items-center justify-center
-            cursor-pointer
-            transition-all duration-200
-            ${isOver ? "border-stone-400 bg-stone-50 dark:bg-stone-800/20" : ""}
-            ${shouldHighlight ? "border-green-400 bg-green-50 dark:bg-green-900/20 shadow-lg" : ""}
-          `}
-          style={{ aspectRatio: "2/3" }}
-          onClick={() => onCardDrop?.(colIndex)}
+          key={columnIndex}
+          className="col-span-1 min-h-32"
+          onDrop={(e) => {
+            e.preventDefault();
+            const dragType = e.dataTransfer.getData("text/plain");
+            if (dragType === "waste") {
+              handleWasteDrop(columnIndex);
+            } else if (dragType === "tableau") {
+              try {
+                const dragData = JSON.parse(
+                  e.dataTransfer.getData("application/json"),
+                );
+                if (dragData.fromColumn !== columnIndex) {
+                  moveTableauToTableau(
+                    dragData.fromColumn,
+                    columnIndex,
+                    dragData.count,
+                  );
+                }
+              } catch (error) {
+                console.warn("Failed to parse drag data:", error);
+              }
+            }
+          }}
+          onDragOver={(e) => e.preventDefault()}
         >
-          <div className="text-stone-400 dark:text-stone-500 text-xs font-mono select-none font-medium">
-            King
-          </div>
-        </div>
-      ) : (
-        // Cards in pile
-        <div className="relative">
-          {pile.map((card, cardIndex) => {
-            // Check if this card can start a moveable sequence
-            const movableSequence = card.faceUp
-              ? getMovableSequence(pile, cardIndex)
-              : [];
-            const canDrag = card.faceUp && movableSequence.length > 0;
-
-            // Check if this card is part of a selected sequence
-            const isInSelectedSequence = Boolean(
-              selectedCardId &&
-                movableSequence.some((c) => c.id === selectedCardId) &&
-                movableSequence.findIndex((c) => c.id === card.id) >=
-                  movableSequence.findIndex((c) => c.id === selectedCardId),
-            );
-
-            return (
-              <Card
+          {tableau.length === 0 ? (
+            <div className="w-full aspect-5/7 border border-dashed border-zinc-700/50 rounded-sm flex items-center justify-center">
+              <span className="text-zinc-700/50 text-lg">K</span>
+            </div>
+          ) : (
+            tableau.map((card, cardIndex) => (
+              <div
                 key={card.id}
-                card={card}
-                onClick={() => {
-                  if (card.faceUp && onCardSelect) {
-                    onCardSelect(card, {
-                      cardId: card.id,
-                      sourceType: "tableau",
-                      sourceIndex: colIndex,
-                      cardIndex,
-                      cardSequence: movableSequence,
-                    });
-                  }
-                }}
-                draggable={canDrag}
-                dragData={
-                  canDrag
-                    ? {
-                        cardId: card.id,
-                        sourceType: "tableau",
-                        sourceIndex: colIndex,
-                        cardIndex,
-                        cardSequence: movableSequence,
-                      }
-                    : undefined
+                className={`-mt-8 md:-mt-20 first:mt-0 ${card.faceUp ? "cursor-grab" : ""}`}
+                draggable={card.faceUp}
+                onDragStart={(e) =>
+                  handleCardDragStart(e, columnIndex, cardIndex)
                 }
-                isSelected={card.id === selectedCardId || isInSelectedSequence}
-                className={`
-                  ${cardIndex > 0 ? "absolute" : "relative"}
-                  transition-all duration-200
-                  ${!card.faceUp ? "hover:scale-105" : ""}
-                  ${isInSelectedSequence ? "ring-2 ring-stone-400 ring-opacity-75" : ""}
-                `}
-                style={
-                  cardIndex > 0
-                    ? { top: `${cardIndex * CARD_OFFSET}px` }
-                    : undefined
-                }
-              />
-            );
-          })}
-
-          {/* Highlight zone indicator for valid drops in easy mode */}
-          {shouldHighlight && (
-            <div
-              className="absolute inset-x-0 rounded-lg border-2 border-green-400 bg-green-50 dark:bg-green-900/20 w-full h-24 max-w-16 shadow-lg"
-              style={{
-                top: `${pile.length * CARD_OFFSET}px`,
-                aspectRatio: "2/3",
-              }}
-            />
-          )}
-
-          {/* Drop zone indicator for non-empty piles */}
-          {isOver && (
-            <div
-              className="absolute inset-x-0 rounded-lg border-2 border-stone-400 bg-stone-100/20 dark:bg-stone-400/20 w-full h-24 max-w-16"
-              style={{
-                top: `${pile.length * CARD_OFFSET}px`,
-                aspectRatio: "2/3",
-              }}
-            />
+                onClick={() => handleCardClick(columnIndex, cardIndex)}
+                onDragEnd={() => {}}
+              >
+                <Card card={card} />
+              </div>
+            ))
           )}
         </div>
-      )}
+      ))}
     </div>
   );
-};
-
-export default Tableau;
+}

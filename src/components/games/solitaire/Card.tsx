@@ -1,150 +1,129 @@
-import React from "react";
-import { useDraggable } from "@dnd-kit/core";
-import type { Card as CardType, DragData } from "./types";
-import { SUIT_SYMBOLS, getCardDisplayRank, getCardColorClass } from "./utils";
+import { cva, type VariantProps } from "class-variance-authority";
+import { clsx } from "clsx";
+import type { Card, Rank, Suit } from "./types.js";
 
-interface CardProps {
-  card: CardType | null;
-  faceUp?: boolean;
-  onClick?: () => void;
+const suits: Record<Suit, string> = {
+  H: "♥",
+  D: "♦",
+  C: "♣",
+  S: "♠",
+};
+const ranks: Record<Rank, string> = {
+  1: "A",
+  2: "2",
+  3: "3",
+  4: "4",
+  5: "5",
+  6: "6",
+  7: "7",
+  8: "8",
+  9: "9",
+  10: "10",
+  11: "J",
+  12: "Q",
+  13: "K",
+};
+const cardVariants = cva(
+  "w-full aspect-5/7 select-none relative flex items-center justify-center p-3 shadow-sm rounded-sm border",
+  {
+    variants: {
+      faceDown: {
+        true: "bg-linear-to-tl from-zinc-500 to-zinc-700 border-zinc-600",
+        false: "bg-zinc-50 border-zinc-200",
+      },
+      size: {
+        sm: "p-2",
+        md: "p-3",
+        lg: "p-4",
+      },
+    },
+    defaultVariants: {
+      faceDown: false,
+      size: "md",
+    },
+  },
+);
+
+const suitVariants = cva("text-sm", {
+  variants: {
+    color: {
+      red: "text-red-600/75",
+      black: "text-zinc-800/75",
+    },
+  },
+  defaultVariants: {
+    color: "black",
+  },
+});
+
+const rankVariants = cva("font-mono", {
+  variants: {
+    size: {
+      sm: "text-lg",
+      md: "text-2xl",
+      lg: "text-3xl",
+    },
+  },
+  defaultVariants: {
+    size: "md",
+  },
+});
+
+export interface CardProps extends VariantProps<typeof cardVariants> {
+  card: Card;
   className?: string;
-  style?: React.CSSProperties;
-  draggable?: boolean;
-  dragData?: DragData;
-  isSelected?: boolean;
 }
 
-const Card: React.FC<CardProps> = ({
+export default function Card({
   card,
-  faceUp = true,
-  onClick,
-  className = "",
-  style,
-  draggable = false,
-  dragData,
-  isSelected = false,
-}) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    isDragging: dndIsDragging,
-  } = useDraggable({
-    id: card?.id || "empty",
-    data: dragData,
-    disabled: !draggable || !card?.faceUp,
-  });
+  size = "md",
+  className,
+  ...props
+}: CardProps) {
+  const { suit, rank, color, faceUp } = card;
 
-  const transformStyle = transform
-    ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-      }
-    : undefined;
-
-  // Disable native drag ghost - hide the original element when dragging
-  const dragStyle = dndIsDragging
-    ? {
-        ...transformStyle,
-        opacity: 0,
-        visibility: "hidden" as const,
-      }
-    : transformStyle;
-
-  // Empty card slot
-  if (!card) {
+  if (!faceUp) {
     return (
       <div
-        className={`
-          w-full h-24 max-w-16
-          border-2 border-dashed border-stone-300 dark:border-stone-600
-          rounded-lg
-          ${className}
-        `}
-        style={{ aspectRatio: "2/3", ...style, ...dragStyle }}
-        onClick={onClick}
+        className={clsx(
+          cardVariants({ faceDown: true, size, ...props }),
+          className,
+        )}
       />
     );
   }
 
-  const displayRank = getCardDisplayRank(card.rank);
-  const colorClass = getCardColorClass(card);
+  const cardClass = cardVariants({
+    faceDown: false,
+    size,
+    ...props,
+    className,
+  });
 
-  // Face-down card
-  if (!faceUp || !card.faceUp) {
-    return (
-      <div
-        ref={draggable ? setNodeRef : undefined}
-        className={`
-          w-full h-24 max-w-16
-          bg-linear-to-br from-stone-600 to-stone-800
-          border border-stone-300 dark:border-stone-600
-          rounded-lg
-          cursor-pointer
-          transition-all duration-200
-          hover:shadow-md
-          shadow
-          ${className}
-        `}
-        onClick={onClick}
-        style={{ aspectRatio: "2/3", ...style, ...dragStyle }}
-        {...(draggable ? { ...listeners, ...attributes } : {})}
-      >
-        <div className="w-full h-full flex items-center justify-center">
-          <div className="text-xs text-white opacity-50 font-mono select-none">
-            ♠♥♦♣
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Face-up card
   return (
-    <div
-      ref={draggable ? setNodeRef : undefined}
-      className={`
-        w-full h-24 max-w-16
-        bg-white dark:bg-stone-100
-        border border-stone-300 dark:border-stone-400
-        rounded-lg
-        cursor-pointer
-        transition-all duration-200
-        hover:shadow-lg hover:scale-105
-        shadow
-        ${isSelected ? "ring-2 ring-stone-500 ring-offset-2" : ""}
-        ${className}
-      `}
-      onClick={onClick}
-      style={{ aspectRatio: "2/3", ...style, ...dragStyle }}
-      {...(draggable ? { ...listeners, ...attributes } : {})}
-    >
-      <div className="p-1 h-full flex flex-col justify-between">
-        {/* Top left rank and suit */}
-        <div
-          className={`text-xs font-mono select-none font-bold leading-none ${colorClass}`}
-        >
-          <div>{displayRank}</div>
-          <div>{SUIT_SYMBOLS[card.suit]}</div>
-        </div>
-
-        {/* Center suit symbol */}
-        <div
-          className={`text-2xl font-mono select-none text-center leading-none ${colorClass}`}
-        >
-          {SUIT_SYMBOLS[card.suit]}
-        </div>
-
-        {/* Bottom right rank and suit (rotated) */}
-        <div
-          className={`text-xs font-mono select-none font-bold leading-none ${colorClass} text-right transform rotate-180`}
-        >
-          <div>{displayRank}</div>
-          <div>{SUIT_SYMBOLS[card.suit]}</div>
-        </div>
-      </div>
+    <div className={cardClass}>
+      <span
+        className={clsx(
+          "absolute top-2 left-2 flex flex-col",
+          suitVariants({ color }),
+        )}
+      >
+        <span className="text-xs hidden md:inline">{ranks[rank]}</span>
+        {suits[suit]}
+      </span>
+      <span className={clsx(rankVariants({ size }), suitVariants({ color }))}>
+        {ranks[rank]}
+      </span>
     </div>
   );
-};
+}
 
-export default Card;
+function EmptyCardStack({ suit }: { suit: keyof typeof suits }) {
+  return (
+    <div className="w-full aspect-5/7 border border-dashed border-zinc-700/50 rounded-sm flex items-center justify-center select-none">
+      <span className="text-zinc-700/50 text-2xl">{suits[suit]}</span>
+    </div>
+  );
+}
+
+Card.EmptyStack = EmptyCardStack;
