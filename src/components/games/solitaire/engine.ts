@@ -660,6 +660,63 @@ export function moveTableauToTableau(
   return newState;
 }
 
+export function moveFoundationToTableau(s: GameState, suit: "S" | "H" | "D" | "C", to: number): GameState {
+  if (to < 0 || to >= 7) return s;
+  
+  const foundation = s.foundations[suit];
+  if (foundation.length === 0) return s;
+  
+  const card = foundation[foundation.length - 1];
+  const targetTop = s.tableaus[to].length > 0 
+    ? s.tableaus[to][s.tableaus[to].length - 1]
+    : undefined;
+  
+  if (!canPlaceOnTableau(card, targetTop)) return s;
+  
+  const ops: EngineOp[] = [];
+  
+  // Move card
+  ops.push({
+    type: "MOVE",
+    from: { kind: "foundation", suit },
+    to: { kind: "tableau", index: to },
+    cards: [card],
+  });
+  
+  // Score penalty for moving from foundation
+  const scoreDelta = s.options.scoring === "standard" ? -15 : -5;
+  ops.push({
+    type: "SCORE",
+    delta: scoreDelta,
+  });
+  
+  let newState = s;
+  for (const op of ops) {
+    newState = applyEngineOp(newState, op);
+  }
+  
+  newState.moves += 1;
+  
+  // Add to history for undo
+  const inverseOps: EngineOp[] = [
+    {
+      type: "SCORE",
+      delta: -scoreDelta,
+    },
+    {
+      type: "MOVE",
+      from: { kind: "tableau", index: to },
+      to: { kind: "foundation", suit },
+      cards: [card],
+    },
+  ];
+  
+  newState.history = [...newState.history, { inverseOps }];
+  newState.future = [];
+  
+  return newState;
+}
+
 // Helpers
 export function legalMoves(s: GameState): MoveHint[] {
   const hints: MoveHint[] = [];
@@ -792,6 +849,30 @@ export function legalMoves(s: GameState): MoveHint[] {
     }
   }
 
+  // FOUNDATION→TABLEAU
+  const suits = ["S", "H", "D", "C"] as const;
+  for (const suit of suits) {
+    const foundation = s.foundations[suit];
+    if (foundation.length > 0) {
+      const card = foundation[foundation.length - 1];
+      
+      for (let to = 0; to < 7; to++) {
+        const targetTop = s.tableaus[to].length > 0
+          ? s.tableaus[to][s.tableaus[to].length - 1]
+          : undefined;
+        
+        if (canPlaceOnTableau(card, targetTop)) {
+          hints.push({
+            kind: "FOUNDATION→TABLEAU",
+            suit,
+            to,
+            scoreDeltaEstimate: s.options.scoring === "standard" ? -15 : -5,
+          });
+        }
+      }
+    }
+  }
+
   return MoveHintZ.array().parse(hints);
 }
 
@@ -881,6 +962,9 @@ export function autoMoveAny(s: GameState): GameState {
     
     case "TABLEAU→TABLEAU":
       return moveTableauToTableau(s, bestMove.from!, bestMove.to!, bestMove.count!);
+    
+    case "FOUNDATION→TABLEAU":
+      return moveFoundationToTableau(s, bestMove.suit!, bestMove.to!);
     
     default:
       return s;

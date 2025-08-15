@@ -100,6 +100,7 @@ export const MoveKindZ = z.enum([
   "WASTE→TABLEAU",
   "TABLEAU→FOUNDATION",
   "TABLEAU→TABLEAU",
+  "FOUNDATION→TABLEAU",
   "DRAW",
   "RECYCLE",
 ]);
@@ -108,6 +109,7 @@ export const MoveHintZ = z.object({
   kind: MoveKindZ,
   from: z.number().int().nonnegative().optional(),
   to: z.number().int().nonnegative().optional(),
+  suit: SuitZ.optional(),
   count: z.number().int().positive().optional(),
   scoreDeltaEstimate: z.number(),
 });

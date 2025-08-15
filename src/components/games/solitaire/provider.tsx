@@ -5,7 +5,7 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import type { GameState, Options, MoveHint } from "./types.js";
+import type { GameState, Options, MoveHint, Suit } from "./types.js";
 import {
   newGame,
   tick,
@@ -15,6 +15,7 @@ import {
   moveWasteToTableau,
   moveTableauToFoundation,
   moveTableauToTableau,
+  moveFoundationToTableau,
   legalMoves,
   hint,
   autoMoveSafe,
@@ -40,6 +41,7 @@ interface SolitaireContextValue {
   moveWasteToTableau: (to: number) => void;
   moveTableauToFoundation: (from: number) => void;
   moveTableauToTableau: (from: number, to: number, count: number) => void;
+  moveFoundationToTableau: (suit: Suit, to: number) => void;
   autoMove: () => void;
   undo: () => void;
   redo: () => void;
@@ -73,6 +75,10 @@ type GameAction =
   | {
       type: "MOVE_TABLEAU_TO_TABLEAU";
       payload: { from: number; to: number; count: number };
+    }
+  | {
+      type: "MOVE_FOUNDATION_TO_TABLEAU";
+      payload: { suit: Suit; to: number };
     }
   | { type: "AUTO_MOVE" }
   | { type: "UNDO" }
@@ -151,6 +157,18 @@ function gameReducer(
             action.payload.from,
             action.payload.to,
             action.payload.count,
+          ),
+        ),
+      };
+
+    case "MOVE_FOUNDATION_TO_TABLEAU":
+      return {
+        ...state,
+        gameState: autoMoveSafe(
+          moveFoundationToTableau(
+            state.gameState,
+            action.payload.suit,
+            action.payload.to,
           ),
         ),
       };
@@ -285,6 +303,11 @@ export function SolitaireProvider({
       dispatch({
         type: "MOVE_TABLEAU_TO_TABLEAU",
         payload: { from, to, count },
+      }),
+    moveFoundationToTableau: (suit: Suit, to: number) =>
+      dispatch({
+        type: "MOVE_FOUNDATION_TO_TABLEAU",
+        payload: { suit, to },
       }),
     autoMove: () => dispatch({ type: "AUTO_MOVE" }),
     undo: () => dispatch({ type: "UNDO" }),
