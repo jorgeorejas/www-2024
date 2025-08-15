@@ -1,8 +1,8 @@
-import React from 'react';
-import StockWaste from './StockWaste';
-import Foundation from './Foundation';
-import Tableau from './Tableau';
-import type { GameState, DragData, Card } from './types';
+import React from "react";
+import StockWaste from "./StockWaste";
+import Foundation from "./Foundation";
+import Tableau from "./Tableau";
+import type { GameState, DragData, Card } from "./types";
 
 interface GameBoardProps {
   gameState: GameState;
@@ -25,10 +25,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
   onTableauDrop,
   selectedCardId,
   isDragging = false,
-  draggedCard = null
+  draggedCard = null,
 }) => {
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-8">
+    <div className="w-full mx-auto space-y-8">
       {/* Top row: Stock/Waste and Foundations */}
       <div className="flex justify-between items-start">
         <StockWaste
@@ -38,16 +38,16 @@ const GameBoard: React.FC<GameBoardProps> = ({
           onWasteCardSelect={onWasteCardSelect}
           selectedCardId={selectedCardId}
         />
-        
+
         <Foundation
           foundations={gameState.foundations}
           onCardDrop={onFoundationDrop}
           isDragging={isDragging}
           draggedCard={draggedCard}
-          isEasyMode={gameState.difficulty === 'easy'}
+          isEasyMode={gameState.difficulty === "easy"}
         />
       </div>
-      
+
       {/* Bottom row: Tableau */}
       <Tableau
         tableau={gameState.tableau}
@@ -56,7 +56,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
         selectedCardId={selectedCardId}
         isDragging={isDragging}
         draggedCard={draggedCard}
-        isEasyMode={gameState.difficulty === 'easy'}
+        isEasyMode={gameState.difficulty === "easy"}
       />
     </div>
   );

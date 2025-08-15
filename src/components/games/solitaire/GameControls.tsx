@@ -68,7 +68,7 @@ const GameControls: React.FC<GameControlsProps> = ({
             rounded-lg
             transition-all duration-200
             hover:shadow-md
-            focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2
+            focus:outline-hidden focus:ring-2 focus:ring-stone-500 focus:ring-offset-2
           "
         >
           New Game

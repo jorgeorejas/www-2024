@@ -111,7 +111,7 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ className = '' }) => {
             value={gridSize}
             onChange={(e) => setGridSize(Number(e.target.value) as GridSize)}
             disabled={isRunning}
-            className="bg-white dark:bg-stone-800 border border-black/15 dark:border-white/15 rounded px-2 py-1 font-mono"
+            className="bg-white dark:bg-stone-800 border border-black/15 dark:border-white/15 rounded-sm px-2 py-1 font-mono"
           >
             <option value={16}>16x16</option>
             <option value={32}>32x32</option>

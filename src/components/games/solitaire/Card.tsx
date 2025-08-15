@@ -77,7 +77,7 @@ const Card: React.FC<CardProps> = ({
         ref={draggable ? setNodeRef : undefined}
         className={`
           w-full h-24 max-w-16
-          bg-gradient-to-br from-stone-600 to-stone-800
+          bg-linear-to-br from-stone-600 to-stone-800
           border border-stone-300 dark:border-stone-600
           rounded-lg
           cursor-pointer
