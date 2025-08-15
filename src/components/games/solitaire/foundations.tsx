@@ -1,9 +1,9 @@
-import Card from "./card";
+import Card from "./Card";
 import { useSolitaire } from "./provider";
 import type { Suit } from "./types";
 
 export default function Foundations() {
-  const { gameState, moveWasteToFoundation, moveTableauToFoundation } = useSolitaire();
+  const { gameState, moveWasteToFoundation, moveTableauToFoundation, isValidDropTarget, setDragState } = useSolitaire();
 
   const suits: Suit[] = ['H', 'C', 'D', 'S'];
 
@@ -25,6 +25,36 @@ export default function Foundations() {
     }
   };
 
+  const handleFoundationDragStart = (e: React.DragEvent, suit: Suit) => {
+    const foundation = gameState.foundations[suit];
+    if (foundation.length === 0) return;
+
+    const card = foundation[foundation.length - 1];
+    
+    const dragData = {
+      suit,
+      card,
+    };
+
+    e.dataTransfer.setData("text/plain", "foundation");
+    e.dataTransfer.setData("application/json", JSON.stringify(dragData));
+
+    // Update drag state for highlighting
+    setDragState({
+      isDragging: true,
+      dragType: "foundation",
+      dragData,
+    });
+  };
+
+  const handleFoundationDragEnd = () => {
+    // Clear drag state when drag ends
+    setDragState({
+      isDragging: false,
+      dragType: null,
+    });
+  };
+
 
   return (
     <div className="col-span-4 col-start-4 space-y-2">
@@ -32,22 +62,34 @@ export default function Foundations() {
         Foundations
       </div>
       <div className="grid grid-cols-4 gap-4">
-        {suits.map((suit) => (
-          <div
-            key={suit}
-            className="cursor-pointer"
-            onDrop={(e) => handleFoundationDrop(e)}
-            onDragOver={(e) => e.preventDefault()}
+        {suits.map((suit) => {
+          const isValidTarget = isValidDropTarget("foundation", undefined, suit);
+          return (
+            <div
+              key={suit}
+              className={`cursor-pointer transition-all duration-200 ${
+                isValidTarget ? "ring-2 ring-green-400 ring-offset-2 ring-offset-green-800/90 rounded-sm" : ""
+              }`}
+              onDrop={(e) => handleFoundationDrop(e)}
+              onDragOver={(e) => e.preventDefault()}
           >
             {gameState.foundations[suit].length === 0 ? (
               <Card.EmptyStack suit={suit} />
             ) : (
-              <Card
-                card={gameState.foundations[suit][gameState.foundations[suit].length - 1]}
-              />
+              <div
+                draggable
+                onDragStart={(e) => handleFoundationDragStart(e, suit)}
+                onDragEnd={handleFoundationDragEnd}
+                className="cursor-grab"
+              >
+                <Card
+                  card={gameState.foundations[suit][gameState.foundations[suit].length - 1]}
+                />
+              </div>
             )}
-          </div>
-        ))}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

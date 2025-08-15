@@ -12,7 +12,7 @@ export default function GameControls() {
   };
 
   return (
-    <div className="col-span-7 space-y-4">
+    <div className="col-span-7 space-y-4 min-h-[180px]">
       <div>
         <h1 className="font-serif font-bold text-black text-2xl">
           Klondike Solitaire
@@ -49,18 +49,21 @@ export default function GameControls() {
         </button>
       </div>
 
-      {stats.won && (
-        <div className="text-zinc-700 bg-zinc-50 p-3 rounded border border-zinc-200">
-          <strong>Congratulations!</strong> You won with a score of{" "}
-          {stats.score} in {stats.moves} moves!
-        </div>
-      )}
+      {/* Fixed height container for status messages to prevent layout shifts */}
+      <div className="min-h-[60px]">
+        {stats.won && (
+          <div className="text-zinc-700 bg-zinc-50 p-3 rounded border border-zinc-200">
+            <strong>Congratulations!</strong> You won with a score of{" "}
+            {stats.score} in {stats.moves} moves!
+          </div>
+        )}
 
-      {stats.lost && (
-        <div className="text-zinc-700 bg-zinc-50 p-3 rounded border border-zinc-200">
-          <strong>Game Over</strong> - No more moves available.
-        </div>
-      )}
+        {stats.lost && (
+          <div className="text-zinc-700 bg-zinc-50 p-3 rounded border border-zinc-200">
+            <strong>Game Over</strong> - No more moves available.
+          </div>
+        )}
+      </div>
 
       <div className="text-xs text-zinc-500">
         Foundation Progress: {stats.foundationProgress.total}/52 cards

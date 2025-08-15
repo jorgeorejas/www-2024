@@ -115,7 +115,7 @@ function deal(seed: string, options: Partial<Options> = {}): GameState {
 }
 
 // Rule helpers
-function canPlaceOnTableau(card: Card, targetTop?: Card): boolean {
+export function canPlaceOnTableau(card: Card, targetTop?: Card): boolean {
   if (!targetTop) {
     // Empty tableau accepts only King
     return card.rank === 13;
@@ -125,7 +125,7 @@ function canPlaceOnTableau(card: Card, targetTop?: Card): boolean {
   return targetTop.rank === card.rank + 1 && targetTop.color !== card.color;
 }
 
-function canMoveToFoundation(card: Card, foundationTop?: Card): boolean {
+export function canMoveToFoundation(card: Card, foundationTop?: Card): boolean {
   if (!foundationTop) {
     // Empty foundation accepts only Ace
     return card.rank === 1;
@@ -144,7 +144,7 @@ function exposedRun(s: GameState, col: number, countFromTail: number): Card[] {
   const run = tableau.slice(-countFromTail);
 
   // All cards must be face-up
-  if (run.some((card) => !card.faceUp)) return [];
+  if (run.some((card: Card) => !card.faceUp)) return [];
 
   // Must form valid descending alternating color sequence
   for (let i = 1; i < run.length; i++) {
@@ -155,7 +155,7 @@ function exposedRun(s: GameState, col: number, countFromTail: number): Card[] {
 }
 
 function isWin(foundations: Foundations): boolean {
-  return Object.values(foundations).every((pile) => pile.length === 13);
+  return Object.values(foundations).every((pile: Card[]) => pile.length === 13);
 }
 
 // Apply engine operations
@@ -260,7 +260,7 @@ export function drawFromStock(s: GameState): GameState {
   const drawCount = Math.min(s.options.turn, s.stock.length);
   const drawnCards = s.stock
     .slice(-drawCount)
-    .map((card) => ({ ...card, faceUp: true }));
+    .map((card: Card) => ({ ...card, faceUp: true }));
 
   const ops: EngineOp[] = [];
 
@@ -281,7 +281,7 @@ export function drawFromStock(s: GameState): GameState {
       type: "MOVE",
       from: { kind: "waste" },
       to: { kind: "stock" },
-      cards: drawnCards.map((card) => ({ ...card, faceUp: false })),
+      cards: drawnCards.map((card: Card) => ({ ...card, faceUp: false })),
     },
   ];
 
@@ -303,7 +303,7 @@ export function recycleStock(s: GameState): GameState {
   const recycledCards = s.waste
     .slice()
     .reverse()
-    .map((card) => ({ ...card, faceUp: false }));
+    .map((card: Card) => ({ ...card, faceUp: false }));
 
   const ops: EngineOp[] = [];
 
@@ -338,7 +338,7 @@ export function recycleStock(s: GameState): GameState {
       type: "MOVE",
       from: { kind: "stock" },
       to: { kind: "waste" },
-      cards: s.waste.map((card) => ({ ...card, faceUp: true })),
+      cards: s.waste.map((card: Card) => ({ ...card, faceUp: true })),
     },
   ];
 
@@ -1156,7 +1156,7 @@ export function describePile(s: GameState, ref: PileRef): string {
   } else if (ref.kind === "tableau" && ref.index !== undefined) {
     const pile = s.tableaus[ref.index];
     const topCard = pile[pile.length - 1];
-    const faceUpCount = pile.filter((c) => c.faceUp).length;
+    const faceUpCount = pile.filter((c: Card) => c.faceUp).length;
     return `Tableau column ${ref.index + 1} with ${pile.length} cards, ${faceUpCount} face up${topCard && topCard.faceUp ? `, top card is ${topCard.rank} of ${topCard.suit}` : ""}`;
   }
   return "Unknown pile";
@@ -1164,5 +1164,5 @@ export function describePile(s: GameState, ref: PileRef): string {
 
 export function isAutoCompleteSafe(s: GameState): boolean {
   // All cards are face up in tableaus
-  return s.tableaus.every((tableau) => tableau.every((card) => card.faceUp));
+  return s.tableaus.every((tableau: Card[]) => tableau.every((card: Card) => card.faceUp));
 }

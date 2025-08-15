@@ -1,4 +1,4 @@
-import Card from "./card";
+import Card from "./Card";
 import { useSolitaire } from "./provider";
 
 export default function StockWaste() {
@@ -8,6 +8,7 @@ export default function StockWaste() {
     recycle,
     moveWasteToFoundation,
     canMoveWasteToFoundation,
+    setDragState,
   } = useSolitaire();
 
   const stockCard =
@@ -64,6 +65,16 @@ export default function StockWaste() {
               draggable
               onDragStart={(e) => {
                 e.dataTransfer.setData("text/plain", "waste");
+                setDragState({
+                  isDragging: true,
+                  dragType: "waste",
+                });
+              }}
+              onDragEnd={() => {
+                setDragState({
+                  isDragging: false,
+                  dragType: null,
+                });
               }}
             >
               <Card card={wasteCard} />

@@ -28,7 +28,7 @@ export const CardZ = z
     color: ColorZ, // derived from suit on creation; validated on parse
     faceUp: z.boolean(),
   })
-  .superRefine((c, ctx) => {
+  .superRefine((c: any, ctx: any) => {
     const should = c.suit === "H" || c.suit === "D" ? "red" : "black";
     if (c.color !== should)
       ctx.addIssue({
@@ -46,7 +46,7 @@ export const OptionsZ = z
     scoring: z.enum(["standard", "vegas"]).default("standard"),
     autoMoveToFoundation: z.boolean().default(true),
   })
-  .superRefine((o, ctx) => {
+  .superRefine((o: any, ctx: any) => {
     if (o.drawThrough === "finite" && o.turn === 3 && (o.maxPasses ?? 3) < 1) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -134,7 +134,7 @@ export const GameStateZ = z
     history: z.array(HistoryEntryZ),
     future: z.array(HistoryEntryZ),
   })
-  .superRefine((s, ctx) => {
+  .superRefine((s: any, ctx: any) => {
     // Foundation monotonicity by suit
     (["S", "H", "D", "C"] as const).forEach((suit) => {
       const f = s.foundations[suit];
@@ -149,7 +149,7 @@ export const GameStateZ = z
       }
     });
     // Tableau invariant: all face-down before face-up in each column
-    s.tableaus.forEach((col, idx) => {
+    s.tableaus.forEach((col: any, idx: number) => {
       let seenFaceUp = false;
       for (const card of col) {
         if (card.faceUp) seenFaceUp = true;

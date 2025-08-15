@@ -18,9 +18,10 @@ import {
   moveFoundationToTableau,
   legalMoves,
   hint,
-  autoMoveSafe,
   autoMoveAny,
   canAutoMove,
+  canPlaceOnTableau,
+  canMoveToFoundation,
   undo,
   redo,
   setOptions,
@@ -29,9 +30,22 @@ import {
   SAVE_KEY,
 } from "./engine.js";
 
+interface DragState {
+  isDragging: boolean;
+  dragType: "waste" | "tableau" | "foundation" | null;
+  dragData?: {
+    fromColumn?: number;
+    cardIndex?: number;
+    count?: number;
+    card?: any;
+    suit?: Suit;
+  };
+}
+
 interface SolitaireContextValue {
   gameState: GameState;
   isLoading: boolean;
+  dragState: DragState;
 
   // Game actions
   startNewGame: (seed?: string, options?: Partial<Options>) => void;
@@ -47,9 +61,13 @@ interface SolitaireContextValue {
   redo: () => void;
   updateOptions: (options: Partial<Options>) => void;
 
+  // Drag state management
+  setDragState: (dragState: DragState) => void;
+
   // Helpers
   getLegalMoves: () => MoveHint[];
   getHint: () => MoveHint | null;
+  isValidDropTarget: (targetType: "foundation" | "tableau", targetIndex?: number, targetSuit?: Suit) => boolean;
 
   // Computed properties
   canMoveWasteToFoundation: boolean;
@@ -83,11 +101,13 @@ type GameAction =
   | { type: "AUTO_MOVE" }
   | { type: "UNDO" }
   | { type: "REDO" }
-  | { type: "UPDATE_OPTIONS"; payload: Partial<Options> };
+  | { type: "UPDATE_OPTIONS"; payload: Partial<Options> }
+  | { type: "SET_DRAG_STATE"; payload: DragState };
 
 interface GameStateWithLoading {
   gameState: GameState;
   isLoading: boolean;
+  dragState: DragState;
 }
 
 function gameReducer(
@@ -117,59 +137,51 @@ function gameReducer(
     case "DRAW":
       return {
         ...state,
-        gameState: autoMoveSafe(drawFromStock(state.gameState)),
+        gameState: drawFromStock(state.gameState),
       };
 
     case "RECYCLE":
       return {
         ...state,
-        gameState: autoMoveSafe(recycleStock(state.gameState)),
+        gameState: recycleStock(state.gameState),
       };
 
     case "MOVE_WASTE_TO_FOUNDATION":
       return {
         ...state,
-        gameState: autoMoveSafe(moveWasteToFoundation(state.gameState)),
+        gameState: moveWasteToFoundation(state.gameState),
       };
 
     case "MOVE_WASTE_TO_TABLEAU":
       return {
         ...state,
-        gameState: autoMoveSafe(
-          moveWasteToTableau(state.gameState, action.payload.to),
-        ),
+        gameState: moveWasteToTableau(state.gameState, action.payload.to),
       };
 
     case "MOVE_TABLEAU_TO_FOUNDATION":
       return {
         ...state,
-        gameState: autoMoveSafe(
-          moveTableauToFoundation(state.gameState, action.payload.from),
-        ),
+        gameState: moveTableauToFoundation(state.gameState, action.payload.from),
       };
 
     case "MOVE_TABLEAU_TO_TABLEAU":
       return {
         ...state,
-        gameState: autoMoveSafe(
-          moveTableauToTableau(
-            state.gameState,
-            action.payload.from,
-            action.payload.to,
-            action.payload.count,
-          ),
+        gameState: moveTableauToTableau(
+          state.gameState,
+          action.payload.from,
+          action.payload.to,
+          action.payload.count,
         ),
       };
 
     case "MOVE_FOUNDATION_TO_TABLEAU":
       return {
         ...state,
-        gameState: autoMoveSafe(
-          moveFoundationToTableau(
-            state.gameState,
-            action.payload.suit,
-            action.payload.to,
-          ),
+        gameState: moveFoundationToTableau(
+          state.gameState,
+          action.payload.suit,
+          action.payload.to,
         ),
       };
 
@@ -197,6 +209,12 @@ function gameReducer(
         gameState: setOptions(state.gameState, action.payload),
       };
 
+    case "SET_DRAG_STATE":
+      return {
+        ...state,
+        dragState: action.payload,
+      };
+
     default:
       return state;
   }
@@ -216,6 +234,10 @@ export function SolitaireProvider({
   const [state, dispatch] = useReducer(gameReducer, {
     gameState: newGame(),
     isLoading: true,
+    dragState: {
+      isDragging: false,
+      dragType: null,
+    },
   });
 
   // Auto-save debounced
@@ -283,9 +305,58 @@ export function SolitaireProvider({
     return false;
   };
 
+  // Helper function to check if a target is valid for the current drag
+  const isValidDropTarget = (targetType: "foundation" | "tableau", targetIndex?: number, targetSuit?: Suit): boolean => {
+    if (!state.dragState.isDragging) return false;
+
+    const { dragType, dragData } = state.dragState;
+    
+    if (dragType === "waste") {
+      const wasteCard = state.gameState.waste[state.gameState.waste.length - 1];
+      if (!wasteCard) return false;
+
+      if (targetType === "foundation") {
+        if (!targetSuit) return false;
+        const foundationTop = state.gameState.foundations[targetSuit][state.gameState.foundations[targetSuit].length - 1];
+        return wasteCard.suit === targetSuit && canMoveToFoundation(wasteCard, foundationTop);
+      } else if (targetType === "tableau" && targetIndex !== undefined) {
+        const targetTop = state.gameState.tableaus[targetIndex].length > 0
+          ? state.gameState.tableaus[targetIndex][state.gameState.tableaus[targetIndex].length - 1]
+          : undefined;
+        return canPlaceOnTableau(wasteCard, targetTop);
+      }
+    } else if (dragType === "tableau" && dragData) {
+      if (dragData.fromColumn === undefined || !dragData.card) return false;
+
+      if (targetType === "foundation" && dragData.count === 1) {
+        if (!targetSuit) return false;
+        const foundationTop = state.gameState.foundations[targetSuit][state.gameState.foundations[targetSuit].length - 1];
+        return dragData.card.suit === targetSuit && canMoveToFoundation(dragData.card, foundationTop);
+      } else if (targetType === "tableau" && targetIndex !== undefined && targetIndex !== dragData.fromColumn) {
+        const targetTop = state.gameState.tableaus[targetIndex].length > 0
+          ? state.gameState.tableaus[targetIndex][state.gameState.tableaus[targetIndex].length - 1]
+          : undefined;
+        return canPlaceOnTableau(dragData.card, targetTop);
+      }
+    } else if (dragType === "foundation" && dragData) {
+      if (!dragData.suit || !dragData.card) return false;
+
+      // Foundation cards can only go to tableau (not to other foundations)
+      if (targetType === "tableau" && targetIndex !== undefined) {
+        const targetTop = state.gameState.tableaus[targetIndex].length > 0
+          ? state.gameState.tableaus[targetIndex][state.gameState.tableaus[targetIndex].length - 1]
+          : undefined;
+        return canPlaceOnTableau(dragData.card, targetTop);
+      }
+    }
+
+    return false;
+  };
+
   const contextValue: SolitaireContextValue = {
     gameState: state.gameState,
     isLoading: state.isLoading,
+    dragState: state.dragState,
 
     startNewGame: (seed?: string, options?: Partial<Options>) => {
       const gameState = newGame(seed, options);
@@ -315,8 +386,12 @@ export function SolitaireProvider({
     updateOptions: (options: Partial<Options>) =>
       dispatch({ type: "UPDATE_OPTIONS", payload: options }),
 
+    setDragState: (dragState: DragState) =>
+      dispatch({ type: "SET_DRAG_STATE", payload: dragState }),
+
     getLegalMoves: () => legalMoves(state.gameState),
     getHint: () => hint(state.gameState),
+    isValidDropTarget,
 
     canMoveWasteToFoundation: (() => {
       const wasteCard =
@@ -404,7 +479,7 @@ export function useGameStats() {
       D: gameState.foundations.D.length,
       C: gameState.foundations.C.length,
       total: Object.values(gameState.foundations).reduce(
-        (sum, pile) => sum + pile.length,
+        (sum: number, pile: any) => sum + pile.length,
         0,
       ),
     },
