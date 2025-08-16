@@ -3,7 +3,16 @@ import { useSolitaire } from "./provider";
 import type { MoveHint } from "./types";
 
 export default function Hint() {
-  const { getHint } = useSolitaire();
+  const { 
+    getHint, 
+    draw, 
+    recycle, 
+    moveWasteToFoundation, 
+    moveWasteToTableau, 
+    moveTableauToFoundation, 
+    moveTableauToTableau, 
+    moveFoundationToTableau 
+  } = useSolitaire();
   const [isOpen, setIsOpen] = useState(false);
 
   const hint = getHint();
@@ -65,6 +74,49 @@ export default function Hint() {
     return "text-zinc-600";
   };
 
+  const applyHint = (hint: MoveHint) => {
+    switch (hint.kind) {
+      case "DRAW":
+        draw();
+        break;
+      
+      case "RECYCLE":
+        recycle();
+        break;
+      
+      case "WASTE→FOUNDATION":
+        moveWasteToFoundation();
+        break;
+      
+      case "WASTE→TABLEAU":
+        if (hint.to !== undefined) {
+          moveWasteToTableau(hint.to);
+        }
+        break;
+      
+      case "TABLEAU→FOUNDATION":
+        if (hint.from !== undefined) {
+          moveTableauToFoundation(hint.from);
+        }
+        break;
+      
+      case "TABLEAU→TABLEAU":
+        if (hint.from !== undefined && hint.to !== undefined && hint.count !== undefined) {
+          moveTableauToTableau(hint.from, hint.to, hint.count);
+        }
+        break;
+      
+      case "FOUNDATION→TABLEAU":
+        if (hint.suit !== undefined && hint.to !== undefined) {
+          moveFoundationToTableau(hint.suit as "S" | "H" | "D" | "C", hint.to);
+        }
+        break;
+    }
+    
+    // Close the hint panel after applying
+    setIsOpen(false);
+  };
+
   return (
     <div className="bg-white border border-zinc-200 rounded-lg shadow-sm col-span-7">
       <button
@@ -110,6 +162,14 @@ export default function Hint() {
                     {getScoreText(hint.scoreDeltaEstimate)}
                   </div>
                 </div>
+              </div>
+              <div className="flex justify-end">
+                <button
+                  onClick={() => applyHint(hint)}
+                  className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors"
+                >
+                  Apply Hint
+                </button>
               </div>
             </div>
           )}

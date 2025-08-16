@@ -931,11 +931,16 @@ export function autoMoveAny(s: GameState): GameState {
   const moves = legalMoves(s);
   if (moves.length === 0) return s;
 
+  // Filter out foundation to tableau moves - auto move should only move TO foundations, not FROM them
+  const autoMovableActions = moves.filter(move => move.kind !== "FOUNDATION→TABLEAU");
+  
+  if (autoMovableActions.length === 0) return s;
+
   // Sort moves by priority and score potential
-  const prioritizedMoves = moves.sort((a, b) => {
+  const prioritizedMoves = autoMovableActions.sort((a, b) => {
     // Foundation moves get highest priority
-    if (a.kind.includes("FOUNDATION") && !b.kind.includes("FOUNDATION")) return -1;
-    if (!a.kind.includes("FOUNDATION") && b.kind.includes("FOUNDATION")) return 1;
+    if (a.kind.includes("→FOUNDATION") && !b.kind.includes("→FOUNDATION")) return -1;
+    if (!a.kind.includes("→FOUNDATION") && b.kind.includes("→FOUNDATION")) return 1;
     
     // Then by score estimate
     return b.scoreDeltaEstimate - a.scoreDeltaEstimate;
@@ -962,9 +967,6 @@ export function autoMoveAny(s: GameState): GameState {
     
     case "TABLEAU→TABLEAU":
       return moveTableauToTableau(s, bestMove.from!, bestMove.to!, bestMove.count!);
-    
-    case "FOUNDATION→TABLEAU":
-      return moveFoundationToTableau(s, bestMove.suit!, bestMove.to!);
     
     default:
       return s;
@@ -1021,7 +1023,9 @@ export function canAutoMoveToFoundation(s: GameState): boolean {
 
 export function canAutoMove(s: GameState): boolean {
   const moves = legalMoves(s);
-  return moves.length > 0;
+  // Filter out foundation to tableau moves - auto move should only move TO foundations, not FROM them
+  const autoMovableActions = moves.filter(move => move.kind !== "FOUNDATION→TABLEAU");
+  return autoMovableActions.length > 0;
 }
 
 // Undo/Redo
