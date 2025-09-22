@@ -8,7 +8,7 @@ The space between your mind and your Mac is apparently small. You think, you typ
 
 The problem isn’t coming up with ideas. Ideas are cheap. The hard part is turning them into something real. That’s where the hidden millions are. It’s like mining. The value isn’t in knowing where the gold is, it’s in building the mine and extracting it.
 
-What makes this gap tricky is that it’s full of distractions. Some people get stuck polishing their ideas, convinced they aren’t ready yet. Others over-engineer the process, building tools they don’t need. But the worst is doing nothing at all—being so overwhelmed by the distance that you never even start.
+What makes this gap tricky is that it’s full of distractions. Some people get stuck polishing their ideas, convinced they aren’t ready yet. Others over-engineer the process, building tools they don’t need. But the worst is doing nothing at all, being so overwhelmed by the distance that you never even start.
 
 The trick is to work fast and imperfectly. Take the smallest step that moves you closer to the idea. If you think of a great app, don’t sketch out a hundred screens. Build one feature, even if it’s ugly. You can always refine later. Every small victory shrinks the gap.
 
