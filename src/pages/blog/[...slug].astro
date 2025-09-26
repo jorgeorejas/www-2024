@@ -7,11 +7,16 @@ import PageLayout from "@layouts/PageLayout.astro";
 import { readingTime } from "@lib/utils";
 import { type CollectionEntry, getCollection } from "astro:content";
 
+export const prerender = true;
+
 export async function getStaticPaths() {
   const posts = (await getCollection("blog"))
-    .filter((post) => !post.data.draft)
-    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-  return posts.map((post) => ({
+    .filter((post: CollectionEntry<"blog">) => !post.data.draft)
+    .sort(
+      (a: CollectionEntry<"blog">, b: CollectionEntry<"blog">) =>
+        b.data.date.valueOf() - a.data.date.valueOf(),
+    );
+  return posts.map((post: CollectionEntry<"blog">) => ({
     params: { slug: post.slug },
     props: post,
   }));

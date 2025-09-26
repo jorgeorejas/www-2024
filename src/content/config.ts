@@ -43,4 +43,37 @@ const blocks = defineCollection({
   }),
 });
 
-export const collections = { blog, work, projects, blocks };
+// Empty collections to prevent auto-generation warnings
+const books = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string(),
+    draft: z.boolean().optional(),
+  }),
+});
+
+const categories = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string(),
+    draft: z.boolean().optional(),
+  }),
+});
+
+const technologies = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string(),
+    draft: z.boolean().optional(),
+  }),
+});
+
+export const collections = {
+  blog,
+  work,
+  projects,
+  blocks,
+  books,
+  categories,
+  technologies,
+};

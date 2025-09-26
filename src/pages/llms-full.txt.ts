@@ -1,8 +1,60 @@
 import type { APIRoute } from "astro";
-import { getCollection } from "astro:content";
+import { getCollection, getEntry } from "astro:content";
+
+// Helper function to process content and resolve JavaScript expressions and components
+async function processContent(content: string): Promise<string> {
+  let processed = content
+    .replace(/^---[\s\S]*?---/, "") // Remove frontmatter
+    .trim();
+
+  // Handle age calculation
+  processed = processed.replace(
+    /\{new Date\(\)\.getFullYear\(\) - new Date\("2003-03-08"\)\.getFullYear\(\)\}/g,
+    String(new Date().getFullYear() - new Date("2003-03-08").getFullYear()),
+  );
+
+  // Handle ContentBlock components by replacing them with the actual content
+  const contentBlockMatches = processed.match(
+    /<ContentBlock slug="([^"]+)" \/>/g,
+  );
+  if (contentBlockMatches) {
+    for (const match of contentBlockMatches) {
+      const slugMatch = match.match(/slug="([^"]+)"/);
+      if (slugMatch) {
+        const slug = slugMatch[1];
+        const blockEntry = await getEntry("blocks", slug);
+        if (blockEntry) {
+          let blockContent = blockEntry.body
+            .replace(/^---[\s\S]*?---/, "")
+            .trim();
+          // Process any JavaScript expressions in the block content too
+          blockContent = blockContent.replace(
+            /\{new Date\(\)\.getFullYear\(\) - new Date\("2003-03-08"\)\.getFullYear\(\)\}/g,
+            String(
+              new Date().getFullYear() - new Date("2003-03-08").getFullYear(),
+            ),
+          );
+          processed = processed.replace(match, blockContent);
+        }
+      }
+    }
+  }
+
+  // Remove import statements
+  processed = processed.replace(/import\s+.*?from\s+.*?;?\n?/g, "");
+
+  return processed;
+}
 
 export const GET: APIRoute = async () => {
   try {
+    // Get bio content first
+    const bioEntry = await getEntry("blocks", "bio");
+    let bioContent = "Bio content not available";
+    if (bioEntry) {
+      bioContent = await processContent(bioEntry.body);
+    }
+
     // Get all collections
     const blogPosts = await getCollection("blog");
     const projects = await getCollection("projects");
@@ -31,6 +83,10 @@ export const GET: APIRoute = async () => {
 
 > This file contains the full content of all blog posts, projects, and work experience from Jorge Orejas's personal website. Intended for LLM ingestion and deep analysis. For a summary and links, see /llms.txt.
 
+## About Jorge
+
+${bioContent}
+
 `;
 
     // Add ALL blog posts (including drafts)
@@ -45,16 +101,9 @@ export const GET: APIRoute = async () => {
       content += `**Draft Status:** ${post.data.draft ? "Draft" : "Published"}\n`;
       content += `**Slug:** ${post.slug}\n\n`;
 
-      // Add the complete content body
-      const bodyContent = post.body;
-
-      // Clean up the content (remove frontmatter but keep everything else)
-      const cleanContent = bodyContent
-        .replace(/^---[\s\S]*?---/, "") // Remove frontmatter
-        .replace(/^\s+|\s+$/g, "") // Trim whitespace
-        .replace(/\n\s*\n\s*\n/g, "\n\n"); // Normalize multiple newlines
-
-      content += cleanContent + "\n\n";
+      // Process the complete content with proper component and image handling
+      const processedContent = await processContent(post.body);
+      content += processedContent + "\n\n";
       content += "---\n\n";
     }
 
@@ -75,16 +124,9 @@ export const GET: APIRoute = async () => {
       content += `**Draft Status:** ${project.data.draft ? "Draft" : "Published"}\n`;
       content += `**Slug:** ${project.slug}\n\n`;
 
-      // Add the complete content body
-      const bodyContent = project.body;
-
-      // Clean up the content (remove frontmatter but keep everything else)
-      const cleanContent = bodyContent
-        .replace(/^---[\s\S]*?---/, "") // Remove frontmatter
-        .replace(/^\s+|\s+$/g, "") // Trim whitespace
-        .replace(/\n\s*\n\s*\n/g, "\n\n"); // Normalize multiple newlines
-
-      content += cleanContent + "\n\n";
+      // Process the complete content with proper component and image handling
+      const processedContent = await processContent(project.body);
+      content += processedContent + "\n\n";
       content += "---\n\n";
     }
 
@@ -101,27 +143,10 @@ export const GET: APIRoute = async () => {
       content += "\n";
       content += `**Slug:** ${job.slug}\n\n`;
 
-      // Add the complete content body
-      const bodyContent = job.body;
-
-      // Clean up the content (remove frontmatter but keep everything else)
-      const cleanContent = bodyContent
-        .replace(/^---[\s\S]*?---/, "") // Remove frontmatter
-        .replace(/^\s+|\s+$/g, "") // Trim whitespace
-        .replace(/\n\s*\n\s*\n/g, "\n\n"); // Normalize multiple newlines
-
-      content += cleanContent + "\n\n";
-      content += "---\n\n";
+      // Process the complete content with proper component and image handling
+      const processedContent = await processContent(job.body);
+      content += processedContent + "\n\n";
     }
-
-    // Add comprehensive site information
-    content += `## Website Structure and Information\n\n`;
-    content += `### Site Configuration\n- **Site URL:** https://jorgeorejas.com\n- **Framework:** Astro with TypeScript\n- **Styling:** Tailwind CSS\n- **Content Management:** Astro Content Collections\n- **Deployment:** Vercel\n\n`;
-    content += `### Content Collections\n- **Blog Posts:** ${blogPosts.length} total posts (${blogPosts.filter((p) => !p.data.draft).length} published, ${blogPosts.filter((p) => p.data.draft).length} drafts)\n- **Projects:** ${projects.length} total projects (${projects.filter((p) => !p.data.draft).length} published, ${projects.filter((p) => p.data.draft).length} drafts)\n- **Work Experience:** ${work.length} entries\n\n`;
-    content += `### Available Routes\n- **Homepage:** /\n- **Blog:** /blog\n- **Projects:** /projects\n- **Work Experience:** /work\n- **RSS Feed:** /rss.xml\n- **Sitemap:** /sitemap-index.xml\n- **Robots.txt:** /robots.txt\n- **LLMS.txt:** /llms.txt (filtered content)\n- **LLMS-Full.txt:** /llms-full.txt (complete content)\n\n`;
-    content += `### Content Schema Information\n\n#### Blog Posts Schema:\n- title: string (required)\n- titleCorrection: string (optional)\n- description: string (required)\n- date: Date (required)\n- draft: boolean (optional)\n\n#### Projects Schema:\n- title: string (required)\n- titleCorrection: string (optional)\n- description: string (required)\n- date: Date (required)\n- draft: boolean (optional)\n- demoURL: string (optional)\n- repoURL: string (optional)\n\n#### Work Schema:\n- company: string (required)\n- role: string (required)\n- dateStart: Date (required)\n- dateEnd: Date | string (required)\n\n`;
-    content += `### Technical Details\n- **Build Output:** Hybrid (static + serverless)\n- **Adapter:** @astrojs/vercel/serverless\n- **Analytics:** Vercel Analytics enabled\n- **Speed Insights:** Vercel Speed Insights enabled\n- **Image Optimization:** Astro's built-in image optimization\n- **Font Loading:** @fontsource packages for optimized font loading\n\n`;
-    content += `### Content Processing\n- **Markdown Support:** Full markdown support with MDX\n- **Image Handling:** Optimized images with WebP format\n- **SEO:** Automatic sitemap generation, meta tags, and Open Graph images\n- **RSS:** Automatic RSS feed generation for blog posts\n\n---\n\n## Contact Information\n\nFor more information, visit the website at https://jorgeorejas.com\n\n### Social and Professional Links\n- **Website:** https://jorgeorejas.com\n- **Blog:** https://jorgeorejas.com/blog\n- **Projects:** https://jorgeorejas.com/projects\n- **Work Experience:** https://jorgeorejas.com/work\n\n---\n\n*This file was generated automatically and contains ALL content from Jorge Orejas's personal website, including draft content and comprehensive technical information. This is the complete dataset for LLM training or analysis purposes.*`;
 
     return new Response(content, {
       status: 200,
