@@ -5,7 +5,7 @@ import sitemap from "@astrojs/sitemap";
 import tailwind from "@astrojs/tailwind";
 import { defineConfig } from "astro/config";
 
-import vercel from "@astrojs/vercel/serverless";
+import vercel from "@astrojs/vercel";
 
 import pageInsight from "astro-page-insight";
 
@@ -13,9 +13,8 @@ import pageInsight from "astro-page-insight";
 export default defineConfig({
   site: "https://jorgeorejas.com",
   integrations: [mdx(), sitemap(), tailwind(), react(), pageInsight()],
-  output: "hybrid",
+  output: "server",
   adapter: vercel({
     webAnalytics: { enabled: true },
-    speedInsights: { enabled: true },
   }),
 });

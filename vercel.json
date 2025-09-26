@@ -1,0 +1,19 @@
+{
+  "functions": {
+    "api/**/*": {
+      "runtime": "nodejs20.x"
+    },
+    "**/*.func": {
+      "runtime": "nodejs20.x"
+    },
+    "**/*.mjs": {
+      "runtime": "nodejs20.x"
+    },
+    "**/*.js": {
+      "runtime": "nodejs20.x"
+    },
+    "_render": {
+      "runtime": "nodejs20.x"
+    }
+  }
+}
