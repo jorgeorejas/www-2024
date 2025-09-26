@@ -34,4 +34,13 @@ const projects = defineCollection({
   }),
 });
 
-export const collections = { blog, work, projects };
+// Reusable markdown blocks for bios, mottos, etc.
+const blocks = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string().optional(),
+    draft: z.boolean().optional(),
+  }),
+});
+
+export const collections = { blog, work, projects, blocks };

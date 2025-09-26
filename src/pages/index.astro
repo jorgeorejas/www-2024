@@ -7,6 +7,7 @@ import Link from "@components/Link.astro";
 import { dateRange } from "@lib/utils";
 import { SITE, HOME, SOCIALS } from "@consts";
 import Nav from "@components/Nav.astro";
+import ContentBlock from "@components/ContentBlock.astro";
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 
@@ -41,15 +42,7 @@ const work = await Promise.all(
     <Nav />
     <div class="space-y-16">
       <section>
-        <article class="space-y-4">
-          <p>
-            I'm a {new Date().getFullYear() - 2003}-year-old developer and
-            entrepreneur from Asturias, Spain, passionate about leveraging
-            technology and innovation. With expertise in AI solutions, web
-            development, and building with business in mind, I focus on creating
-            impactful, creative and scalable solutions.
-          </p>
-        </article>
+        <ContentBlock slug="bio" class="space-y-4" />
       </section>
 
       <section class="space-y-6">
