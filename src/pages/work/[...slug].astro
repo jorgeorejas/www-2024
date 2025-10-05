@@ -3,16 +3,18 @@ import Container from "@components/Container.astro";
 import Nav from "@components/Nav.astro";
 import WorkEntry from "@components/WorkEntry.astro";
 import PageLayout from "@layouts/PageLayout.astro";
-import { dateRange } from "@lib/utils";
+import { dateRange, getWorkDateRange } from "@lib/utils";
 import { type CollectionEntry, getCollection } from "astro:content";
 
 export const prerender = true;
 
 export async function getStaticPaths() {
   const workEntries = (await getCollection("work")).sort(
-    (a: CollectionEntry<"work">, b: CollectionEntry<"work">) =>
-      new Date(b.data.dateStart).valueOf() -
-      new Date(a.data.dateStart).valueOf(),
+    (a: CollectionEntry<"work">, b: CollectionEntry<"work">) => {
+      const aDateRange = getWorkDateRange(a.data.roles);
+      const bDateRange = getWorkDateRange(b.data.roles);
+      return bDateRange.startDate.valueOf() - aDateRange.startDate.valueOf();
+    },
   );
   return workEntries.map((work: CollectionEntry<"work">) => ({
     params: { slug: work.slug },
@@ -23,6 +25,9 @@ type Props = CollectionEntry<"work">;
 
 const work = Astro.props;
 const { Content } = await work.render();
+
+// Derive the overall date range from roles
+const { startDate, endDate } = getWorkDateRange(work.data.roles);
 ---
 
 <PageLayout
@@ -41,7 +46,7 @@ const { Content } = await work.render();
     <div class="space-y-4 my-10">
       <div class="flex items-center gap-1.5">
         <div class="font-base text-sm">
-          {dateRange(work.data.dateStart, work.data.dateEnd)}
+          {dateRange(startDate, endDate)}
         </div>
       </div>
 

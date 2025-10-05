@@ -1,7 +1,5 @@
 ---
 company: "Vivla"
-dateStart: "09/23/2024"
-dateEnd: "Present"
 roles:
   - title: "Growth Associate"
     dateStart: "09/23/2024"

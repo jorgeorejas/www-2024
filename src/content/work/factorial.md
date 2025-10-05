@@ -1,7 +1,5 @@
 ---
 company: "Factorial"
-dateStart: "11/21/2022"
-dateEnd: "09/20/2024"
 roles:
   - title: "Junior Growth Engineer"
     dateStart: "11/21/2022"

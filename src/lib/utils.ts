@@ -38,3 +38,81 @@ export function dateRange(startDate: Date, endDate?: Date | string): string {
 
   return `${startMonth} ${startYear} ー ${endMonth} ${endYear}`;
 }
+
+export function getWorkDateRange(
+  roles: Array<{
+    dateStart: Date;
+    dateEnd?: Date | string;
+  }>,
+): { startDate: Date; endDate: Date | string } {
+  if (roles.length === 0) {
+    throw new Error("Roles array cannot be empty");
+  }
+
+  // Sort roles by dateStart to get the earliest start date
+  const sortedRoles = [...roles].sort(
+    (a, b) => a.dateStart.valueOf() - b.dateStart.valueOf(),
+  );
+  const startDate = sortedRoles[0].dateStart;
+
+  // Find the latest end date or "Present" if any role is current
+  let endDate: Date | string = "Present";
+  let hasPresentRole = false;
+
+  for (const role of roles) {
+    if (role.dateEnd === "Present") {
+      hasPresentRole = true;
+      break;
+    } else if (role.dateEnd && typeof role.dateEnd !== "string") {
+      if (typeof endDate === "string" || role.dateEnd > endDate) {
+        endDate = role.dateEnd;
+      }
+    }
+  }
+
+  // If no role is "Present", use the latest end date
+  if (!hasPresentRole && typeof endDate !== "string") {
+    return { startDate, endDate };
+  }
+
+  return { startDate, endDate: hasPresentRole ? "Present" : endDate };
+}
+
+export function processWorkEntry(workEntry: {
+  slug: string;
+  data: {
+    company: string;
+    roles: Array<{
+      title: string;
+      dateStart: Date;
+      dateEnd?: Date | string;
+      description?: string;
+    }>;
+  };
+  body: string;
+}) {
+  const { startDate, endDate } = getWorkDateRange(workEntry.data.roles);
+
+  return {
+    slug: workEntry.slug,
+    name: workEntry.data.company,
+    description: workEntry.body.trim(),
+    startDate,
+    endDate,
+    positions: workEntry.data.roles
+      .sort((a, b) => b.dateStart.valueOf() - a.dateStart.valueOf())
+      .map((role) => ({
+        title: role.title,
+        startDate: role.dateStart,
+        endDate: role.dateEnd || "Present",
+        description: role.description || "",
+      })),
+  };
+}
+
+export function formatWorkDate(date: Date | string): string {
+  if (typeof date === "string") {
+    return date;
+  }
+  return date.toLocaleDateString("es-ES");
+}

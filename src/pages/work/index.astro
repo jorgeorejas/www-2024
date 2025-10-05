@@ -4,12 +4,14 @@ import Nav from "@components/Nav.astro";
 import WorkEntry from "@components/WorkEntry.astro";
 import { WORK } from "@consts";
 import PageLayout from "@layouts/PageLayout.astro";
+import { getWorkDateRange, processWorkEntry, formatWorkDate } from "@lib/utils";
 import { getCollection } from "astro:content";
 
-const collection = (await getCollection("work")).sort(
-  (a, b) =>
-    new Date(b.data.dateStart).valueOf() - new Date(a.data.dateStart).valueOf(),
-);
+const collection = (await getCollection("work")).sort((a, b) => {
+  const aDateRange = getWorkDateRange(a.data.roles);
+  const bDateRange = getWorkDateRange(b.data.roles);
+  return bDateRange.startDate.valueOf() - aDateRange.startDate.valueOf();
+});
 
 const work = await Promise.all(
   collection.map(async (item) => {
@@ -17,6 +19,9 @@ const work = await Promise.all(
     return { ...item, Content };
   }),
 );
+
+// Process work entries into structured format
+const processedWork = work.map((item) => processWorkEntry(item));
 ---
 
 <PageLayout title={WORK.TITLE} description={WORK.DESCRIPTION}>
@@ -24,24 +29,47 @@ const work = await Promise.all(
     <div class="space-y-2">
       <Nav breadCrumbsItems={[{ href: "/work", label: "Work" }]} />
     </div>
-    <div class="space-y-10 my-10">
-      <div class="font-semibold text-black dark:text-white">Work</div>
-      <ul class="flex flex-col space-y-4">
+    <div class="my-10 space-y-10">
+      <div class="font-semibold font-serif hover:opacity-70 transition-opacity">
+        Work
+      </div>
+      <div class="space-y-2">
         {
-          work.map((entry) => (
-            <WorkEntry
-              entry={entry}
-              showTimeline={true}
-              showDescription={false}
-              linkToDetail={true}
-            />
+          processedWork.map((job, i) => (
+            <div class="space-y-2">
+              <div class="text-sm text-black/50 dark:text-white/50 md:mt-0.5">
+                {formatWorkDate(job.endDate)}
+              </div>
+              <div class="border-l border-black/15 dark:border-white pl-4">
+                <a href={`/work/${job.slug}`} class="font-bold font-serif">
+                  {job.name}
+                </a>
+                <div>
+                  {job.positions.map((position, i) => (
+                    <div class=" space-y-2">
+                      {i > 0 && (
+                        <p class="text-sm text-black/50 dark:text-white/50 md:mt-0.5">
+                          {formatWorkDate(position.endDate)}
+                        </p>
+                      )}
+                      <div class="border-l pl-4 space-y-2">
+                        <p class="font-medium font-serif">{position.title}</p>
+                        <div class="text-sm opacity-60 mt-1">
+                          {position.description}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div class="text-sm text-black/50 dark:text-white/50">
+                {i === processedWork.length - 1 &&
+                  formatWorkDate(job.startDate)}
+              </div>
+            </div>
           ))
         }
-      </ul>
-      <!-- 
-      <ul class=" flex flex-col gap-4">
-
-      </ul> -->
+      </div>
     </div>
   </Container>
 </PageLayout>

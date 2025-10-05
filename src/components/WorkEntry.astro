@@ -1,5 +1,5 @@
 ---
-import { dateRange } from "@lib/utils";
+import { dateRange, getWorkDateRange } from "@lib/utils";
 import type { CollectionEntry } from "astro:content";
 
 interface Props {
@@ -15,6 +15,9 @@ const {
   showDescription = true,
   linkToDetail = false,
 } = Astro.props;
+
+// Derive the overall date range from roles
+const { startDate, endDate } = getWorkDateRange(entry.data.roles);
 ---
 
 <li class="work-entry">
@@ -33,7 +36,7 @@ const {
     }
     <div class="text-sm text-black/50 dark:text-white/50">
       <span class="hidden md:inline"> - </span>
-      {dateRange(entry.data.dateStart, entry.data.dateEnd)}
+      {dateRange(startDate, endDate)}
     </div>
   </div>
 

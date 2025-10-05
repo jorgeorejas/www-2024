@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { getCollection, getEntry } from "astro:content";
+import { getWorkDateRange } from "@lib/utils";
 
 // Helper function to process content and resolve JavaScript expressions and components
 async function processContent(content: string): Promise<string> {
@@ -73,11 +74,11 @@ export const GET: APIRoute = async () => {
     );
 
     // Sort work by start date (newest first)
-    const sortedWork = work.sort(
-      (a, b) =>
-        new Date(b.data.dateStart).getTime() -
-        new Date(a.data.dateStart).getTime(),
-    );
+    const sortedWork = work.sort((a, b) => {
+      const aDateRange = getWorkDateRange(a.data.roles);
+      const bDateRange = getWorkDateRange(b.data.roles);
+      return bDateRange.startDate.getTime() - aDateRange.startDate.getTime();
+    });
 
     let content = `# Jorge Orejas - Complete Website Content
 
@@ -132,13 +133,14 @@ ${bioContent}
 
     content += `## Complete Work Experience Collection\n\n`;
     for (const job of sortedWork) {
+      const { startDate, endDate } = getWorkDateRange(job.data.roles);
       content += `### ${job.data.roles[job.data.roles.length - 1].title} at ${job.data.company}\n`;
-      content += `**Start Date:** ${job.data.dateStart.toLocaleDateString()}\n`;
+      content += `**Start Date:** ${startDate.toLocaleDateString()}\n`;
       content += `**End Date:** `;
-      if (typeof job.data.dateEnd === "string") {
-        content += job.data.dateEnd;
+      if (typeof endDate === "string") {
+        content += endDate;
       } else {
-        content += job.data.dateEnd.toLocaleDateString();
+        content += endDate.toLocaleDateString();
       }
       content += "\n";
       content += `**Slug:** ${job.slug}\n\n`;
