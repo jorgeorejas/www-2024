@@ -54,12 +54,40 @@ const { startDate, endDate } = getWorkDateRange(work.data.roles);
         {work.data.company}
       </div>
 
-      <div class="border-b border-black/15 dark:border-white/20 pb-4">
-        <WorkEntry
-          entry={{ ...work, Content }}
-          showTimeline={true}
-          showDescription={false}
-        />
+      <div class="prose prose-neutral dark:prose-invert max-w-none">
+        <Content />
+      </div>
+
+      <div class="space-y-4">
+        <h3 class="text-lg font-semibold font-serif">Positions</h3>
+        <div class="space-y-3">
+          {
+            work.data.roles
+              .sort((a, b) => b.dateStart.valueOf() - a.dateStart.valueOf())
+              .map((position, i) => (
+                <div class="space-y-2">
+                  <div class="text-sm text-black/50 dark:text-white/50">
+                    {position.dateEnd
+                      ? new Date(position.dateEnd).toLocaleDateString("es-ES")
+                      : "Present"}
+                  </div>
+                  <div class="border-l border-black/15 dark:border-white/20 pl-4 space-y-2">
+                    <div class="font-medium font-serif">{position.title}</div>
+                    {position.description && (
+                      <div class="text-sm opacity-60">
+                        {position.description}
+                      </div>
+                    )}
+                  </div>
+                  {i === work.data.roles.length - 1 && (
+                    <div class="text-sm text-black/50 dark:text-white/50">
+                      {position.dateStart.toLocaleDateString("es-ES")}
+                    </div>
+                  )}
+                </div>
+              ))
+          }
+        </div>
       </div>
     </div>
   </Container>

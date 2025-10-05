@@ -7,7 +7,7 @@ roles:
     description: "Focused on user acquisition and retention through data-driven growth experiments and feature development. Mainly focused on AB Testing and frontend features for our public acquisition channels. (Website, Blog, Ads...)"
   - title: "Mid-Level Growth Engineer"
     dateStart: "07/1/2023"
-    dateEnd: "09/22/2024"
+    dateEnd: "09/23/2024"
     description: "Mainly focused on AB Testing and frontend features for our public acquisition channels. (Website, Blog, Ads...)"
 ---
 

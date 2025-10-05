@@ -1,0 +1,58 @@
+---
+import { formatWorkDate } from "@lib/utils";
+
+interface Props {
+  processedWork: Array<{
+    slug: string;
+    name: string;
+    description: string;
+    startDate: Date | string;
+    endDate: Date | string;
+    positions: Array<{
+      title: string;
+      startDate: Date;
+      endDate: Date | string;
+      description: string;
+    }>;
+  }>;
+}
+
+const { processedWork } = Astro.props;
+---
+
+<div class="space-y-2">
+  {
+    processedWork.map((job, i) => (
+      <div class="space-y-2">
+        <div class="text-sm text-black/50 dark:text-white/50 md:mt-0.5">
+          {formatWorkDate(job.endDate)}
+        </div>
+        <div class="border-l border-black/15 dark:border-white pl-4">
+          <a href={`/work/${job.slug}`} class="font-bold font-serif">
+            {job.name}
+          </a>
+          <div>
+            {job.positions.map((position, i) => (
+              <div class=" space-y-2">
+                {i > 0 && (
+                  <p class="text-sm text-black/50 dark:text-white/50 md:mt-0.5">
+                    {formatWorkDate(position.endDate)}
+                  </p>
+                )}
+                <div class="border-l pl-4 space-y-2">
+                  <p class="font-medium font-serif">{position.title}</p>
+                  <div class="text-sm opacity-60 mt-1">
+                    {position.description}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div class="text-sm text-black/50 dark:text-white/50">
+          {i === processedWork.length - 1 && formatWorkDate(job.startDate)}
+        </div>
+      </div>
+    ))
+  }
+</div>
