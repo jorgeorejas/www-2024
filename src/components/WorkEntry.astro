@@ -6,14 +6,31 @@ interface Props {
   entry: CollectionEntry<"work"> & { Content: any }; // eslint-disable-line @typescript-eslint/no-explicit-any
   showTimeline?: boolean;
   showDescription?: boolean;
+  linkToDetail?: boolean;
 }
 
-const { entry, showTimeline = false, showDescription = true } = Astro.props;
+const {
+  entry,
+  showTimeline = false,
+  showDescription = true,
+  linkToDetail = false,
+} = Astro.props;
 ---
 
 <li class="work-entry">
   <div class="flex md:gap-2 md:items-center flex-col md:flex-row">
-    <div class="font-semibold font-serif">{entry.data.company}</div>
+    {
+      linkToDetail ? (
+        <a
+          href={`/work/${entry.slug}`}
+          class="font-semibold font-serif hover:opacity-70 transition-opacity"
+        >
+          {entry.data.company}
+        </a>
+      ) : (
+        <div class="font-semibold font-serif">{entry.data.company}</div>
+      )
+    }
     <div class="text-sm text-black/50 dark:text-white/50">
       <span class="hidden md:inline"> - </span>
       {dateRange(entry.data.dateStart, entry.data.dateEnd)}

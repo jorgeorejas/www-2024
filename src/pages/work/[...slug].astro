@@ -1,0 +1,61 @@
+---
+import Container from "@components/Container.astro";
+import Nav from "@components/Nav.astro";
+import WorkEntry from "@components/WorkEntry.astro";
+import PageLayout from "@layouts/PageLayout.astro";
+import { dateRange } from "@lib/utils";
+import { type CollectionEntry, getCollection } from "astro:content";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const workEntries = (await getCollection("work")).sort(
+    (a: CollectionEntry<"work">, b: CollectionEntry<"work">) =>
+      new Date(b.data.dateStart).valueOf() -
+      new Date(a.data.dateStart).valueOf(),
+  );
+  return workEntries.map((work: CollectionEntry<"work">) => ({
+    params: { slug: work.slug },
+    props: work,
+  }));
+}
+type Props = CollectionEntry<"work">;
+
+const work = Astro.props;
+const { Content } = await work.render();
+---
+
+<PageLayout
+  title={`${work.data.company} - Work Experience`}
+  description={`Work experience at ${work.data.company}`}
+>
+  <Container>
+    <div class="space-y-2">
+      <Nav
+        breadCrumbsItems={[
+          { href: "/work", label: "Work" },
+          { href: `/work/${work.slug}`, label: work.data.company },
+        ]}
+      />
+    </div>
+    <div class="space-y-4 my-10">
+      <div class="flex items-center gap-1.5">
+        <div class="font-base text-sm">
+          {dateRange(work.data.dateStart, work.data.dateEnd)}
+        </div>
+      </div>
+
+      <div class="text-2xl font-semibold font-serif text-black dark:text-white">
+        {work.data.company}
+      </div>
+
+      <div class="border-b border-black/15 dark:border-white/20 pb-4">
+        <WorkEntry
+          entry={{ ...work, Content }}
+          showTimeline={true}
+          showDescription={false}
+        />
+      </div>
+    </div>
+  </Container>
+</PageLayout>
