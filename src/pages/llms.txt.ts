@@ -50,7 +50,7 @@ Below you'll find links to the main content sections and resources of this site,
 
     content += `\n## Work\n`;
     for (const job of work) {
-      content += `- [${job.data.role} at ${job.data.company}](https://jorgeorejas.com/work): ${job.body.trim().split("\n")[0] || "Work experience entry"}\n`;
+      content += `- [${job.data.roles[job.data.roles.length - 1].title} at ${job.data.company}](https://jorgeorejas.com/work): ${job.body.trim().split("\n")[0] || "Work experience entry"}\n`;
     }
     content += `- [Work Experience](https://jorgeorejas.com/work): Professional history and roles\n`;
 

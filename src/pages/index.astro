@@ -4,7 +4,7 @@ import Container from "@components/Container.astro";
 import PageLayout from "@layouts/PageLayout.astro";
 import ArrowCard from "@components/ArrowCard.astro";
 import Link from "@components/Link.astro";
-import { dateRange } from "@lib/utils";
+import WorkEntry from "@components/WorkEntry.astro";
 import { SITE, HOME } from "@consts";
 import Nav from "@components/Nav.astro";
 import ContentBlock from "@components/ContentBlock.astro";
@@ -91,21 +91,11 @@ const work = await Promise.all(
         <ul class="flex flex-col space-y-4">
           {
             work.map((entry) => (
-              <li>
-                <div class="flex md:gap-2 md:items-center flex-col md:flex-row">
-                  <div class="font-semibold font-serif">
-                    {entry.data.company}
-                  </div>
-                  <div class="text-sm text-black/50 dark:text-white/50">
-                    <span class="hidden md:inline"> - </span>
-                    {dateRange(entry.data.dateStart, entry.data.dateEnd)}
-                  </div>
-                </div>
-                <div class="text-sm opacity-75">{entry.data.role}</div>
-                <article>
-                  <entry.Content />
-                </article>
-              </li>
+              <WorkEntry
+                entry={entry}
+                showTimeline={false}
+                showDescription={true}
+              />
             ))
           }
         </ul>

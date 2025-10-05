@@ -132,7 +132,7 @@ ${bioContent}
 
     content += `## Complete Work Experience Collection\n\n`;
     for (const job of sortedWork) {
-      content += `### ${job.data.role} at ${job.data.company}\n`;
+      content += `### ${job.data.roles[job.data.roles.length - 1].title} at ${job.data.company}\n`;
       content += `**Start Date:** ${job.data.dateStart.toLocaleDateString()}\n`;
       content += `**End Date:** `;
       if (typeof job.data.dateEnd === "string") {
