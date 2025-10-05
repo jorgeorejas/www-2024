@@ -114,5 +114,5 @@ export function formatWorkDate(date: Date | string): string {
   if (typeof date === "string") {
     return date;
   }
-  return date.toLocaleDateString("es-ES");
+  return date.toLocaleDateString("en-EN", { day: "2-digit", month: "long", year: "numeric" });
 }
