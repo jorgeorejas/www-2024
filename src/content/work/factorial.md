@@ -8,7 +8,7 @@ roles:
   - title: "Mid-Level Growth Engineer"
     dateStart: "07/1/2023"
     dateEnd: "09/23/2024"
-    description: "Mainly focused on AB Testing and frontend features for our public acquisition channels. (Website, Blog, Ads...)"
+    description: "Mainly focused on AB Testing and frontend features for our public acquisition channels. (Website, Blog, Ads...). I also started developing backend features for the GTM team and developed a smart enrichment tool for the public forms."
 ---
 
 FactorialHR is an all-in-one HR software platform that helps businesses manage employee onboarding, time tracking, payroll, performance reviews, and document management. It streamlines HR processes, making it easier for companies to focus on growth and efficiency.
