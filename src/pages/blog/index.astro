@@ -9,8 +9,10 @@ import { type CollectionEntry, getCollection } from "astro:content";
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 
+const isDev = import.meta.env.DEV;
+
 const data = (await getCollection("blog"))
-  .filter((post) => !post.data.draft && post.data.date <= today)
+  .filter((post) => !post.data.draft && (isDev || post.data.date <= today))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
 type Acc = {
