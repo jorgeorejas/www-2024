@@ -1,8 +1,8 @@
 ---
+import AnimatedLink from "@components/AnimatedLink.astro";
 import ArrowCard from "@components/ArrowCard.astro";
 import Container from "@components/Container.astro";
 import ContentBlock from "@components/ContentBlock.astro";
-import Link from "@components/Link.astro";
 import Nav from "@components/Nav.astro";
 import WorkTimeline from "@components/WorkTimeline.astro";
 import { HOME, SITE } from "@consts";
@@ -54,7 +54,7 @@ const processedWork = allwork.map((item) => processWorkEntry(item));
           <h5 class="font-semibold text-black dark:text-white font-serif">
             Latest posts
           </h5>
-          <Link href="/blog"> See all posts </Link>
+          <AnimatedLink href="/blog"> See all posts </AnimatedLink>
         </div>
         <ul class="flex flex-col gap-4">
           {
@@ -72,7 +72,7 @@ const processedWork = allwork.map((item) => processWorkEntry(item));
           <h5 class="font-semibold text-black font-serif dark:text-white">
             Recent projects
           </h5>
-          <Link href="/projects"> See all projects </Link>
+          <AnimatedLink href="/projects"> See all projects </AnimatedLink>
         </div>
         <ul class="flex flex-col gap-4">
           {
@@ -90,7 +90,7 @@ const processedWork = allwork.map((item) => processWorkEntry(item));
           <h5 class="font-semibold text-black font-serif dark:text-white">
             Work Experience
           </h5>
-          <Link href="/work"> See all work </Link>
+          <AnimatedLink href="/work"> See all work </AnimatedLink>
         </div>
         <WorkTimeline processedWork={processedWork} />
       </section>
