@@ -24,3 +24,24 @@ const { breadCrumbsItems } = Astro.props;
     {breadCrumbsItems && <Breadcrumbs items={breadCrumbsItems} />}
   </div>
 </div>
+
+<script>
+  // Auto dark mode based on system preference
+  const html = document.documentElement;
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+  if (prefersDark) {
+    html.classList.add("dark");
+  }
+
+  // Listen for system theme changes
+  window
+    .matchMedia("(prefers-color-scheme: dark)")
+    .addEventListener("change", (e) => {
+      if (e.matches) {
+        html.classList.add("dark");
+      } else {
+        html.classList.remove("dark");
+      }
+    });
+</script>
