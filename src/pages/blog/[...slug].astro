@@ -32,6 +32,17 @@ const { Content } = await post.render();
   description={post.data.description}
   ogImage={`/og/${post.slug}.png`}
 >
+  <!-- Sticky header that appears after scrolling past post header -->
+  <header id="sticky-header" class="pointer-events-none">
+    <Container>
+      <div class="text-xl font-semibold font-serif text-black dark:text-white">
+        <span class="font-semibold font-serif">Jorge Orejas</span>
+        <span class="text-black/50 dark:text-white/50">~</span>
+        <span class="truncate">{post.data.title}</span>
+      </div>
+    </Container>
+  </header>
+
   <Container>
     <div class="space-y-2">
       <Nav
@@ -41,7 +52,7 @@ const { Content } = await post.render();
         ]}
       />
     </div>
-    <div class="space-y-4 my-10">
+    <div class="space-y-4 my-10" id="post-header">
       <div class="flex items-center gap-1.5">
         <div class="font-base text-sm">
           <FormattedDate date={post.data.date} />
@@ -77,3 +88,27 @@ const { Content } = await post.render();
     </article>
   </Container>
 </PageLayout>
+
+<script>
+  // Show sticky header after scrolling past post header
+  const stickyHeader = document.getElementById("sticky-header");
+  const postHeader = document.getElementById("post-header");
+
+  if (stickyHeader && postHeader) {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          stickyHeader.classList.add("hidden");
+        } else {
+          stickyHeader.classList.remove("hidden");
+        }
+      },
+      {
+        threshold: 0,
+        rootMargin: "-80px 0px 0px 0px", // Account for main header height
+      },
+    );
+
+    observer.observe(postHeader);
+  }
+</script>
