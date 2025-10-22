@@ -12,7 +12,7 @@ const { href, external, ...rest } = Astro.props;
 <a
   href={href}
   target={external ? "_blank" : "_self"}
-  class="group relative inline-flex items-center gap-2 text-current hover:text-black dark:hover:text-white transition-colors duration-300 ease-in-out"
+  class="group relative inline-flex items-center gap-2 px-4 text-current hover:text-black dark:hover:text-white transition-colors duration-300 ease-in-out"
   {...rest}
 >
   <span class="inline-flex items-center">
@@ -23,5 +23,5 @@ const { href, external, ...rest } = Astro.props;
       ></span>
     </span>
   </span>
-  <AnimatedArrow size="sm" inline />
+  <AnimatedArrow inline />
 </a>
