@@ -6,42 +6,45 @@ import { visit } from "unist-util-visit";
  */
 export function remarkCorrection() {
   return (tree) => {
-    visit(tree, "delete", (node, index, parent) => {
-      // Check if the next node is a text node starting with '('
-      if (index !== null && parent && index < parent.children.length - 1) {
-        const nextNode = parent.children[index + 1];
+    visit(tree, "paragraph", (node, index, parent) => {
+      if (node.children) {
+        for (let i = 0; i < node.children.length - 1; i++) {
+          const currentNode = node.children[i];
+          const nextNode = node.children[i + 1];
 
-        // Check if next node is text and starts with (
-        if (
-          nextNode &&
-          nextNode.type === "text" &&
-          nextNode.value.startsWith("(")
-        ) {
-          const match = nextNode.value.match(/^\(([^)]+)\)/);
+          // Check if current node is delete and next node is text with parentheses
+          if (
+            currentNode.type === "delete" &&
+            nextNode &&
+            nextNode.type === "text" &&
+            nextNode.value.startsWith("(")
+          ) {
+            const match = nextNode.value.match(/^\(([^)]+)\)/);
 
-          if (match) {
-            const correctionText = match[1];
-            const remainingText = nextNode.value.slice(match[0].length);
+            if (match) {
+              const correctionText = match[1];
+              const remainingText = nextNode.value.slice(match[0].length);
 
-            // Get the original text from the delete node
-            const originalText = node.children
-              .map((child) => (child.type === "text" ? child.value : ""))
-              .join("");
+              // Get the original text from the delete node
+              const originalText = currentNode.children
+                .map((child) => (child.type === "text" ? child.value : ""))
+                .join("");
 
-            // Create inline correction without line breaks
-            const correctionNode = {
-              type: "html",
-              value: `<span class="line-through decoration-blue-800">${originalText}</span> <span class="font-handwritten font-bold text-blue-800">${correctionText}</span>`,
-            };
+              // Create inline correction
+              const correctionNode = {
+                type: "html",
+                value: `<span class="line-through decoration-blue-800">${originalText}</span> <span class="font-handwritten font-bold text-blue-800 text-xl">${correctionText}</span>`,
+              };
 
-            // Replace the delete node with our correction node
-            parent.children[index] = correctionNode;
+              // Replace the delete node with our correction node
+              node.children[i] = correctionNode;
 
-            // Update or remove the next text node
-            if (remainingText) {
-              nextNode.value = remainingText;
-            } else {
-              parent.children.splice(index + 1, 1);
+              // Update or remove the next text node
+              if (remainingText) {
+                nextNode.value = remainingText;
+              } else {
+                node.children.splice(i + 1, 1);
+              }
             }
           }
         }

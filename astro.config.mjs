@@ -16,6 +16,9 @@ export default defineConfig({
   markdown: {
     remarkPlugins: [remarkCorrection],
   },
+  mdx: {
+    remarkPlugins: [remarkCorrection],
+  },
   output: "server",
   adapter: vercel({
     webAnalytics: { enabled: true },
