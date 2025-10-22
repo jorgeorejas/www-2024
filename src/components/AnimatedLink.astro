@@ -1,4 +1,6 @@
 ---
+import AnimatedArrow from "./AnimatedArrow.astro";
+
 type Props = {
   href: string;
   external?: boolean;
@@ -10,28 +12,16 @@ const { href, external, ...rest } = Astro.props;
 <a
   href={href}
   target={external ? "_blank" : "_self"}
-  class="group relative inline-flex items-center gap-1 text-current hover:text-black dark:hover:text-white transition-colors duration-300 ease-in-out"
+  class="group relative inline-flex items-center gap-2 text-current hover:text-black dark:hover:text-white transition-colors duration-300 ease-in-out"
   {...rest}
 >
-  <span class="relative inline-block">
-    <slot />
-    <span class="absolute left-0 bottom-0 w-full h-[1px] bg-blue-800 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-in-out"></span>
+  <span class="inline-flex items-center">
+    <span class="relative">
+      <slot />
+      <span
+        class="absolute left-0 bottom-0 w-full h-[1px] bg-blue-800 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-in-out"
+      ></span>
+    </span>
   </span>
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    class="size-4 stroke-2 fill-none stroke-current"
-  >
-    <line
-      x1="5"
-      y1="12"
-      x2="19"
-      y2="12"
-      class="translate-x-2 group-hover:translate-x-0 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out"
-    ></line>
-    <polyline
-      points="12 5 19 12 12 19"
-      class="-translate-x-1 group-hover:translate-x-0 transition-transform duration-300 ease-in-out"
-    ></polyline>
-  </svg>
+  <AnimatedArrow size="sm" inline />
 </a>

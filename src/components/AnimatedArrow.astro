@@ -1,26 +1,21 @@
 ---
 type Props = {
   size?: "sm" | "md";
+  inline?: boolean;
 };
 
-const { size = "md" } = Astro.props;
+const { size = "md", inline = false } = Astro.props;
 const sizeClass = size === "sm" ? "size-4" : "size-5";
+const positionClass = inline ? "" : "absolute top-1/2 right-2 -translate-y-1/2";
 ---
 
 <svg
   xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
-  class={`absolute top-1/2 right-2 -translate-y-1/2 ${sizeClass} stroke-2 fill-none stroke-current`}
+  viewBox="-2 -2 28 28"
+  class={`${positionClass} ${sizeClass} fill-current`}
 >
-  <line
-    x1="5"
-    y1="12"
-    x2="19"
-    y2="12"
-    class="translate-x-3 group-hover:translate-x-0 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out"
-  ></line>
-  <polyline
-    points="12 5 19 12 12 19"
-    class="-translate-x-1 group-hover:translate-x-0 transition-transform duration-300 ease-in-out"
-  ></polyline>
+  <path
+    d="m17.114 20.23-2.749-.62c.148-1.479.68-2.81 1.567-4.021.916-1.212 1.951-1.981 3.134-2.336H.5v-2.306h18.566c-1.183-.354-2.218-1.123-3.134-2.306-.887-1.212-1.42-2.542-1.567-4.05L17.115 4c.206 4.168 2.69 6.622 6.385 6.947v2.306c-3.695.325-6.179 2.809-6.386 6.977"
+    class="-translate-x-3 group-hover:translate-x-0 transition-transform duration-300 ease-in-out"
+  ></path>
 </svg>
