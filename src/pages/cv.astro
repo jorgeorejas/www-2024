@@ -29,7 +29,9 @@ const processedWork = work.map((item) => processWorkEntry(item));
 
 // Fetch and process education collection
 const educationCollection = (await getCollection("education")).sort((a, b) => {
-  return b.data.dateEnd.valueOf() - a.data.dateEnd.valueOf();
+  const aEndDate = a.data.dateEnd === "Present" ? new Date() : a.data.dateEnd;
+  const bEndDate = b.data.dateEnd === "Present" ? new Date() : b.data.dateEnd;
+  return bEndDate.valueOf() - aEndDate.valueOf();
 });
 
 const education = await Promise.all(

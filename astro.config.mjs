@@ -12,11 +12,15 @@ import { remarkCorrection } from "./src/lib/remark-correction.mjs";
 // https://astro.build/config
 export default defineConfig({
   site: "https://jorgeorejas.com",
-  integrations: [mdx(), sitemap(), react(), pageInsight()],
+  integrations: [
+    mdx({
+      remarkPlugins: [remarkCorrection],
+    }),
+    sitemap(),
+    react(),
+    pageInsight(),
+  ],
   markdown: {
-    remarkPlugins: [remarkCorrection],
-  },
-  mdx: {
     remarkPlugins: [remarkCorrection],
   },
   output: "server",
