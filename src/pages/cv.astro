@@ -1,0 +1,106 @@
+---
+import Container from "@components/Container.astro";
+import Nav from "@components/Nav.astro";
+import WorkTimeline from "@components/WorkTimeline.astro";
+import EducationTimeline from "@components/EducationTimeline.astro";
+import PageLayout from "@layouts/PageLayout.astro";
+import {
+  getWorkDateRange,
+  processWorkEntry,
+  processEducationEntry,
+} from "@lib/utils";
+import { getCollection } from "astro:content";
+
+// Fetch and process work collection
+const workCollection = (await getCollection("work")).sort((a, b) => {
+  const aDateRange = getWorkDateRange(a.data.roles);
+  const bDateRange = getWorkDateRange(b.data.roles);
+  return bDateRange.startDate.valueOf() - aDateRange.startDate.valueOf();
+});
+
+const work = await Promise.all(
+  workCollection.map(async (item) => {
+    const { Content } = await item.render();
+    return { ...item, Content };
+  }),
+);
+
+const processedWork = work.map((item) => processWorkEntry(item));
+
+// Fetch and process education collection
+const educationCollection = (await getCollection("education")).sort((a, b) => {
+  return b.data.dateEnd.valueOf() - a.data.dateEnd.valueOf();
+});
+
+const education = await Promise.all(
+  educationCollection.map(async (item) => {
+    const { Content } = await item.render();
+    return { ...item, Content };
+  }),
+);
+
+const processedEducation = education.map((item) => processEducationEntry(item));
+---
+
+<PageLayout
+  title="CV"
+  description="My curriculum vitae - work experience and education timeline"
+>
+  <Container>
+    <div class="space-y-2 print:hidden">
+      <Nav breadCrumbsItems={[{ href: "/cv", label: "CV" }]} />
+    </div>
+    <div class="my-12 space-y-16 print:my-0 print:space-y-8">
+      <!-- Work Experience Section -->
+      <div class="space-y-12 print:space-y-6">
+        <div
+          class="font-semibold font-serif hover:opacity-70 transition-opacity"
+        >
+          Work Experience
+        </div>
+        <WorkTimeline processedWork={processedWork} />
+      </div>
+
+      <!-- Education Section -->
+      <div class="space-y-12 print:space-y-6">
+        <div
+          class="font-semibold font-serif hover:opacity-70 transition-opacity"
+        >
+          Education
+        </div>
+        <EducationTimeline processedEducation={processedEducation} />
+      </div>
+    </div>
+  </Container>
+</PageLayout>
+
+<style is:global>
+  @media print {
+    /* Hide footer */
+    footer {
+      display: none !important;
+    }
+
+    /* Hide background noise */
+    .fixed.inset-0.pointer-events-none {
+      display: none !important;
+    }
+
+    /* Ensure links are visible with underlines */
+    a {
+      text-decoration: underline;
+      color: inherit;
+    }
+
+    /* Remove hover effects */
+    a:hover {
+      background-color: transparent !important;
+    }
+
+    /* Better spacing for print */
+    body {
+      background: white;
+      color: black;
+    }
+  }
+</style>

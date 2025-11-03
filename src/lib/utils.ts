@@ -114,5 +114,42 @@ export function formatWorkDate(date: Date | string): string {
   if (typeof date === "string") {
     return date;
   }
-  return date.toLocaleDateString("en-EN", { day: "2-digit", month: "long", year: "numeric" });
+  return date.toLocaleDateString("en-EN", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+export function processEducationEntry(educationEntry: {
+  slug: string;
+  data: {
+    institution: string;
+    degree: string;
+    field?: string;
+    grade?: string;
+    dateStart: Date;
+    dateEnd: Date | string;
+    expectedEnd?: Date;
+  };
+  body: string;
+}) {
+  return {
+    slug: educationEntry.slug,
+    institution: educationEntry.data.institution,
+    degree: educationEntry.data.degree,
+    field: educationEntry.data.field,
+    grade: educationEntry.data.grade,
+    description: educationEntry.body.trim(),
+    startDate: educationEntry.data.dateStart,
+    endDate: educationEntry.data.dateEnd,
+    expectedEnd: educationEntry.data.expectedEnd,
+  };
+}
+
+export function formatEducationDate(date: Date | string): string {
+  if (typeof date === "string") {
+    return date;
+  }
+  return date.toLocaleDateString("en-EN", { month: "short", year: "numeric" });
 }

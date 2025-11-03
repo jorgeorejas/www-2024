@@ -1,0 +1,56 @@
+---
+import { formatEducationDate } from "@lib/utils";
+
+interface Props {
+  processedEducation: Array<{
+    slug: string;
+    institution: string;
+    degree: string;
+    field?: string;
+    grade?: string;
+    description: string;
+    startDate: Date;
+    endDate: Date | string;
+    expectedEnd?: Date;
+  }>;
+}
+
+const { processedEducation } = Astro.props;
+---
+
+<div class="space-y-4">
+  {
+    processedEducation.map((education, i) => (
+      <div class="space-y-3">
+        <div class="text-sm text-black/50 dark:text-white/50">
+          {formatEducationDate(education.endDate)}
+          {education.expectedEnd && education.endDate === "Present" && (
+            <span class="text-xs ml-1">
+              (Expected {formatEducationDate(education.expectedEnd)})
+            </span>
+          )}
+        </div>
+        <div class="relative block border-l border-black/15 dark:border-white/20 pl-4 print:border-black">
+          <div class="font-bold font-serif">{education.institution}</div>
+          <div class="mt-2 space-y-1">
+            <p class="font-medium">{education.degree}</p>
+            {education.field && (
+              <p class="text-sm text-black/60 dark:text-white/60 print:text-black">
+                {education.field}
+              </p>
+            )}
+            {education.grade && (
+              <p class="text-sm text-black/50 dark:text-white/50 print:text-black/70">
+                Grade: {education.grade}
+              </p>
+            )}
+          </div>
+        </div>
+        <div class="text-sm text-black/50 dark:text-white/50">
+          {i === processedEducation.length - 1 &&
+            formatEducationDate(education.startDate)}
+        </div>
+      </div>
+    ))
+  }
+</div>

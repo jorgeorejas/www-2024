@@ -26,6 +26,19 @@ const work = defineCollection({
   }),
 });
 
+const education = defineCollection({
+  type: "content",
+  schema: z.object({
+    institution: z.string(),
+    degree: z.string(),
+    field: z.string().optional(),
+    grade: z.string().optional(),
+    dateStart: z.coerce.date(),
+    dateEnd: z.union([z.coerce.date(), z.literal("Present")]),
+    expectedEnd: z.coerce.date().optional(),
+  }),
+});
+
 const projects = defineCollection({
   type: "content",
   schema: z.object({
@@ -76,6 +89,7 @@ const technologies = defineCollection({
 export const collections = {
   blog,
   work,
+  education,
   projects,
   blocks,
   books,
