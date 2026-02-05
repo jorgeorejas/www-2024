@@ -4,11 +4,10 @@ import ArrowCard from "@components/ArrowCard.astro";
 import Container from "@components/Container.astro";
 import ContentBlock from "@components/ContentBlock.astro";
 import Nav from "@components/Nav.astro";
-import WorkTimeline from "@components/WorkTimeline.astro";
 import { HOME, SITE } from "@consts";
 import PageLayout from "@layouts/PageLayout.astro";
-import { getWorkDateRange, processWorkEntry } from "@lib/utils";
 import { getCollection } from "astro:content";
+
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 
@@ -24,23 +23,15 @@ const projects = (await getCollection("projects"))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, SITE.NUM_PROJECTS_ON_HOMEPAGE);
 
-const allwork = (await getCollection("work"))
-  .sort((a, b) => {
-    const aDateRange = getWorkDateRange(a.data.roles);
-    const bDateRange = getWorkDateRange(b.data.roles);
-    return bDateRange.startDate.valueOf() - aDateRange.startDate.valueOf();
-  })
-  .slice(0, SITE.NUM_WORKS_ON_HOMEPAGE);
+const ideas = (await getCollection("ideas"))
+  .filter((idea) => !idea.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, SITE.NUM_POSTS_ON_HOMEPAGE);
 
-const work = await Promise.all(
-  allwork.map(async (item) => {
-    const { Content } = await item.render();
-    return { ...item, Content };
-  }),
-);
-
-// Process work entries for timeline
-const processedWork = allwork.map((item) => processWorkEntry(item));
+const notes = (await getCollection("notes"))
+  .filter((note) => !note.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, SITE.NUM_POSTS_ON_HOMEPAGE);
 ---
 
 <PageLayout title={HOME.TITLE} description={HOME.DESCRIPTION}>
@@ -48,15 +39,13 @@ const processedWork = allwork.map((item) => processWorkEntry(item));
     <Nav />
     <div class="space-y-20">
       <section>
-        <ContentBlock slug="bio" class="space-y-4" />
+        <ContentBlock slug="opening-statement" class="space-y-4" />
       </section>
 
       <section class="space-y-8">
         <div class="flex flex-wrap gap-y-2 items-center justify-between">
-          <h5 class="font-semibold text-black dark:text-white font-serif">
-            Latest posts
-          </h5>
-          <AnimatedLink href="/blog"> See all posts </AnimatedLink>
+          <h5 class="font-semibold text-black dark:text-white font-serif">Writing</h5>
+          <AnimatedLink href="/blog">Blog archive</AnimatedLink>
         </div>
         <ul class="flex flex-col gap-4">
           {
@@ -71,10 +60,8 @@ const processedWork = allwork.map((item) => processWorkEntry(item));
 
       <section class="space-y-8">
         <div class="flex flex-wrap gap-y-2 items-center justify-between">
-          <h5 class="font-semibold text-black font-serif dark:text-white">
-            Recent projects
-          </h5>
-          <AnimatedLink href="/projects"> See all projects </AnimatedLink>
+          <h5 class="font-semibold text-black font-serif dark:text-white">Projects</h5>
+          <AnimatedLink href="/projects">Project archive</AnimatedLink>
         </div>
         <ul class="flex flex-col gap-4">
           {
@@ -89,12 +76,52 @@ const processedWork = allwork.map((item) => processWorkEntry(item));
 
       <section class="space-y-8">
         <div class="flex flex-wrap gap-y-2 items-center justify-between">
-          <h5 class="font-semibold text-black font-serif dark:text-white">
-            Work Experience
-          </h5>
-          <AnimatedLink href="/work"> See all work </AnimatedLink>
+          <h5 class="font-semibold text-black font-serif dark:text-white">Ideas in progress</h5>
+          <AnimatedLink href="/ideas">Ideas index</AnimatedLink>
         </div>
-        <WorkTimeline processedWork={processedWork} />
+        {
+          ideas.length > 0 ? (
+            <ul class="flex flex-col gap-4">
+              {ideas.map((idea) => (
+                <li>
+                  <a href={`/ideas/${idea.slug}`} class="block py-2">
+                    <span class="font-semibold font-serif">{idea.data.title}</span>
+                    <span class="block text-sm text-neutral-600 dark:text-neutral-400">{idea.data.description}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p class="text-sm text-neutral-600 dark:text-neutral-400">
+              Placeholder collection ready for upcoming idea drafts.
+            </p>
+          )
+        }
+      </section>
+
+      <section class="space-y-8">
+        <div class="flex flex-wrap gap-y-2 items-center justify-between">
+          <h5 class="font-semibold text-black font-serif dark:text-white">Notes / fragments</h5>
+          <AnimatedLink href="/notes">Notes index</AnimatedLink>
+        </div>
+        {
+          notes.length > 0 ? (
+            <ul class="flex flex-col gap-4">
+              {notes.map((note) => (
+                <li>
+                  <a href={`/notes/${note.slug}`} class="block py-2">
+                    <span class="font-semibold font-serif">{note.data.title}</span>
+                    <span class="block text-sm text-neutral-600 dark:text-neutral-400">{note.data.description}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p class="text-sm text-neutral-600 dark:text-neutral-400">
+              Placeholder collection ready for short notes and fragments.
+            </p>
+          )
+        }
       </section>
     </div>
   </Container>

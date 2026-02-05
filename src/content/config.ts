@@ -52,6 +52,27 @@ const projects = defineCollection({
   }),
 });
 
+
+const ideas = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    date: z.coerce.date(),
+    draft: z.boolean().optional(),
+  }),
+});
+
+const notes = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    date: z.coerce.date(),
+    draft: z.boolean().optional(),
+  }),
+});
+
 // Reusable markdown blocks for bios, mottos, etc.
 const blocks = defineCollection({
   type: "content",
@@ -91,6 +112,8 @@ export const collections = {
   work,
   education,
   projects,
+  ideas,
+  notes,
   blocks,
   books,
   categories,
