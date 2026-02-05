@@ -41,13 +41,12 @@ body {
 }
 
 header {
-  @apply fixed top-0 left-0 right-0 z-50 py-5;
+  @apply py-5;
   background-color: var(--bg-color);
-  
 }
 
 main {
-  @apply flex-1 py-32;
+  @apply flex-1 py-16 md:py-20;
 }
 
 footer {
