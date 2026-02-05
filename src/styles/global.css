@@ -14,6 +14,10 @@
 
 :root {
   --bg-color: #fafafa;
+  --paper-tint: rgba(148, 123, 90, 0.1);
+  --halftone-dot: rgba(24, 24, 24, 0.06);
+  --halftone-fade: rgba(250, 250, 250, 0.92);
+  --noise-opacity: 0.13;
 }
 
 html {
@@ -25,6 +29,10 @@ html {
 html.dark {
   color-scheme: dark;
   --bg-color: #0f0f0f;
+  --paper-tint: rgba(34, 28, 18, 0.28);
+  --halftone-dot: rgba(255, 245, 223, 0.08);
+  --halftone-fade: rgba(16, 16, 16, 0.86);
+  --noise-opacity: 0.15;
 }
 
 html,
@@ -35,8 +43,40 @@ body {
 body {
   @apply font-mono antialiased;
   @apply flex flex-col;
-  /* @apply bg-stone-100 dark:bg-stone-900; */
   @apply text-black dark:text-white;
+  position: relative;
+  background-color: var(--bg-color);
+  background-image: linear-gradient(175deg, color-mix(in srgb, var(--bg-color) 80%, #fff 20%) 0%, var(--bg-color) 100%);
+  isolation: isolate;
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+body::before {
+  background-image: linear-gradient(140deg, var(--paper-tint) 0%, transparent 65%);
+}
+
+body::after {
+  background-image:
+    radial-gradient(circle at center, color-mix(in srgb, var(--halftone-dot) 45%, transparent) 0 0.45px, transparent 0.75px),
+    repeating-linear-gradient(
+      40deg,
+      rgba(255, 255, 255, 0.02) 0,
+      rgba(255, 255, 255, 0.02) 1px,
+      transparent 1px,
+      transparent 4px
+    ),
+    radial-gradient(circle at top right, transparent 0%, var(--halftone-fade) 78%);
+  background-size: 3px 3px, 100% 100%, 100% 100%;
+  mix-blend-mode: soft-light;
+  opacity: var(--noise-opacity);
 }
 
 header {
@@ -58,6 +98,44 @@ article {
   @apply prose-headings:font-semibold prose-p:font-mono;
   @apply prose-headings:text-black prose-headings:dark:text-white;
   @apply prose-p:text-black prose-p:dark:text-white;
+}
+
+
+article .halftone-image {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  max-width: 100%;
+  isolation: isolate;
+}
+
+article .halftone-image > img {
+  display: block;
+  max-width: 100%;
+  filter: saturate(0.88) contrast(1.06);
+}
+
+article .halftone-image__cmyk,
+article .halftone-image__fade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+article .halftone-image__cmyk {
+  background-image:
+    radial-gradient(circle at center, rgba(0, 212, 255, 0.22) 0 0.55px, transparent 0.9px),
+    radial-gradient(circle at center, rgba(255, 0, 200, 0.2) 0 0.5px, transparent 0.88px),
+    radial-gradient(circle at center, rgba(255, 230, 0, 0.24) 0 0.6px, transparent 0.95px),
+    radial-gradient(circle at center, rgba(20, 20, 20, 0.32) 0 0.55px, transparent 0.9px);
+  background-size: 7px 7px, 7px 7px, 7px 7px, 6px 6px;
+  background-position: 0 0, 2px 1px, -1px 2px, 1px -1px;
+  mix-blend-mode: multiply;
+  opacity: 0.72;
+}
+
+article .halftone-image__fade {
+  background: radial-gradient(circle at center, transparent 58%, color-mix(in srgb, var(--bg-color) 78%, transparent) 100%);
 }
 
 @layer utilities {

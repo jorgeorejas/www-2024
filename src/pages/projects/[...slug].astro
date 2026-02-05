@@ -5,6 +5,7 @@ import FormattedDate from "@components/FormattedDate.astro";
 import Link from "@components/Link.astro";
 import Nav from "@components/Nav.astro";
 import PageLayout from "@layouts/PageLayout.astro";
+import HalftoneImage from "@components/HalftoneImage";
 import { readingTime } from "@lib/utils";
 import { type CollectionEntry, getCollection } from "astro:content";
 
@@ -83,7 +84,7 @@ const { Content } = await project.render();
       }
     </div>
     <article>
-      <Content />
+      <Content components={{ img: HalftoneImage }} />
     </article>
   </Container>
 </PageLayout>

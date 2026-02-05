@@ -4,6 +4,7 @@ import Correction from "@components/Correction.astro";
 import FormattedDate from "@components/FormattedDate.astro";
 import Nav from "@components/Nav.astro";
 import PageLayout from "@layouts/PageLayout.astro";
+import HalftoneImage from "@components/HalftoneImage";
 import { readingTime } from "@lib/utils";
 import { type CollectionEntry, getCollection } from "astro:content";
 
@@ -84,7 +85,7 @@ const { Content } = await post.render();
       </div>
     </div>
     <article>
-      <Content />
+      <Content components={{ img: HalftoneImage }} />
     </article>
   </Container>
 </PageLayout>
