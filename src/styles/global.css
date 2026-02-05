@@ -7,7 +7,8 @@
   --font-mono: IBM Plex Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --font-handwritten: Caveat Variable, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   
-  --color-international-orange: #FF4F00;
+  --color-accent: #9a3412;
+  --color-international-orange: var(--color-accent);
   
   --spacing-full: 100%;
 }
@@ -63,6 +64,10 @@ article {
 }
 
 @layer utilities {
+  .metadata-accent {
+    color: var(--color-accent);
+  }
+
   article a {
     @apply font-sans font-medium text-current underline underline-offset-2;
     @apply decoration-black/15 dark:decoration-white/30;
@@ -75,5 +80,5 @@ article {
 }
 
 ::selection {
-  @apply text-black bg-international-orange/80;
+  @apply text-black bg-black/15 dark:bg-white/20;
 }
