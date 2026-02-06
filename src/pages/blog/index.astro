@@ -38,25 +38,23 @@ const monthYears = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a));
       <Nav breadCrumbsItems={[{ href: "/blog", label: "Blog" }]} />
     </div>
     <div class="space-y-12 my-12">
-      <div class="font-semibold text-black dark:text-white font-serif">
-        Blog
-      </div>
-      <div class="space-y-8">
+      <h1 class="font-display uppercase tracking-wider text-5xl text-ink-black dark:text-paper-white mb-12">
+        {BLOG.TITLE}
+      </h1>
+      <div class="space-y-12">
         {
           monthYears.map((year) => (
             <section class="space-y-6">
-              <div class="font-semibold text-black dark:text-white font-serif">
+              <h2 class="font-display uppercase tracking-wider text-2xl text-ink-black dark:text-paper-white">
                 {year}
-              </div>
-              <div>
-                <ul class="flex flex-col gap-4">
-                  {posts[year].map((post) => (
-                    <li>
-                      <ArrowCard entry={post} dateFormat="day" />
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              </h2>
+              <ul class="flex flex-col gap-4">
+                {posts[year].map((post) => (
+                  <li>
+                    <ArrowCard entry={post} dateFormat="day" />
+                  </li>
+                ))}
+              </ul>
             </section>
           ))
         }
