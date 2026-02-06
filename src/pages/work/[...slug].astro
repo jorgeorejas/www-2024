@@ -1,11 +1,10 @@
 ---
 import Container from "@components/Container.astro";
 import Nav from "@components/Nav.astro";
-import WorkEntry from "@components/WorkEntry.astro";
 import PageLayout from "@layouts/PageLayout.astro";
 import LogbookDivider from "@components/LogbookDivider.astro";
 import { SectionHeader, DateBadge } from "@components/logbook";
-import { dateRange, getWorkDateRange } from "@lib/utils";
+import { getWorkDateRange } from "@lib/utils";
 import { type CollectionEntry, getCollection } from "astro:content";
 
 export const prerender = true;
@@ -29,7 +28,7 @@ const work = Astro.props;
 const { Content } = await work.render();
 
 // Derive the overall date range from roles
-const { startDate, endDate } = getWorkDateRange(work.data.roles);
+const { startDate } = getWorkDateRange(work.data.roles);
 ---
 
 <PageLayout
@@ -68,10 +67,13 @@ const { startDate, endDate } = getWorkDateRange(work.data.roles);
               .sort((a, b) => b.dateStart.valueOf() - a.dateStart.valueOf())
               .map((position, i) => (
                 <div class="space-y-2">
-                  <DateBadge
-                    date={position.dateEnd || new Date()}
-                    format="day"
-                  />
+                  {position.dateEnd && position.dateEnd !== "Present" ? (
+                    <DateBadge date={position.dateEnd} format="day" />
+                  ) : (
+                    <span class="font-sans text-sm text-orange-ink uppercase tracking-wide">
+                      Present
+                    </span>
+                  )}
                   <div class="border-l-2 border-soft-gray/20 pl-4 space-y-2">
                     <div class="font-sans font-medium text-ink-black dark:text-paper-white">
                       {position.title}
