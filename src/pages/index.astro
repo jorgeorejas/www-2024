@@ -3,6 +3,7 @@ import AnimatedLink from "@components/AnimatedLink.astro";
 import ArrowCard from "@components/ArrowCard.astro";
 import Container from "@components/Container.astro";
 import ContentBlock from "@components/ContentBlock.astro";
+import LogbookDivider from "@components/LogbookDivider.astro";
 import Nav from "@components/Nav.astro";
 import WorkTimeline from "@components/WorkTimeline.astro";
 import { HOME, SITE } from "@consts";
@@ -50,6 +51,8 @@ const processedWork = allwork.map((item) => processWorkEntry(item));
       <section class="space-y-6">
         <ContentBlock slug="bio" class="space-y-4 leading-relaxed" />
       </section>
+
+      <LogbookDivider />
 
       <section class="space-y-8">
         <div class="flex flex-wrap gap-y-2 items-center justify-between">
