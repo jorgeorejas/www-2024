@@ -1,0 +1,18 @@
+---
+export interface Props {
+  date: Date;
+  format?: "short" | "day" | "month";
+  class?: string;
+}
+
+import FormattedDate from "@components/FormattedDate.astro";
+
+const { date, format, class: className } = Astro.props;
+---
+
+<time class:list={[
+  "font-sans text-sm text-orange-ink uppercase tracking-wide",
+  className
+]}>
+  <FormattedDate date={date} detail={format} />
+</time>

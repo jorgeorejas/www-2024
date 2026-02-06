@@ -1,0 +1,23 @@
+---
+export interface Props {
+  level?: 1 | 2 | 3;
+  class?: string;
+}
+
+const { level = 2, class: className } = Astro.props;
+const Tag = `h${level}` as 'h1' | 'h2' | 'h3';
+
+const sizeClasses = {
+  1: 'text-3xl',
+  2: 'text-xl',
+  3: 'text-lg'
+};
+---
+
+<Tag class:list={[
+  "font-display uppercase tracking-wider text-ink-black dark:text-paper-white",
+  sizeClasses[level],
+  className
+]}>
+  <slot />
+</Tag>
