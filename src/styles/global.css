@@ -7,7 +7,8 @@
   --font-mono: IBM Plex Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --font-handwritten: Caveat Variable, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   
-  --color-international-orange: #FF4F00;
+  --color-accent: #9a3412;
+  --color-international-orange: var(--color-accent);
   
   --spacing-full: 100%;
 }
@@ -33,20 +34,19 @@ body {
 }
 
 body {
-  @apply font-mono antialiased;
+  @apply font-sans antialiased;
   @apply flex flex-col;
   /* @apply bg-stone-100 dark:bg-stone-900; */
   @apply text-black dark:text-white;
 }
 
 header {
-  @apply fixed top-0 left-0 right-0 z-50 py-5;
+  @apply py-5;
   background-color: var(--bg-color);
-  
 }
 
 main {
-  @apply flex-1 py-32;
+  @apply flex-1 py-16 md:py-20;
 }
 
 footer {
@@ -55,14 +55,20 @@ footer {
 
 article {
   @apply max-w-full prose dark:prose-invert prose-img:mx-auto prose-img:my-auto;
-  @apply prose-headings:font-semibold prose-p:font-mono;
+  @apply prose-headings:font-serif prose-headings:font-semibold;
+  @apply prose-p:font-sans prose-p:font-normal prose-li:font-sans prose-li:font-normal;
+  @apply prose-ul:font-sans prose-ol:font-sans;
   @apply prose-headings:text-black prose-headings:dark:text-white;
-  @apply prose-p:text-black prose-p:dark:text-white;
+  @apply prose-p:text-black prose-p:dark:text-white prose-li:text-black prose-li:dark:text-white;
 }
 
 @layer utilities {
+  .metadata-accent {
+    color: var(--color-accent);
+  }
+
   article a {
-    @apply font-mono text-current underline underline-offset-2;
+    @apply font-sans font-medium text-current underline underline-offset-2;
     @apply decoration-black/15 dark:decoration-white/30;
     @apply transition-colors duration-300 ease-in-out;
   }
@@ -73,5 +79,5 @@ article {
 }
 
 ::selection {
-  @apply text-black bg-international-orange/80;
+  @apply text-black bg-black/15 dark:bg-white/20;
 }
