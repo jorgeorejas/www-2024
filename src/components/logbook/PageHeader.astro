@@ -6,15 +6,16 @@ export interface Props {
   titleCorrection?: string;
   description?: string;
   class?: string;
+  id?: string;
 }
 
 import FormattedDate from "@components/FormattedDate.astro";
 import Correction from "@components/Correction.astro";
 
-const { title, date, metadata, titleCorrection, description, class: className } = Astro.props;
+const { title, date, metadata, titleCorrection, description, class: className, id } = Astro.props;
 ---
 
-<div class:list={["space-y-4 my-10", className]}>
+<div class:list={["space-y-4 my-10", className]} id={id}>
   <div class="flex items-center gap-1.5">
     <div class="font-sans text-sm text-orange-ink uppercase tracking-wide">
       <FormattedDate date={date} />
