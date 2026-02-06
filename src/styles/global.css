@@ -42,10 +42,9 @@ body {
 }
 
 body {
-  @apply font-mono antialiased;
+  @apply size-full font-sans antialiased;
   @apply flex flex-col;
-  /* @apply bg-stone-100 dark:bg-stone-900; */
-  @apply text-black dark:text-white;
+  @apply text-ink-black dark:text-paper-white;
 }
 
 header {
@@ -64,23 +63,24 @@ footer {
 
 article {
   @apply max-w-full prose dark:prose-invert prose-img:mx-auto prose-img:my-auto;
-  @apply prose-headings:font-semibold prose-p:font-mono;
-  @apply prose-headings:text-black prose-headings:dark:text-white;
-  @apply prose-p:text-black prose-p:dark:text-white;
+  @apply prose-headings:font-display prose-headings:uppercase prose-headings:tracking-wide;
+  @apply prose-p:font-sans prose-p:leading-relaxed;
+  @apply prose-headings:text-ink-black prose-headings:dark:text-paper-white;
+  @apply prose-p:text-ink-black prose-p:dark:text-paper-white;
 }
 
 @layer utilities {
   article a {
-    @apply font-mono text-current underline underline-offset-2;
-    @apply decoration-black/15 dark:decoration-white/30;
+    @apply font-sans text-current underline underline-offset-2;
+    @apply decoration-soft-gray/40 dark:decoration-soft-gray/50;
     @apply transition-colors duration-300 ease-in-out;
   }
   article a:hover {
-    @apply text-black dark:text-white;
-    @apply decoration-black/25 dark:decoration-white/50;
+    @apply text-orange-ink dark:text-orange-ink;
+    @apply decoration-orange-ink/60;
   }
 }
 
 ::selection {
-  @apply text-black bg-international-orange/80;
+  @apply text-paper-white bg-orange-ink/80;
 }
