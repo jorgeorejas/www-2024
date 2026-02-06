@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "pnpx",
+      "args": ["@playwright/mcp@latest"]
+    },
+    "Astro docs": {
+      "type": "http",
+      "url": "https://mcp.docs.astro.build/mcp"
+    }
+  }
+}
