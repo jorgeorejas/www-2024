@@ -12,23 +12,22 @@ export const SITE: Site = {
 export const HOME: Metadata = {
   TITLE: "Home",
   DESCRIPTION:
-    "Jorge Orejas is a software developer and a passionate about technology & entrepreneurship.",
+    "A logbook of ideas, notes, and projects—written to think, not to perform.",
 };
 
 export const BLOG: Metadata = {
-  TITLE: "Blog",
-  DESCRIPTION: "A collection of articles on topics I am passionate about.",
+  TITLE: "Notes",
+  DESCRIPTION: "Thinking on paper.",
 };
 
 export const WORK: Metadata = {
   TITLE: "Work",
-  DESCRIPTION: "Where I have worked and what I have done.",
+  DESCRIPTION: "Where I have worked.",
 };
 
 export const PROJECTS: Metadata = {
   TITLE: "Projects",
-  DESCRIPTION:
-    "A collection of my projects, with links to repositories and demos.",
+  DESCRIPTION: "Things built.",
 };
 
 export const SOCIALS: Socials = [
