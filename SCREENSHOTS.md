@@ -25,3 +25,32 @@
 | **Work List** | ![](screenshots/before/mobile/work-list.png) | ![](screenshots/after/mobile/work-list.png) |
 | **Work Detail** | ![](screenshots/before/mobile/work-detail.png) | ![](screenshots/after/mobile/work-detail.png) |
 | **Cv** | ![](screenshots/before/mobile/cv.png) | ![](screenshots/after/mobile/cv.png) |
+
+## Design Verification (2026-02-06)
+
+All screenshots taken after applying logbook design system from `docs/design-brief.md`.
+
+### Typography
+- Display: Bricolage Grotesque (width: 75, weight: 700) - headers only, uppercase
+- Body: IBM Plex Sans - all reading text
+- Handwritten: Caveat - micro annotations only (homepage bio)
+
+### Colors
+- Ink Black (#0B0B0B) - primary text
+- Paper White (#F7F6F3) - background
+- Soft Gray (#8A8A8A) - secondary text
+- Orange Ink (#FF4F00) - dates, editorial marks
+- Ballpoint Blue (#3300FF) - handwritten notes
+
+### Layout
+- Single column throughout
+- No visual containers
+- Logbook feel: notebook, not interface
+
+### Key Changes from Before
+- Replaced serif fonts with Bricolage Grotesque (condensed, uppercase)
+- Replaced generic black/white with logbook color palette
+- Applied PageHeader component to blog/projects detail pages
+- Applied SectionHeader/DateBadge to work detail page
+- Added LogbookDivider components throughout
+- Unified typography across all detail pages
