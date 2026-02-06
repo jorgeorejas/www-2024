@@ -9,6 +9,13 @@ export default {
         sans: ["var(--font-sans)"],
         handwritten: ["var(--font-handwritten)"],
       },
+      colors: {
+        "ink-black": "var(--color-ink-black)",
+        "paper-white": "var(--color-paper-white)",
+        "soft-gray": "var(--color-soft-gray)",
+        "orange-ink": "var(--color-orange-ink)",
+        "ballpoint-blue": "var(--color-ballpoint-blue)",
+      },
     },
   },
 };

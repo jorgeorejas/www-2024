@@ -6,24 +6,34 @@
   --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   --font-handwritten: "Caveat", cursive, ui-sans-serif;
 
-  --color-international-orange: #FF4F00;
+  /* Core Colors */
+  --color-ink-black: #0B0B0B;
+  --color-paper-white: #F7F6F3;
+  --color-soft-gray: #8A8A8A;
+
+  /* Accent Colors */
+  --color-orange-ink: #FF4F00;
+  --color-ballpoint-blue: #3300FF;
 
   --spacing-full: 100%;
 }
 
 :root {
-  --bg-color: #fafafa;
+  --bg-color: var(--color-paper-white);
+  --text-color: var(--color-ink-black);
 }
 
 html {
   overflow-y: scroll;
   color-scheme: light;
   background-color: var(--bg-color);
+  color: var(--text-color);
 }
 
 html.dark {
   color-scheme: dark;
-  --bg-color: #0f0f0f;
+  --bg-color: var(--color-ink-black);
+  --text-color: var(--color-paper-white);
 }
 
 html,
