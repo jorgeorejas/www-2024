@@ -1,0 +1,58 @@
+---
+import Container from "@components/Container.astro";
+import FormattedDate from "@components/FormattedDate.astro";
+import Nav from "@components/Nav.astro";
+import PageLayout from "@layouts/PageLayout.astro";
+import { readingTime } from "@lib/utils";
+import { type CollectionEntry, getCollection } from "astro:content";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const notes = (await getCollection("notes"))
+    .filter((note: CollectionEntry<"notes">) => !note.data.draft)
+    .sort(
+      (a: CollectionEntry<"notes">, b: CollectionEntry<"notes">) =>
+        b.data.date.valueOf() - a.data.date.valueOf(),
+    );
+
+  return notes.map((note: CollectionEntry<"notes">) => ({
+    params: { slug: note.slug },
+    props: note,
+  }));
+}
+
+const note = Astro.props as CollectionEntry<"notes">;
+const { Content } = await note.render();
+---
+
+<PageLayout title={note.data.title} description={note.data.description}>
+  <Container>
+    <div class="space-y-2">
+      <Nav
+        breadCrumbsItems={[
+          { href: "/notes", label: "Notes" },
+          { href: `/notes/${note.slug}`, label: note.data.title },
+        ]}
+      />
+    </div>
+    <div class="space-y-4 my-10">
+      <div class="flex items-center gap-1.5">
+        <div class="font-base text-sm">
+          <FormattedDate date={note.data.date} />
+        </div>
+        &bull;
+        <div class="font-base text-sm">{readingTime(note.body)}</div>
+      </div>
+      <div class="text-2xl font-semibold font-serif text-black dark:text-white">
+        {note.data.title}
+      </div>
+      <div class="border-b border-black/15 dark:border-white/20 pb-4">
+        {note.data.description}
+      </div>
+    </div>
+    <article>
+      <Content />
+    </article>
+  </Container>
+</PageLayout>

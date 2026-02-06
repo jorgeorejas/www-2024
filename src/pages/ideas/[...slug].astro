@@ -1,0 +1,58 @@
+---
+import Container from "@components/Container.astro";
+import FormattedDate from "@components/FormattedDate.astro";
+import Nav from "@components/Nav.astro";
+import PageLayout from "@layouts/PageLayout.astro";
+import { readingTime } from "@lib/utils";
+import { type CollectionEntry, getCollection } from "astro:content";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const ideas = (await getCollection("ideas"))
+    .filter((idea: CollectionEntry<"ideas">) => !idea.data.draft)
+    .sort(
+      (a: CollectionEntry<"ideas">, b: CollectionEntry<"ideas">) =>
+        b.data.date.valueOf() - a.data.date.valueOf(),
+    );
+
+  return ideas.map((idea: CollectionEntry<"ideas">) => ({
+    params: { slug: idea.slug },
+    props: idea,
+  }));
+}
+
+const idea = Astro.props as CollectionEntry<"ideas">;
+const { Content } = await idea.render();
+---
+
+<PageLayout title={idea.data.title} description={idea.data.description}>
+  <Container>
+    <div class="space-y-2">
+      <Nav
+        breadCrumbsItems={[
+          { href: "/ideas", label: "Ideas" },
+          { href: `/ideas/${idea.slug}`, label: idea.data.title },
+        ]}
+      />
+    </div>
+    <div class="space-y-4 my-10">
+      <div class="flex items-center gap-1.5">
+        <div class="font-base text-sm">
+          <FormattedDate date={idea.data.date} />
+        </div>
+        &bull;
+        <div class="font-base text-sm">{readingTime(idea.body)}</div>
+      </div>
+      <div class="text-2xl font-semibold font-serif text-black dark:text-white">
+        {idea.data.title}
+      </div>
+      <div class="border-b border-black/15 dark:border-white/20 pb-4">
+        {idea.data.description}
+      </div>
+    </div>
+    <article>
+      <Content />
+    </article>
+  </Container>
+</PageLayout>
