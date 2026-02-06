@@ -5,7 +5,11 @@ import Correction from "./Correction.astro";
 import AnimatedArrow from "./AnimatedArrow.astro";
 
 type Props = {
-  entry: CollectionEntry<"blog"> | CollectionEntry<"projects">;
+  entry:
+    | CollectionEntry<"blog">
+    | CollectionEntry<"projects">
+    | CollectionEntry<"ideas">
+    | CollectionEntry<"notes">;
   dateFormat?: "short" | "day" | "month";
 };
 

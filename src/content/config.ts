@@ -58,6 +58,7 @@ const ideas = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string(),
+    titleCorrection: z.string().optional(),
     date: z.coerce.date(),
     draft: z.boolean().optional(),
   }),
@@ -68,6 +69,7 @@ const notes = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string(),
+    titleCorrection: z.string().optional(),
     date: z.coerce.date(),
     draft: z.boolean().optional(),
   }),
