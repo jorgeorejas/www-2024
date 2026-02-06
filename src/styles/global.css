@@ -2,7 +2,7 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --font-display: "Bebas Neue", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   --font-handwritten: "Caveat", cursive, ui-sans-serif;
 
@@ -45,6 +45,11 @@ body {
   @apply size-full font-sans antialiased;
   @apply flex flex-col;
   @apply text-ink-black dark:text-paper-white;
+}
+
+.font-display {
+  font-variation-settings: 'wdth' 75, 'wght' 700;
+  font-weight: 700;
 }
 
 header {
