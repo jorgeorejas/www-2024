@@ -1,11 +1,11 @@
 ---
 import Container from "@components/Container.astro";
-import Correction from "@components/Correction.astro";
-import FormattedDate from "@components/FormattedDate.astro";
 import Nav from "@components/Nav.astro";
 import PageLayout from "@layouts/PageLayout.astro";
 import { readingTime } from "@lib/utils";
 import { type CollectionEntry, getCollection } from "astro:content";
+import LogbookDivider from "@components/LogbookDivider.astro";
+import { PageHeader } from "@components/logbook";
 
 export const prerender = true;
 
@@ -35,9 +35,9 @@ const { Content } = await post.render();
   <!-- Sticky header that appears after scrolling past post header -->
   <header id="sticky-header" class="pointer-events-none">
     <Container>
-      <div class="text-xl font-semibold font-serif text-black dark:text-white">
-        <span class="font-semibold font-serif">Jorge Orejas</span>
-        <span class="text-black/50 dark:text-white/50">~</span>
+      <div class="text-lg font-display uppercase tracking-wider text-ink-black dark:text-paper-white">
+        <span class="font-display">Jorge Orejas</span>
+        <span class="text-soft-gray">~</span>
         <span class="whitespace-wrap">{post.data.title}</span>
       </div>
     </Container>
@@ -52,37 +52,16 @@ const { Content } = await post.render();
         ]}
       />
     </div>
-    <div class="space-y-4 my-10" id="post-header">
-      <div class="flex items-center gap-1.5">
-        <div class="font-base text-sm">
-          <FormattedDate date={post.data.date} />
-        </div>
-        &bull;
-        <div class="font-base text-sm">
-          {readingTime(post.body)}
-        </div>
-      </div>
-      {
-        post.data.titleCorrection ? (
-          <Correction
-            text={post.data.titleCorrection}
-            textClass="text-2xl -top-6"
-          >
-            <div class="text-2xl font-semibold font-serif text-black dark:text-white">
-              {post.data.title}
-            </div>
-          </Correction>
-        ) : (
-          <div class="text-2xl font-semibold font-serif text-black dark:text-white">
-            {post.data.title}
-          </div>
-        )
-      }
+    <PageHeader
+      title={post.data.title}
+      date={post.data.date}
+      metadata={readingTime(post.body)}
+      titleCorrection={post.data.titleCorrection}
+      description={post.data.description}
+      id="post-header"
+    />
 
-      <div class="border-b border-black/15 dark:border-white/20 pb-4">
-        {post.data.description}
-      </div>
-    </div>
+    <LogbookDivider />
     <article>
       <Content />
     </article>
