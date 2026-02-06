@@ -1,0 +1,67 @@
+---
+// No props needed - fetches data client-side
+---
+
+<div id="spotify-widget" class="hidden">
+  <div class="flex items-center gap-3 text-soft-gray">
+    <span class="flex items-center gap-2">
+      <span class="relative flex h-2 w-2">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-ink opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-orange-ink"></span>
+      </span>
+      <span class="font-sans uppercase tracking-wide text-xs">Listening to:</span>
+    </span>
+    <a
+      id="spotify-track-link"
+      href="#"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="font-sans text-sm hover:text-orange-ink transition-colors"
+    >
+      <span id="spotify-track-title">—</span>
+      <span class="text-soft-gray/60"> — </span>
+      <span id="spotify-track-artist">—</span>
+    </a>
+  </div>
+</div>
+
+<script>
+  interface SpotifyData {
+    isPlaying: boolean;
+    title?: string;
+    artist?: string;
+    url?: string;
+  }
+
+  const widget = document.getElementById("spotify-widget");
+  const trackLink = document.getElementById("spotify-track-link") as HTMLAnchorElement;
+  const trackTitle = document.getElementById("spotify-track-title");
+  const trackArtist = document.getElementById("spotify-track-artist");
+
+  async function updateNowPlaying() {
+    try {
+      const response = await fetch("/api/spotify/now-playing");
+      const data: SpotifyData = await response.json();
+
+      if (data.isPlaying && data.title && data.artist && data.url) {
+        // Show widget and update content
+        widget?.classList.remove("hidden");
+        if (trackTitle) trackTitle.textContent = data.title;
+        if (trackArtist) trackArtist.textContent = data.artist;
+        if (trackLink) trackLink.href = data.url;
+      } else {
+        // Hide widget when not playing
+        widget?.classList.add("hidden");
+      }
+    } catch (error) {
+      console.error("Failed to fetch Spotify data:", error);
+      widget?.classList.add("hidden");
+    }
+  }
+
+  // Initial fetch
+  updateNowPlaying();
+
+  // Poll every 30 seconds
+  setInterval(updateNowPlaying, 30000);
+</script>

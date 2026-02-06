@@ -1,28 +1,35 @@
 ---
 import Link from "@components/Link.astro";
 import Container from "@components/Container.astro";
+import SpotifyNowPlaying from "@components/SpotifyNowPlaying.astro";
 import { SITE, SOCIALS } from "@consts";
 ---
 
 <Container>
   <footer class="py-8 border-t border-soft-gray/20">
-    <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-soft-gray">
-      <p class="font-sans">
-        © {new Date().getFullYear()} {SITE.NAME}
-      </p>
-      <nav class="flex gap-4">
-        {SOCIALS.map((social) => (
-          <a
-            href={social.HREF}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="font-sans hover:text-orange-ink transition-colors uppercase tracking-wide"
-            aria-label={`${SITE.NAME} on ${social.NAME}`}
-          >
-            {social.NAME}
-          </a>
-        ))}
-      </nav>
+    <div class="flex flex-col items-center gap-4 text-sm text-soft-gray">
+      <!-- Spotify Now Playing Widget -->
+      <SpotifyNowPlaying />
+
+      <!-- Copyright and Social Links -->
+      <div class="flex flex-col md:flex-row items-center justify-between w-full gap-4">
+        <p class="font-sans">
+          © {new Date().getFullYear()} {SITE.NAME}
+        </p>
+        <nav class="flex gap-4">
+          {SOCIALS.map((social) => (
+            <a
+              href={social.HREF}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="font-sans hover:text-orange-ink transition-colors uppercase tracking-wide"
+              aria-label={`${SITE.NAME} on ${social.NAME}`}
+            >
+              {social.NAME}
+            </a>
+          ))}
+        </nav>
+      </div>
     </div>
   </footer>
 </Container>
