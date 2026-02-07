@@ -4,29 +4,45 @@ import { useEffect, useState } from "react";
 interface HalftoneImageProps {
   src: string;
   alt: string;
-  width?: number;
-  height?: number;
 }
 
-export default function HalftoneImage({
-  src,
-  alt,
-  width = 800,
-  height = 600,
-}: HalftoneImageProps) {
-  const [dimensions, setDimensions] = useState({ width, height });
+export default function HalftoneImage({ src, alt }: HalftoneImageProps) {
+  const [dimensions, setDimensions] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
 
   useEffect(() => {
     // Load image to get actual dimensions
     const img = new Image();
     img.onload = () => {
-      setDimensions({ width: img.width, height: img.height });
+      // Calculate dimensions that fit within a reasonable max width while maintaining aspect ratio
+      const maxWidth = 1200;
+      const aspectRatio = img.height / img.width;
+
+      if (img.width > maxWidth) {
+        setDimensions({
+          width: maxWidth,
+          height: Math.round(maxWidth * aspectRatio),
+        });
+      } else {
+        setDimensions({ width: img.width, height: img.height });
+      }
     };
     img.src = src;
   }, [src]);
 
+  // Don't render until we have dimensions
+  if (!dimensions) {
+    return (
+      <div className="my-8 flex items-center justify-center min-h-[400px]">
+        <span className="text-soft-gray">Loading...</span>
+      </div>
+    );
+  }
+
   return (
-    <div className="my-8 rounded-sm overflow-hidden">
+    <div className="my-8 rounded-sm overflow-hidden max-w-full">
       <HalftoneCmyk
         width={dimensions.width}
         height={dimensions.height}
@@ -41,6 +57,7 @@ export default function HalftoneImage({
         type="ink"
         softness={0.8}
         contrast={1.05}
+        fit="contain"
       />
       <span className="sr-only">{alt}</span>
     </div>
