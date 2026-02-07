@@ -42,7 +42,13 @@ export default function HalftoneImage({ src, alt }: HalftoneImageProps) {
   }
 
   return (
-    <div className="my-8 rounded-sm overflow-hidden max-w-full">
+    <div
+      className="my-8 rounded-sm max-w-full"
+      style={{
+        width: dimensions.width,
+        height: dimensions.height
+      }}
+    >
       <HalftoneCmyk
         width={dimensions.width}
         height={dimensions.height}
