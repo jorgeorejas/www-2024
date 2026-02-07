@@ -16,10 +16,10 @@ export default function HalftoneImage({ src, alt }: HalftoneImageProps) {
     // Load image to get actual dimensions
     const img = new Image();
     img.onload = () => {
-      // Calculate dimensions that fit within the Container content width
-      // Container has max-w-screen-md (768px) with px-5 (40px total padding)
-      // So actual content width is 728px
-      const maxWidth = 728;
+      // Render at higher resolution for better quality halftone
+      // We'll render at 2x the display size for sharper dots
+      // Display size is 728px (container width), so render at ~1456px
+      const maxWidth = 1456;
       const aspectRatio = img.height / img.width;
 
       if (img.width > maxWidth) {
