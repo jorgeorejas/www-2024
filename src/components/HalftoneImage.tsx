@@ -1,4 +1,4 @@
-import { HalftoneCMYK } from "@paper-design/shaders-react";
+import { HalftoneCmyk } from "@paper-design/shaders-react";
 import { useEffect, useState } from "react";
 
 interface HalftoneImageProps {
@@ -27,7 +27,7 @@ export default function HalftoneImage({
 
   return (
     <div className="my-8 rounded-sm overflow-hidden">
-      <HalftoneCMYK
+      <HalftoneCmyk
         width={dimensions.width}
         height={dimensions.height}
         image={src}
