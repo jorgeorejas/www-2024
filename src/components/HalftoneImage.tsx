@@ -43,9 +43,8 @@ export default function HalftoneImage({ src, alt }: HalftoneImageProps) {
 
   return (
     <div
-      className="my-8 rounded-sm w-full"
+      className="my-8 rounded-sm w-full overflow-hidden"
       style={{
-        maxWidth: dimensions.width,
         aspectRatio: `${dimensions.width} / ${dimensions.height}`
       }}
     >
