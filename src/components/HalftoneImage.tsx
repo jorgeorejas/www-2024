@@ -16,9 +16,10 @@ export default function HalftoneImage({ src, alt }: HalftoneImageProps) {
     // Load image to get actual dimensions
     const img = new Image();
     img.onload = () => {
-      // Calculate dimensions that fit within the Container max width (768px for md)
-      // This ensures the shader renders at a size that won't be cropped
-      const maxWidth = 768;
+      // Calculate dimensions that fit within the Container content width
+      // Container has max-w-screen-md (768px) with px-5 (40px total padding)
+      // So actual content width is 728px
+      const maxWidth = 728;
       const aspectRatio = img.height / img.width;
 
       if (img.width > maxWidth) {
