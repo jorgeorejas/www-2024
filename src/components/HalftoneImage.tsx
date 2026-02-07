@@ -43,10 +43,10 @@ export default function HalftoneImage({ src, alt }: HalftoneImageProps) {
 
   return (
     <div
-      className="my-8 rounded-sm max-w-full"
+      className="my-8 rounded-sm w-full"
       style={{
-        width: dimensions.width,
-        height: dimensions.height
+        maxWidth: dimensions.width,
+        aspectRatio: `${dimensions.width} / ${dimensions.height}`
       }}
     >
       <HalftoneCmyk
