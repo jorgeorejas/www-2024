@@ -14,33 +14,33 @@ const { entry, dateFormat } = Astro.props;
 
 <a
   href={`/${entry.collection}/${entry.slug}`}
-  class="relative group flex flex-nowrap py-3 px-4 pr-10 border-l border-black/15 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-colors duration-300 ease-in-out"
+  class="relative group flex flex-nowrap py-4 pr-10 transition-colors duration-300 ease-in-out"
 >
   <div class="flex flex-col gap-2 flex-1">
-    <div class="flex md:gap-2 md:items-center flex-col md:flex-row">
+    <div class="flex md:gap-4 md:items-baseline flex-col md:flex-row">
       {
         entry.data.titleCorrection ? (
-          <div class="font-semibold font-serif">
+          <h3 class="font-sans font-medium text-lg text-ink-black dark:text-paper-white group-hover:text-orange-ink transition-colors">
             <Correction text={entry.data.titleCorrection} rotate>
               {entry.data.title}
             </Correction>
-          </div>
+          </h3>
         ) : (
-          <div class="font-semibold font-serif relative inline-block">
+          <h3 class="font-sans font-medium text-lg text-ink-black dark:text-paper-white group-hover:text-orange-ink transition-colors">
             {entry.data.title}
-            <span class="absolute left-0 bottom-0 w-full h-[1px] bg-blue-800 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-in-out" />
-          </div>
+          </h3>
         )
       }
-      <div class="text-sm text-black/50 dark:text-white/50">
-        <span class="hidden md:inline"> - </span>
+      <time class="font-sans text-sm text-orange-ink uppercase tracking-wide">
         <FormattedDate date={entry.data.date} detail={dateFormat} />
-      </div>
+      </time>
     </div>
 
-    <div class="text-sm">
-      {entry.data.description}
-    </div>
+    {entry.data.description && (
+      <p class="font-sans text-sm text-soft-gray leading-relaxed">
+        {entry.data.description}
+      </p>
+    )}
   </div>
   <AnimatedArrow />
 </a>

@@ -3,6 +3,7 @@ import AnimatedLink from "@components/AnimatedLink.astro";
 import ArrowCard from "@components/ArrowCard.astro";
 import Container from "@components/Container.astro";
 import ContentBlock from "@components/ContentBlock.astro";
+import LogbookDivider from "@components/LogbookDivider.astro";
 import Nav from "@components/Nav.astro";
 import WorkTimeline from "@components/WorkTimeline.astro";
 import { HOME, SITE } from "@consts";
@@ -46,16 +47,18 @@ const processedWork = allwork.map((item) => processWorkEntry(item));
 <PageLayout title={HOME.TITLE} description={HOME.DESCRIPTION}>
   <Container>
     <Nav />
-    <div class="space-y-20">
-      <section>
-        <ContentBlock slug="bio" class="space-y-4" />
+    <div class="space-y-24">
+      <section class="space-y-6">
+        <ContentBlock slug="bio" class="space-y-4 leading-relaxed" />
       </section>
+
+      <LogbookDivider />
 
       <section class="space-y-8">
         <div class="flex flex-wrap gap-y-2 items-center justify-between">
-          <h5 class="font-semibold text-black dark:text-white font-serif">
+          <h2 class="font-display uppercase tracking-wider text-3xl text-ink-black dark:text-paper-white">
             Latest posts
-          </h5>
+          </h2>
           <AnimatedLink href="/blog"> See all posts </AnimatedLink>
         </div>
         <ul class="flex flex-col gap-4">
@@ -71,9 +74,9 @@ const processedWork = allwork.map((item) => processWorkEntry(item));
 
       <section class="space-y-8">
         <div class="flex flex-wrap gap-y-2 items-center justify-between">
-          <h5 class="font-semibold text-black font-serif dark:text-white">
+          <h2 class="font-display uppercase tracking-wider text-3xl text-ink-black dark:text-paper-white">
             Recent projects
-          </h5>
+          </h2>
           <AnimatedLink href="/projects"> See all projects </AnimatedLink>
         </div>
         <ul class="flex flex-col gap-4">
@@ -89,9 +92,9 @@ const processedWork = allwork.map((item) => processWorkEntry(item));
 
       <section class="space-y-8">
         <div class="flex flex-wrap gap-y-2 items-center justify-between">
-          <h5 class="font-semibold text-black font-serif dark:text-white">
+          <h2 class="font-display uppercase tracking-wider text-3xl text-ink-black dark:text-paper-white">
             Work Experience
-          </h5>
+          </h2>
           <AnimatedLink href="/work"> See all work </AnimatedLink>
         </div>
         <WorkTimeline processedWork={processedWork} />

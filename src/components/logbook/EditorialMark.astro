@@ -1,0 +1,23 @@
+---
+export interface Props {
+  variant?: "dot" | "dash" | "double-dash";
+  class?: string;
+}
+
+const { variant = "dot", class: className } = Astro.props;
+---
+
+{variant === "dot" && (
+  <span class:list={["inline-block w-1.5 h-1.5 rounded-full bg-orange-ink", className]}></span>
+)}
+
+{variant === "dash" && (
+  <span class:list={["inline-block w-6 h-0.5 bg-orange-ink", className]}></span>
+)}
+
+{variant === "double-dash" && (
+  <span class:list={["inline-flex items-center gap-1", className]}>
+    <span class="block w-6 h-0.5 bg-orange-ink"></span>
+    <span class="block w-2 h-0.5 bg-orange-ink"></span>
+  </span>
+)}

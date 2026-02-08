@@ -26,18 +26,9 @@ importers:
       '@astrojs/vercel':
         specifier: ^8.2.10
         version: 8.2.10(astro@5.14.6(@vercel/functions@2.2.13)(jiti@2.6.1)(lightningcss@1.30.2)(rollup@4.52.2)(typescript@5.6.2)(yaml@2.5.1))(react@18.3.1)(rollup@4.52.2)
-      '@fontsource-variable/caveat':
-        specifier: ^5.1.0
-        version: 5.1.0
-      '@fontsource/ibm-plex-mono':
-        specifier: ^5.1.0
-        version: 5.1.0
-      '@fontsource/inter':
-        specifier: ^5.0.17
-        version: 5.0.17
-      '@fontsource/lora':
-        specifier: ^5.0.16
-        version: 5.0.16
+      '@paper-design/shaders-react':
+        specifier: ^0.0.71
+        version: 0.0.71(@types/react@18.3.9)(react@18.3.1)
       '@tailwindcss/postcss':
         specifier: ^4.1.15
         version: 4.1.15
@@ -508,18 +499,6 @@ packages:
     resolution: {integrity: sha512-Ys+3g2TaW7gADOJzPt83SJtCDhMjndcDMFVQ/Tj9iA1BfJzFKD9mAUXT3OenpuPHbI6P/myECxRJrofUsDx/5g==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
-  '@fontsource-variable/caveat@5.1.0':
-    resolution: {integrity: sha512-zLBtg14o5AHlJjsq7v4fpgot1XQDqJkMi9fAmbGO4rQHr9w5nxj9Zu3da85TyVP86tZ94rhFFeGhjMNvwgfaHw==}
-
-  '@fontsource/ibm-plex-mono@5.1.0':
-    resolution: {integrity: sha512-XKsZNyRCj6tz8zlatHmniSoLVephMD5GQG2sXgcaEb8DkUO+O61r28uTlIMEZuoZXtP4c4STvL+KUlJM5jZOEg==}
-
-  '@fontsource/inter@5.0.17':
-    resolution: {integrity: sha512-2meBGx1kt7u5LwzGc5Sz5rka6ZDrydg6nT3x6Wkt310vHXUchIywrO8pooWMzZdHYcyFY/cv4lEpJZgMD94bCg==}
-
-  '@fontsource/lora@5.0.16':
-    resolution: {integrity: sha512-5OPNjH930aebYUBE/hai0ujeAKLxgkASZ67ozXh5s+eKIbw+/crEm/T3rwofWnZHHoAHedc7DgLrpVtigHVtXQ==}
-
   '@formatjs/ecma402-abstract@2.3.1':
     resolution: {integrity: sha512-Ip9uV+/MpLXWRk03U/GzeJMuPeOXpJBSB5V1tjA6kJhvqssye5J5LoYLc7Z5IAHb7nR62sRoguzrFiVCP/hnzw==}
 
@@ -848,6 +827,18 @@ packages:
 
   '@oslojs/encoding@1.1.0':
     resolution: {integrity: sha512-70wQhgYmndg4GCPxPPxPGevRKqTIJ2Nh4OkiMWmDAVYsTQ+Ta7Sq+rPevXyXGdzr30/qZBnyOalCszoMxlyldQ==}
+
+  '@paper-design/shaders-react@0.0.71':
+    resolution: {integrity: sha512-kTqjIlyZcpkwqJie+3ldEDscTtx1oOi8eRBD5QgWKI21GaNn/SSg26092M5zzqr3e8dVANv0ktS2ICSjbMFKbw==}
+    peerDependencies:
+      '@types/react': ^18 || ^19
+      react: ^18 || ^19
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+
+  '@paper-design/shaders@0.0.71':
+    resolution: {integrity: sha512-brCt05YxxyjBrhnE3l1wJJHcFXsM8aE4lmpd9TMQp+p0dMU3F+OWkJZL9m/RC1Tt7om5xr0Wg7d0HYm+b9NYZA==}
 
   '@paulirish/trace_engine@0.0.32':
     resolution: {integrity: sha512-KxWFdRNbv13U8bhYaQvH6gLG9CVEt2jKeosyOOYILVntWEVWhovbgDrbOiZ12pJO3vjZs0Zgbd3/Zgde98woEA==}
@@ -4813,14 +4804,6 @@ snapshots:
 
   '@eslint/js@8.57.0': {}
 
-  '@fontsource-variable/caveat@5.1.0': {}
-
-  '@fontsource/ibm-plex-mono@5.1.0': {}
-
-  '@fontsource/inter@5.0.17': {}
-
-  '@fontsource/lora@5.0.16': {}
-
   '@formatjs/ecma402-abstract@2.3.1':
     dependencies:
       '@formatjs/fast-memoize': 2.2.5
@@ -5128,6 +5111,15 @@ snapshots:
       fastq: 1.17.1
 
   '@oslojs/encoding@1.1.0': {}
+
+  '@paper-design/shaders-react@0.0.71(@types/react@18.3.9)(react@18.3.1)':
+    dependencies:
+      '@paper-design/shaders': 0.0.71
+      react: 18.3.1
+    optionalDependencies:
+      '@types/react': 18.3.9
+
+  '@paper-design/shaders@0.0.71': {}
 
   '@paulirish/trace_engine@0.0.32': {}
 

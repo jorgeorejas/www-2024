@@ -1,0 +1,18 @@
+---
+export interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<span
+  class:list={[
+    "font-handwritten text-ballpoint-blue dark:text-ballpoint-blue",
+    "text-sm leading-tight",
+    "inline-block",
+    className,
+  ]}
+>
+  <slot />
+</span>

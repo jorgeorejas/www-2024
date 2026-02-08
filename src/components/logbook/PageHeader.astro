@@ -1,0 +1,54 @@
+---
+export interface Props {
+  title: string;
+  date: Date;
+  metadata?: string;
+  titleCorrection?: string;
+  description?: string;
+  class?: string;
+  id?: string;
+}
+
+import FormattedDate from "@components/FormattedDate.astro";
+import Correction from "@components/Correction.astro";
+
+const { title, date, metadata, titleCorrection, description, class: className, id } = Astro.props;
+---
+
+<div class:list={["space-y-4 my-10", className]} id={id}>
+  <div class="flex items-center gap-1.5">
+    <div class="font-sans text-sm text-orange-ink uppercase tracking-wide">
+      <FormattedDate date={date} />
+    </div>
+    {metadata && (
+      <>
+        <span class="text-soft-gray">&bull;</span>
+        <div class="font-sans text-sm text-soft-gray">
+          {metadata}
+        </div>
+      </>
+    )}
+  </div>
+
+  {
+    titleCorrection ? (
+      <Correction text={titleCorrection} textClass="text-3xl -top-6">
+        <h1 class="text-3xl font-display uppercase tracking-wider text-ink-black dark:text-paper-white">
+          {title}
+        </h1>
+      </Correction>
+    ) : (
+      <h1 class="text-3xl font-display uppercase tracking-wider text-ink-black dark:text-paper-white">
+        {title}
+      </h1>
+    )
+  }
+
+  {description && (
+    <div class="border-b border-soft-gray/20 pb-4 font-sans text-soft-gray leading-relaxed">
+      {description}
+    </div>
+  )}
+
+  <slot />
+</div>

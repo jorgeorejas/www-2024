@@ -1,9 +1,10 @@
 ---
 import Container from "@components/Container.astro";
 import Nav from "@components/Nav.astro";
-import WorkEntry from "@components/WorkEntry.astro";
 import PageLayout from "@layouts/PageLayout.astro";
-import { dateRange, getWorkDateRange } from "@lib/utils";
+import LogbookDivider from "@components/LogbookDivider.astro";
+import { SectionHeader, DateBadge } from "@components/logbook";
+import { getWorkDateRange } from "@lib/utils";
 import { type CollectionEntry, getCollection } from "astro:content";
 
 export const prerender = true;
@@ -27,7 +28,7 @@ const work = Astro.props;
 const { Content } = await work.render();
 
 // Derive the overall date range from roles
-const { startDate, endDate } = getWorkDateRange(work.data.roles);
+const { startDate } = getWorkDateRange(work.data.roles);
 ---
 
 <PageLayout
@@ -44,43 +45,47 @@ const { startDate, endDate } = getWorkDateRange(work.data.roles);
       />
     </div>
     <div class="space-y-4 my-10">
-      <div class="flex items-center gap-1.5">
-        <div class="font-base text-sm">
-          {dateRange(startDate, endDate)}
-        </div>
-      </div>
+      <DateBadge date={startDate} />
 
-      <div class="text-2xl font-semibold font-serif text-black dark:text-white">
+      <SectionHeader level={1}>
         {work.data.company}
-      </div>
+      </SectionHeader>
 
       <div class="prose prose-neutral dark:prose-invert max-w-none">
         <Content />
       </div>
 
+      <LogbookDivider />
+
       <div class="space-y-4">
-        <h3 class="text-lg font-semibold font-serif">Positions</h3>
-        <div class="space-y-3">
+        <SectionHeader level={2}>
+          Positions
+        </SectionHeader>
+        <div class="space-y-4">
           {
             work.data.roles
               .sort((a, b) => b.dateStart.valueOf() - a.dateStart.valueOf())
               .map((position, i) => (
                 <div class="space-y-2">
-                  <div class="text-sm text-black/50 dark:text-white/50">
-                    {position.dateEnd
-                      ? new Date(position.dateEnd).toLocaleDateString("es-ES")
-                      : "Present"}
-                  </div>
-                  <div class="border-l border-black/15 dark:border-white/20 pl-4 space-y-2">
-                    <div class="font-medium font-serif">{position.title}</div>
+                  {position.dateEnd && position.dateEnd !== "Present" ? (
+                    <DateBadge date={position.dateEnd} format="day" />
+                  ) : (
+                    <span class="font-sans text-sm text-orange-ink uppercase tracking-wide">
+                      Present
+                    </span>
+                  )}
+                  <div class="border-l-2 border-soft-gray/20 pl-4 space-y-2">
+                    <div class="font-sans font-medium text-ink-black dark:text-paper-white">
+                      {position.title}
+                    </div>
                     {position.description && (
-                      <div class="text-sm opacity-60">
+                      <div class="font-sans text-sm text-soft-gray leading-relaxed">
                         {position.description}
                       </div>
                     )}
                   </div>
                   {i === work.data.roles.length - 1 && (
-                    <div class="text-sm text-black/50 dark:text-white/50">
+                    <div class="font-sans text-sm text-soft-gray">
                       {position.dateStart.toLocaleDateString("es-ES")}
                     </div>
                   )}
