@@ -27,22 +27,22 @@ export interface CalendarError {
 }
 
 /**
- * Calculate the 5-day calendar window (2 days ago, yesterday, today, tomorrow, 2 days from now)
- * Returns midnight-to-midnight date range in local timezone
+ * Calculate calendar window with configurable past and future days
+ * Returns midnight-to-midnight date range
  */
-export function get5DayWindow(): { start: Date; end: Date } {
+export function getDateWindow(pastDays: number = 2, futureDays: number = 2): { start: Date; end: Date } {
   const now = new Date();
 
   // Get today at midnight in local timezone
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-  // Calculate start: 2 days ago at midnight
+  // Calculate start: pastDays ago at midnight
   const start = new Date(today);
-  start.setDate(start.getDate() - 2);
+  start.setDate(start.getDate() - pastDays);
 
-  // Calculate end: 2 days from now at end of day (next day at midnight)
+  // Calculate end: futureDays from now + 1 (next day at midnight)
   const end = new Date(today);
-  end.setDate(end.getDate() + 3); // +3 because we want the start of day 3 days from now
+  end.setDate(end.getDate() + futureDays + 1);
 
   return { start, end };
 }
@@ -139,7 +139,9 @@ function getStringValue(value: string | { val: string; params: Record<string, st
  * Fetch and parse iCal data, returning events within the 5-day window
  */
 export async function fetchCalendarEvents(
-  icalUrl: string
+  icalUrl: string,
+  pastDays: number = 2,
+  futureDays: number = 2
 ): Promise<CalendarResponse | CalendarError> {
   try {
     // Fetch iCal data with timeout
@@ -164,8 +166,8 @@ export async function fetchCalendarEvents(
     // Parse iCal data
     const events = await ical.async.parseICS(icalData);
 
-    // Get 5-day window
-    const { start, end } = get5DayWindow();
+    // Get date window
+    const { start, end } = getDateWindow(pastDays, futureDays);
 
     // Filter and transform events
     const calendarEvents: CalendarEvent[] = [];

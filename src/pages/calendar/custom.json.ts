@@ -61,7 +61,32 @@ export const GET: APIRoute = async ({ url }) => {
     );
   }
 
-  const result = await fetchCalendarEvents(icalUrl);
+  // Parse optional query parameters
+  const pastDays = parseInt(url.searchParams.get('past') || '2', 10);
+  const futureDays = parseInt(url.searchParams.get('future') || '2', 10);
+
+  // Validate parameters
+  if (isNaN(pastDays) || pastDays < 0 || pastDays > 30) {
+    return new Response(
+      JSON.stringify({ error: 'Invalid past parameter: must be between 0 and 30' }),
+      {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+  }
+
+  if (isNaN(futureDays) || futureDays < 0 || futureDays > 30) {
+    return new Response(
+      JSON.stringify({ error: 'Invalid future parameter: must be between 0 and 30' }),
+      {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+  }
+
+  const result = await fetchCalendarEvents(icalUrl, pastDays, futureDays);
 
   if ('error' in result) {
     return new Response(JSON.stringify(result), {
