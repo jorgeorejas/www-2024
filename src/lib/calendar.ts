@@ -171,39 +171,68 @@ export async function fetchCalendarEvents(
     const calendarEvents: CalendarEvent[] = [];
 
     for (const event of Object.values(events)) {
-      // Skip undefined entries
-      if (!event) continue;
-
       // Only process VEVENT types
-      if (event.type !== 'VEVENT') continue;
+      if (!event || event.type !== 'VEVENT') continue;
 
-      // TypeScript now knows event is VEvent
-      const vevent = event;
+      const vevent = event as any;
 
-      // Get event start date
-      const eventStart = new Date(vevent.start);
+      // Handle recurring events
+      if (vevent.rrule) {
+        try {
+          // Expand recurring event to get all occurrences within the window
+          const occurrences = vevent.rrule.between(start, end, true);
 
-      // Check if event falls within our window
-      if (eventStart >= start && eventStart < end) {
-        const eventEnd = vevent.end ? new Date(vevent.end) : eventStart;
+          for (const occurrence of occurrences) {
+            const eventStart = occurrence;
+            const eventEnd = vevent.end
+              ? new Date(occurrence.getTime() + (new Date(vevent.end).getTime() - new Date(vevent.start).getTime()))
+              : occurrence;
 
-        // Check if this is an all-day event using datetype field
-        const isAllDay = vevent.datetype === 'date';
+            const isAllDay = vevent.datetype === 'date';
 
-        calendarEvents.push({
-          id: vevent.uid || '',
-          title: getStringValue(vevent.summary) || 'Untitled Event',
-          start: eventStart.toISOString(),
-          end: eventEnd.toISOString(),
-          location: getStringValue(vevent.location) || null,
-          description: stripHtml(getStringValue(vevent.description)),
-          url: extractMeetingUrl(
-            getStringValue(vevent.description),
-            vevent.url,
-            (vevent as any)['x-google-conference']
-          ),
-          isAllDay,
-        });
+            calendarEvents.push({
+              id: vevent.uid || '',
+              title: getStringValue(vevent.summary) || 'Untitled Event',
+              start: eventStart.toISOString(),
+              end: eventEnd.toISOString(),
+              location: getStringValue(vevent.location) || null,
+              description: stripHtml(getStringValue(vevent.description)),
+              url: extractMeetingUrl(
+                getStringValue(vevent.description),
+                vevent.url,
+                getStringValue((vevent as any)['x-google-conference'])
+              ),
+              isAllDay,
+            });
+          }
+        } catch (error) {
+          // If RRule expansion fails, fall back to treating it as a single event
+          console.error('Failed to expand recurring event:', getStringValue(vevent.summary), error);
+        }
+      } else {
+        // Non-recurring event - use original logic
+        const eventStart = new Date(vevent.start);
+
+        // Check if event falls within our window
+        if (eventStart >= start && eventStart < end) {
+          const eventEnd = vevent.end ? new Date(vevent.end) : eventStart;
+          const isAllDay = vevent.datetype === 'date';
+
+          calendarEvents.push({
+            id: vevent.uid || '',
+            title: getStringValue(vevent.summary) || 'Untitled Event',
+            start: eventStart.toISOString(),
+            end: eventEnd.toISOString(),
+            location: getStringValue(vevent.location) || null,
+            description: stripHtml(getStringValue(vevent.description)),
+            url: extractMeetingUrl(
+              getStringValue(vevent.description),
+              vevent.url,
+              getStringValue((vevent as any)['x-google-conference'])
+            ),
+            isAllDay,
+          });
+        }
       }
     }
 
