@@ -241,16 +241,29 @@ export async function fetchCalendarEvents(
       new Date(a.start).getTime() - new Date(b.start).getTime()
     );
 
-    // Group events by day
+    // Pre-populate all days in the 5-day window
     const todayString = getTodayDateString();
-    const eventsByDay = new Map<string, CalendarEvent[]>();
+    const allDays: string[] = [];
 
+    // Calculate all 5 days
+    const currentDate = new Date(start);
+    while (currentDate < end) {
+      allDays.push(getDateString(currentDate));
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    // Initialize day groups for all days with empty event arrays
+    const eventsByDay = new Map<string, CalendarEvent[]>();
+    for (const day of allDays) {
+      eventsByDay.set(day, []);
+    }
+
+    // Add events to their respective days
     for (const event of calendarEvents) {
       const eventDate = getDateString(new Date(event.start));
-      if (!eventsByDay.has(eventDate)) {
-        eventsByDay.set(eventDate, []);
+      if (eventsByDay.has(eventDate)) {
+        eventsByDay.get(eventDate)!.push(event);
       }
-      eventsByDay.get(eventDate)!.push(event);
     }
 
     // Separate into past, today, and future
@@ -258,7 +271,8 @@ export async function fetchCalendarEvents(
     let today: DayGroup = { day: todayString, events: [] };
     const future: DayGroup[] = [];
 
-    for (const [day, events] of eventsByDay) {
+    for (const day of allDays) {
+      const events = eventsByDay.get(day) || [];
       const dayGroup: DayGroup = { day, events };
 
       if (day < todayString) {
