@@ -38,6 +38,7 @@
     "eslint": "^8.57.0",
     "eslint-plugin-astro": "^0.32.0",
     "eslint-plugin-jsx-a11y": "^6.8.0",
+    "node-ical": "^0.25.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "satori": "^0.11.1",
