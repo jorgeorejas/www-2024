@@ -46,7 +46,7 @@ export default function HalftoneImage({ src, alt }: HalftoneImageProps) {
     <div
       className="my-8 rounded-sm w-full overflow-hidden"
       style={{
-        aspectRatio: `${dimensions.width} / ${dimensions.height}`
+        aspectRatio: `${dimensions.width} / ${dimensions.height}`,
       }}
     >
       <HalftoneCmyk
@@ -58,7 +58,7 @@ export default function HalftoneImage({ src, alt }: HalftoneImageProps) {
         colorM="#fc4f9d"
         colorY="#ffd900"
         colorK="#231f20"
-        size={0.008}
+        size={0.004}
         gridNoise={0.15}
         type="ink"
         softness={0.8}
