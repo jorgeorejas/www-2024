@@ -11,8 +11,15 @@ export interface CalendarEvent {
   isAllDay: boolean;
 }
 
-export interface CalendarResponse {
+export interface DayGroup {
+  day: string; // ISO date string (YYYY-MM-DD)
   events: CalendarEvent[];
+}
+
+export interface CalendarResponse {
+  past: DayGroup[];
+  today: DayGroup;
+  future: DayGroup[];
 }
 
 export interface CalendarError {
@@ -38,6 +45,27 @@ export function get5DayWindow(): { start: Date; end: Date } {
   end.setDate(end.getDate() + 3); // +3 because we want the start of day 3 days from now
 
   return { start, end };
+}
+
+/**
+ * Get today's date in YYYY-MM-DD format
+ */
+function getTodayDateString(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+/**
+ * Get date string from a Date object in YYYY-MM-DD format
+ */
+function getDateString(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 /**
@@ -184,7 +212,36 @@ export async function fetchCalendarEvents(
       new Date(a.start).getTime() - new Date(b.start).getTime()
     );
 
-    return { events: calendarEvents };
+    // Group events by day
+    const todayString = getTodayDateString();
+    const eventsByDay = new Map<string, CalendarEvent[]>();
+
+    for (const event of calendarEvents) {
+      const eventDate = getDateString(new Date(event.start));
+      if (!eventsByDay.has(eventDate)) {
+        eventsByDay.set(eventDate, []);
+      }
+      eventsByDay.get(eventDate)!.push(event);
+    }
+
+    // Separate into past, today, and future
+    const past: DayGroup[] = [];
+    let today: DayGroup = { day: todayString, events: [] };
+    const future: DayGroup[] = [];
+
+    for (const [day, events] of eventsByDay) {
+      const dayGroup: DayGroup = { day, events };
+
+      if (day < todayString) {
+        past.push(dayGroup);
+      } else if (day === todayString) {
+        today = dayGroup;
+      } else {
+        future.push(dayGroup);
+      }
+    }
+
+    return { past, today, future };
   } catch (error) {
     if (error instanceof Error) {
       if (error.name === 'AbortError') {
