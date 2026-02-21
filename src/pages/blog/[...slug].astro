@@ -4,6 +4,7 @@ import Correction from "@components/Correction.astro";
 import FormattedDate from "@components/FormattedDate.astro";
 import Nav from "@components/Nav.astro";
 import PageLayout from "@layouts/PageLayout.astro";
+import { AnimatedSignature } from "@components/AnimatedSignature";
 import { readingTime } from "@lib/utils";
 import { type CollectionEntry, getCollection } from "astro:content";
 
@@ -86,6 +87,14 @@ const { Content } = await post.render();
     <article>
       <Content />
     </article>
+
+    <!-- Animated Signature -->
+    <div class="mt-16 mb-8 pt-8 border-t border-black/10 dark:border-white/10">
+      <AnimatedSignature
+        client:visible
+        className="w-full max-w-md mx-auto text-black dark:text-white"
+      />
+    </div>
   </Container>
 </PageLayout>
 
