@@ -40,7 +40,7 @@ if (code) {
       error = errorData.error_description || 'Failed to get tokens';
     }
   } catch (e) {
-    error = e.message;
+    error = e instanceof Error ? e.message : 'An unknown error occurred';
   }
 } else {
   // Generate authorization URL
@@ -189,7 +189,12 @@ if (code) {
 
   <script>
     function copyToken() {
-      const token = document.getElementById('refresh-token').textContent;
+      const element = document.getElementById('refresh-token');
+      const token = element?.textContent;
+      if (!token) {
+        alert('❌ Failed to copy. Please select and copy manually.');
+        return;
+      }
       navigator.clipboard.writeText(token).then(() => {
         alert('✅ Token copied to clipboard!');
       }).catch(() => {
