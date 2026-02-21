@@ -8,6 +8,7 @@ import WorkTimeline from "@components/WorkTimeline.astro";
 import { HOME, SITE } from "@consts";
 import PageLayout from "@layouts/PageLayout.astro";
 import { getWorkDateRange, processWorkEntry } from "@lib/utils";
+import { generatePersonSchema } from "@lib/seo-utils";
 import { getCollection } from "astro:content";
 const today = new Date();
 today.setHours(0, 0, 0, 0);
@@ -41,9 +42,17 @@ const work = await Promise.all(
 
 // Process work entries for timeline
 const processedWork = allwork.map((item) => processWorkEntry(item));
+
+// Generate Person schema for SEO
+const personSchema = generatePersonSchema(Astro.site!.toString());
 ---
 
-<PageLayout title={HOME.TITLE} description={HOME.DESCRIPTION}>
+<PageLayout
+  title={HOME.TITLE}
+  description={HOME.DESCRIPTION}
+  type="profile"
+  structuredData={personSchema}
+>
   <Container>
     <Nav />
     <div class="space-y-20">
@@ -53,9 +62,9 @@ const processedWork = allwork.map((item) => processWorkEntry(item));
 
       <section class="space-y-8">
         <div class="flex flex-wrap gap-y-2 items-center justify-between">
-          <h5 class="font-semibold text-black dark:text-white font-serif">
+          <h2 class="text-2xl font-semibold text-black dark:text-white font-serif">
             Latest posts
-          </h5>
+          </h2>
           <AnimatedLink href="/blog"> See all posts </AnimatedLink>
         </div>
         <ul class="flex flex-col gap-4">
@@ -71,9 +80,9 @@ const processedWork = allwork.map((item) => processWorkEntry(item));
 
       <section class="space-y-8">
         <div class="flex flex-wrap gap-y-2 items-center justify-between">
-          <h5 class="font-semibold text-black font-serif dark:text-white">
+          <h2 class="text-2xl font-semibold text-black font-serif dark:text-white">
             Recent projects
-          </h5>
+          </h2>
           <AnimatedLink href="/projects"> See all projects </AnimatedLink>
         </div>
         <ul class="flex flex-col gap-4">
@@ -89,9 +98,9 @@ const processedWork = allwork.map((item) => processWorkEntry(item));
 
       <section class="space-y-8">
         <div class="flex flex-wrap gap-y-2 items-center justify-between">
-          <h5 class="font-semibold text-black font-serif dark:text-white">
+          <h2 class="text-2xl font-semibold text-black font-serif dark:text-white">
             Work Experience
-          </h5>
+          </h2>
           <AnimatedLink href="/work"> See all work </AnimatedLink>
         </div>
         <WorkTimeline processedWork={processedWork} />

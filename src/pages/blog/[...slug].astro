@@ -6,6 +6,7 @@ import Nav from "@components/Nav.astro";
 import PageLayout from "@layouts/PageLayout.astro";
 import { AnimatedSignature } from "@components/AnimatedSignature";
 import { readingTime } from "@lib/utils";
+import { generateBlogPostingSchema, generateBreadcrumbSchema } from "@lib/seo-utils";
 import { type CollectionEntry, getCollection } from "astro:content";
 
 export const prerender = true;
@@ -26,12 +27,26 @@ type Props = CollectionEntry<"blog">;
 
 const post = Astro.props;
 const { Content } = await post.render();
+
+// Generate structured data for SEO
+const blogPostingSchema = generateBlogPostingSchema(post, Astro.site!.toString());
+const breadcrumbSchema = generateBreadcrumbSchema(
+  [
+    { href: "/", label: "Home" },
+    { href: "/blog", label: "Blog" },
+    { href: `/blog/${post.slug}`, label: post.data.title },
+  ],
+  Astro.site!.toString()
+);
 ---
 
 <PageLayout
   title={post.data.title}
   description={post.data.description}
   ogImage={`/og/${post.slug}.png`}
+  type="article"
+  publishedTime={post.data.date}
+  structuredData={[blogPostingSchema, breadcrumbSchema]}
 >
   <!-- Sticky header that appears after scrolling past post header -->
   <header id="sticky-header" class="pointer-events-none">

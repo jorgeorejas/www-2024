@@ -10,9 +10,23 @@ type Props = {
   title: string;
   description: string;
   ogImage?: string;
+  type?: "website" | "article" | "profile";
+  publishedTime?: Date;
+  modifiedTime?: Date;
+  author?: string;
+  structuredData?: Record<string, unknown> | Record<string, unknown>[];
 };
 
-const { title, description, ogImage } = Astro.props;
+const {
+  title,
+  description,
+  ogImage,
+  type,
+  publishedTime,
+  modifiedTime,
+  author,
+  structuredData,
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -22,6 +36,11 @@ const { title, description, ogImage } = Astro.props;
       title={`${title} | ${SITE.NAME}`}
       description={description}
       image={ogImage}
+      type={type}
+      publishedTime={publishedTime}
+      modifiedTime={modifiedTime}
+      author={author}
+      structuredData={structuredData}
     />
   </head>
   <body class="relative">

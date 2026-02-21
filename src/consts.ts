@@ -7,6 +7,9 @@ export const SITE: Site = {
   NUM_POSTS_ON_HOMEPAGE: 3,
   NUM_WORKS_ON_HOMEPAGE: 2,
   NUM_PROJECTS_ON_HOMEPAGE: 3,
+  TWITTER_HANDLE: "@jorejasrojo",
+  AUTHOR_NAME: "Jorge Orejas",
+  LOCALE: "en_US",
 };
 
 export const HOME: Metadata = {
