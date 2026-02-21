@@ -27,4 +27,12 @@ export default defineConfig({
   adapter: vercel({
     webAnalytics: { enabled: true },
   }),
+  vite: {
+    server: {
+      allowedHosts: [
+        'kyla-microporous-erna.ngrok-free.dev',
+        '.ngrok-free.dev', // Allow all ngrok domains
+      ],
+    },
+  },
 });
