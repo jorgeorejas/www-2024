@@ -3,6 +3,7 @@ import "../styles/global.css";
 import "@fontsource/instrument-serif/400.css";
 import instrumentSerif400 from "@fontsource/instrument-serif/files/instrument-serif-latin-400-normal.woff2";
 import { SITE } from "@consts";
+import { ViewTransitions } from "astro:transitions";
 
 interface Props {
   title: string;
@@ -47,6 +48,10 @@ const {
 <meta name="description" content={description} />
 <meta name="author" content={author} />
 
+<!-- SEO Meta Tags -->
+<meta name="robots" content="index, follow" />
+<meta name="googlebot" content="index, follow" />
+
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content={type} />
 <meta property="og:url" content={Astro.url} />
@@ -86,3 +91,6 @@ const {
     JSON.stringify(Array.isArray(structuredData) ? structuredData : [structuredData])
   } />
 )}
+
+<!-- View Transitions for smooth page navigation -->
+<ViewTransitions />

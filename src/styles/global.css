@@ -6,10 +6,26 @@
   --font-serif: Instrument Serif, ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   --font-mono: Berkeley Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --font-handwritten: Caveat Variable, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  
+
   --color-international-orange: #FF4F00;
-  
+
   --spacing-full: 100%;
+}
+
+/* Prevent flash of invisible text (FOIT) */
+@font-face {
+  font-family: "Instrument Serif";
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Caveat Variable";
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Berkeley Mono";
+  font-display: swap;
 }
 
 :root {
@@ -74,4 +90,16 @@ article {
 
 ::selection {
   @apply text-black bg-international-orange/80;
+}
+
+/* Keyboard navigation focus styles */
+*:focus-visible {
+  outline: 2px solid theme(colors.international-orange);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Remove default focus outline for mouse users */
+*:focus:not(:focus-visible) {
+  outline: none;
 }
