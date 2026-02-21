@@ -108,7 +108,7 @@ This is the single source of truth for site configuration.
 
 ### Styling
 - **Tailwind CSS 4** with `@tailwindcss/typography` for prose content
-- Custom fonts: Inter (body), Lora (serif), Caveat (handwritten for corrections), Berkeley Mono (code)
+- Custom fonts: Instrument Serif (serif), Caveat (handwritten for corrections), Berkeley Mono (code/monospace)
 - Global styles in `src/styles/global.css`
 - Dark mode support via Tailwind's dark mode utilities
 

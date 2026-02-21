@@ -40,8 +40,8 @@ This is the personal website of Jorge Orejas, built with Astro and deployed on V
 - @astrojs/tailwind
 - @astrojs/vercel
 - @fontsource-variable/caveat
-- @fontsource/inter
-- @fontsource/lora
+- @fontsource/ibm-plex-mono
+- @fontsource/instrument-serif
 - @tailwindcss/typography
 - @vercel/analytics
 - @vercel/speed-insights

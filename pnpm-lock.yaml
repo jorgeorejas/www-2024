@@ -32,12 +32,9 @@ importers:
       '@fontsource/ibm-plex-mono':
         specifier: ^5.1.0
         version: 5.1.0
-      '@fontsource/inter':
-        specifier: ^5.0.17
-        version: 5.0.17
-      '@fontsource/lora':
-        specifier: ^5.0.16
-        version: 5.0.16
+      '@fontsource/instrument-serif':
+        specifier: ^5.2.8
+        version: 5.2.8
       '@tailwindcss/postcss':
         specifier: ^4.1.15
         version: 4.1.15
@@ -520,11 +517,8 @@ packages:
   '@fontsource/ibm-plex-mono@5.1.0':
     resolution: {integrity: sha512-XKsZNyRCj6tz8zlatHmniSoLVephMD5GQG2sXgcaEb8DkUO+O61r28uTlIMEZuoZXtP4c4STvL+KUlJM5jZOEg==}
 
-  '@fontsource/inter@5.0.17':
-    resolution: {integrity: sha512-2meBGx1kt7u5LwzGc5Sz5rka6ZDrydg6nT3x6Wkt310vHXUchIywrO8pooWMzZdHYcyFY/cv4lEpJZgMD94bCg==}
-
-  '@fontsource/lora@5.0.16':
-    resolution: {integrity: sha512-5OPNjH930aebYUBE/hai0ujeAKLxgkASZ67ozXh5s+eKIbw+/crEm/T3rwofWnZHHoAHedc7DgLrpVtigHVtXQ==}
+  '@fontsource/instrument-serif@5.2.8':
+    resolution: {integrity: sha512-s+bkz+syj2rO00Rmq9g0P+PwuLig33DR1xDR8pTWmovH1pUjwnncrFk++q9mmOex8fUQ7oW80gPpPDaw7V1MMw==}
 
   '@formatjs/ecma402-abstract@2.3.1':
     resolution: {integrity: sha512-Ip9uV+/MpLXWRk03U/GzeJMuPeOXpJBSB5V1tjA6kJhvqssye5J5LoYLc7Z5IAHb7nR62sRoguzrFiVCP/hnzw==}
@@ -4868,9 +4862,7 @@ snapshots:
 
   '@fontsource/ibm-plex-mono@5.1.0': {}
 
-  '@fontsource/inter@5.0.17': {}
-
-  '@fontsource/lora@5.0.16': {}
+  '@fontsource/instrument-serif@5.2.8': {}
 
   '@formatjs/ecma402-abstract@2.3.1':
     dependencies:
