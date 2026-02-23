@@ -6,8 +6,12 @@ import Nav from "@components/Nav.astro";
 import PageLayout from "@layouts/PageLayout.astro";
 import { AnimatedSignature } from "@components/AnimatedSignature";
 import { readingTime } from "@lib/utils";
-import { generateBlogPostingSchema, generateBreadcrumbSchema } from "@lib/seo-utils";
+import {
+  generateBlogPostingSchema,
+  generateBreadcrumbSchema,
+} from "@lib/seo-utils";
 import { type CollectionEntry, getCollection } from "astro:content";
+import { SITE } from "@consts";
 
 export const prerender = true;
 
@@ -29,14 +33,17 @@ const post = Astro.props;
 const { Content } = await post.render();
 
 // Generate structured data for SEO
-const blogPostingSchema = generateBlogPostingSchema(post, Astro.site!.toString());
+const blogPostingSchema = generateBlogPostingSchema(
+  post,
+  Astro.site!.toString(),
+);
 const breadcrumbSchema = generateBreadcrumbSchema(
   [
     { href: "/", label: "Home" },
     { href: "/blog", label: "Blog" },
     { href: `/blog/${post.slug}`, label: post.data.title },
   ],
-  Astro.site!.toString()
+  Astro.site!.toString(),
 );
 ---
 
@@ -104,10 +111,11 @@ const breadcrumbSchema = generateBreadcrumbSchema(
     </article>
 
     <!-- Animated Signature -->
-    <div class="mt-16 mb-8 pt-8 border-t border-black/10 dark:border-white/10">
+    <div class="mt-16 mb-8 space-y-4 pt-8 border-black/10 dark:border-white/10">
+      <p class="mb-4">By {SITE.AUTHOR_NAME}</p>
       <AnimatedSignature
         client:visible
-        className="w-full max-w-md mx-auto text-black dark:text-white"
+        className="w-full max-w-2xs mr-auto text-black dark:text-white"
       />
     </div>
   </Container>
