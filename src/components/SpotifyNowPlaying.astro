@@ -1,78 +1,56 @@
 ---
-interface SpotifyData {
-  isPlaying: boolean;
-  title?: string;
-  artist?: string;
-  url?: string;
-}
-
-// Fetch initial data server-side for immediate display
-let initialData: SpotifyData = { isPlaying: false };
-
-try {
-  const response = await fetch(`${Astro.url.origin}/api/spotify/now-playing`);
-  if (response.ok) {
-    initialData = await response.json();
-  }
-} catch (error) {
-  console.error('Failed to fetch initial Spotify data:', error);
-}
-
-const hasTrack = initialData.title && initialData.artist && initialData.url;
+// Widget shell is always rendered hidden; client-side script populates and
+// reveals it after fetching /api/spotify/now-playing. Avoids fragile SSR
+// self-fetch that can be blocked by Vercel preview deployment protection.
 ---
 
-{hasTrack && (
-  <div id="spotify-widget" class="mb-8" data-initial={JSON.stringify(initialData)}>
-    <div class="flex items-center gap-2 text-sm">
-      <span id="spotify-icon" class="flex items-center">
-        <!-- Music note icon for currently playing -->
-        <svg
-          id="icon-playing"
-          class={initialData.isPlaying ? '' : 'hidden'}
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M6 3v8.5a2.5 2.5 0 1 1-1-2V4.5L11 3v6.5a2.5 2.5 0 1 1-1-2V4l-4 1z"
-            fill="currentColor"
-          />
-          <circle cx="4.5" cy="11.5" r="1.5" fill="currentColor" />
-          <circle cx="10.5" cy="9.5" r="1.5" fill="currentColor" />
-        </svg>
-        <!-- Pause icon for last played -->
-        <svg
-          id="icon-paused"
-          class={!initialData.isPlaying ? '' : 'hidden'}
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <rect x="4" y="3" width="2.5" height="10" rx="0.5" fill="currentColor" />
-          <rect x="9.5" y="3" width="2.5" height="10" rx="0.5" fill="currentColor" />
-        </svg>
-      </span>
-      <span id="spotify-status" class="opacity-60">
-        {initialData.isPlaying ? 'Listening to' : 'Last played'}
-      </span>
-      <a
-        id="spotify-track-link"
-        href={initialData.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="inline-block decoration-black/50 dark:decoration-white/30 hover:decoration-black/75 hover:dark:decoration-white/50 text-current hover:text-black hover:dark:text-white transition-colors duration-300 ease-in-out underline underline-offset-2"
+<div id="spotify-widget" class="mb-8 hidden">
+  <div class="flex items-center gap-2 text-sm">
+    <span id="spotify-icon" class="flex items-center">
+      <!-- Music note icon for currently playing -->
+      <svg
+        id="icon-playing"
+        class="hidden"
+        width="16"
+        height="16"
+        viewBox="0 0 16 16"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
       >
-        <span id="spotify-track-title">{initialData.title}</span>
-        <span class="opacity-60"> by </span>
-        <span id="spotify-track-artist">{initialData.artist}</span>
-      </a>
-    </div>
+        <path
+          d="M6 3v8.5a2.5 2.5 0 1 1-1-2V4.5L11 3v6.5a2.5 2.5 0 1 1-1-2V4l-4 1z"
+          fill="currentColor"
+        />
+        <circle cx="4.5" cy="11.5" r="1.5" fill="currentColor" />
+        <circle cx="10.5" cy="9.5" r="1.5" fill="currentColor" />
+      </svg>
+      <!-- Pause icon for last played -->
+      <svg
+        id="icon-paused"
+        width="16"
+        height="16"
+        viewBox="0 0 16 16"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <rect x="4" y="3" width="2.5" height="10" rx="0.5" fill="currentColor" />
+        <rect x="9.5" y="3" width="2.5" height="10" rx="0.5" fill="currentColor" />
+      </svg>
+    </span>
+    <span id="spotify-status" class="opacity-60">Last played</span>
+    <a
+      id="spotify-track-link"
+      href="#"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="inline-block decoration-black/50 dark:decoration-white/30 hover:decoration-black/75 hover:dark:decoration-white/50 text-current hover:text-black hover:dark:text-white transition-colors duration-300 ease-in-out underline underline-offset-2"
+    >
+      <span id="spotify-track-title"></span>
+      <span class="opacity-60"> by </span>
+      <span id="spotify-track-artist"></span>
+    </a>
   </div>
-)}
+</div>
 
 <script>
   interface SpotifyData {
@@ -83,11 +61,6 @@ const hasTrack = initialData.title && initialData.artist && initialData.url;
   }
 
   const widget = document.getElementById("spotify-widget");
-  if (!widget) {
-    // Widget not initially rendered, we'll need to create it on first successful fetch
-    console.log('Spotify widget not initially rendered, will create on first fetch');
-  }
-
   const trackLink = document.getElementById("spotify-track-link") as HTMLAnchorElement;
   const trackTitle = document.getElementById("spotify-track-title");
   const trackArtist = document.getElementById("spotify-track-artist");
@@ -132,6 +105,6 @@ const hasTrack = initialData.title && initialData.artist && initialData.url;
     }
   }
 
-  // Start polling every 30 seconds
+  updateNowPlaying();
   setInterval(updateNowPlaying, 30000);
 </script>
