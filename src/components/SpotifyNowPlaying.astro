@@ -7,8 +7,12 @@ import SpotifyAlbumArt from "@components/SpotifyAlbumArt.astro";
 const isDev = import.meta.env.DEV;
 ---
 
-<div id="spotify-widget" data-dev={isDev ? "true" : "false"} class="hidden text-sm">
-  <div class="flex items-center gap-3">
+<div
+  id="spotify-widget"
+  data-dev={isDev ? "true" : "false"}
+  class="hidden text-sm"
+>
+  <div class="grid grid-rows-3 gap-3">
     <span class="flex items-center shrink-0">
       <svg
         id="spotify-icon-playing"
@@ -21,10 +25,9 @@ const isDev = import.meta.env.DEV;
       >
         <path
           d="M6 3v8.5a2.5 2.5 0 1 1-1-2V4.5L11 3v6.5a2.5 2.5 0 1 1-1-2V4l-4 1z"
-          fill="currentColor"
-        />
-        <circle cx="4.5" cy="11.5" r="1.5" fill="currentColor" />
-        <circle cx="10.5" cy="9.5" r="1.5" fill="currentColor" />
+          fill="currentColor"></path>
+        <circle cx="4.5" cy="11.5" r="1.5" fill="currentColor"></circle>
+        <circle cx="10.5" cy="9.5" r="1.5" fill="currentColor"></circle>
       </svg>
       <svg
         id="spotify-icon-paused"
@@ -34,8 +37,10 @@ const isDev = import.meta.env.DEV;
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <rect x="4" y="3" width="2.5" height="10" rx="0.5" fill="currentColor" />
-        <rect x="9.5" y="3" width="2.5" height="10" rx="0.5" fill="currentColor" />
+        <rect x="4" y="3" width="2.5" height="10" rx="0.5" fill="currentColor"
+        ></rect>
+        <rect x="9.5" y="3" width="2.5" height="10" rx="0.5" fill="currentColor"
+        ></rect>
       </svg>
     </span>
     <SpotifyAlbumArt />
@@ -71,7 +76,8 @@ const isDev = import.meta.env.DEV;
           id="spotify-progress-fill"
           class="h-full pattern-hatch text-flexoki-ink dark:text-flexoki-base-50 transition-[width] duration-700 ease-linear"
           style="width: 0%"
-        ></div>
+        >
+        </div>
       </div>
     </div>
   </div>
@@ -92,11 +98,16 @@ const isDev = import.meta.env.DEV;
   }
 
   const widget = document.getElementById("spotify-widget");
-  const trackLink = document.getElementById("spotify-track-link") as HTMLAnchorElement;
+  const isDev = widget?.dataset.dev === "true";
+  const trackLink = document.getElementById(
+    "spotify-track-link",
+  ) as HTMLAnchorElement;
   const trackTitle = document.getElementById("spotify-track-title");
   const trackArtist = document.getElementById("spotify-track-artist");
   const trackAlbum = document.getElementById("spotify-album");
-  const trackAlbumLink = document.getElementById("spotify-album-link") as HTMLAnchorElement | null;
+  const trackAlbumLink = document.getElementById(
+    "spotify-album-link",
+  ) as HTMLAnchorElement | null;
   const statusText = document.getElementById("spotify-status");
   const iconPlaying = document.getElementById("spotify-icon-playing");
   const iconPaused = document.getElementById("spotify-icon-paused");
@@ -125,7 +136,7 @@ const isDev = import.meta.env.DEV;
     if (!widget) return;
 
     if (!data.title || !data.artist || !data.url) {
-      widget.classList.add("hidden");
+      if (!isDev) widget.classList.add("hidden");
       return;
     }
 
@@ -149,8 +160,16 @@ const isDev = import.meta.env.DEV;
       iconPlaying?.classList.remove("hidden");
       iconPaused?.classList.add("hidden");
 
-      if (progress && progressFill && data.durationMs && data.progressMs != null) {
-        const pct = Math.min(100, Math.max(0, (data.progressMs / data.durationMs) * 100));
+      if (
+        progress &&
+        progressFill &&
+        data.durationMs &&
+        data.progressMs != null
+      ) {
+        const pct = Math.min(
+          100,
+          Math.max(0, (data.progressMs / data.durationMs) * 100),
+        );
         progressFill.style.width = `${pct}%`;
         progress.classList.remove("hidden");
       } else {
@@ -170,15 +189,15 @@ const isDev = import.meta.env.DEV;
       const response = await fetch("/api/spotify/now-playing");
       const data: SpotifyData = await response.json();
       render(data);
-      document.dispatchEvent(new CustomEvent("spotify:update", { detail: data }));
+      document.dispatchEvent(
+        new CustomEvent("spotify:update", { detail: data }),
+      );
     } catch (error) {
       console.error("Failed to fetch Spotify data:", error);
-      widget?.classList.add("hidden");
+      if (!isDev) widget?.classList.add("hidden");
       document.dispatchEvent(new CustomEvent("spotify:update", { detail: {} }));
     }
   }
-
-  const isDev = widget?.dataset.dev === "true";
 
   function flex(token: string): string {
     return getComputedStyle(document.documentElement)
@@ -213,7 +232,9 @@ const isDev = import.meta.env.DEV;
       playedAt: new Date(Date.now() - 1000 * 60 * 7).toISOString(),
     };
     render(placeholder);
-    document.dispatchEvent(new CustomEvent("spotify:update", { detail: placeholder }));
+    document.dispatchEvent(
+      new CustomEvent("spotify:update", { detail: placeholder }),
+    );
   }
 
   poll();
