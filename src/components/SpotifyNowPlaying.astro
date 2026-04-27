@@ -150,8 +150,8 @@ const isDev = import.meta.env.DEV;
           ? data.albumType.charAt(0).toUpperCase() + data.albumType.slice(1)
           : "";
         trackAlbum.textContent = type
-          ? `· ${type} · ${data.album}`
-          : `· ${data.album}`;
+          ? `${type} · ${data.album}`
+          : `${data.album}`;
         trackAlbumLink.href = data.albumUrl;
         trackAlbumLink.classList.remove("hidden");
       } else {
