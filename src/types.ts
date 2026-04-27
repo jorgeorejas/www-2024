@@ -5,6 +5,7 @@ export type Site = {
   NUM_POSTS_ON_HOMEPAGE: number;
   NUM_WORKS_ON_HOMEPAGE: number;
   NUM_PROJECTS_ON_HOMEPAGE: number;
+  NUM_GAMES_ON_HOMEPAGE: number;
   TWITTER_HANDLE: string;
   AUTHOR_NAME: string;
   LOCALE: string;

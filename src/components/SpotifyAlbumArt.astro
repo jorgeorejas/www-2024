@@ -1,0 +1,132 @@
+---
+// Renders the current Spotify album cover as a Flexoki-CMYK halftone.
+// Listens for `spotify:update` CustomEvent dispatched by SpotifyNowPlaying.
+---
+
+<canvas
+  id="spotify-art"
+  width="96"
+  height="96"
+  class="hidden w-14 h-14 shrink-0 bg-flexoki-paper dark:bg-flexoki-ink"
+></canvas>
+
+<script>
+  const canvas = document.getElementById(
+    "spotify-art",
+  ) as HTMLCanvasElement | null;
+  let lastImageUrl: string | null = null;
+
+  function isDark(): boolean {
+    return document.documentElement.classList.contains("dark");
+  }
+
+  function flex(token: string): string {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(`--color-flexoki-${token}`)
+      .trim();
+  }
+
+  function renderHalftone(c: HTMLCanvasElement, img: HTMLImageElement) {
+    const dst = c.getContext("2d");
+    if (!dst) return;
+    const W = c.width;
+    const H = c.height;
+
+    const SAMPLE = 28;
+    const cell = W / SAMPLE;
+
+    const src = document.createElement("canvas");
+    src.width = SAMPLE;
+    src.height = SAMPLE;
+    const sctx = src.getContext("2d");
+    if (!sctx) return;
+    sctx.drawImage(img, 0, 0, SAMPLE, SAMPLE);
+    const data = sctx.getImageData(0, 0, SAMPLE, SAMPLE).data;
+
+    const dark = isDark();
+    const C = flex(dark ? "cyan-400" : "cyan-600");
+    const M = flex(dark ? "magenta-400" : "magenta-600");
+    const Y = flex(dark ? "yellow-400" : "yellow-600");
+    const K = flex(dark ? "base-50" : "ink");
+
+    dst.fillStyle = flex(dark ? "ink" : "paper");
+    dst.fillRect(0, 0, W, H);
+    dst.globalCompositeOperation = dark ? "screen" : "multiply";
+
+    const max = cell * 0.62;
+    const offsets: Array<[number, number, string]> = [
+      [0, 0, C],
+      [cell * 0.25, cell * 0.25, M],
+      [cell * 0.5, 0, Y],
+      [0, cell * 0.5, K],
+    ];
+
+    for (const [ox, oy, color] of offsets) {
+      dst.fillStyle = color;
+      for (let y = 0; y < SAMPLE; y++) {
+        for (let x = 0; x < SAMPLE; x++) {
+          const i = (y * SAMPLE + x) * 4;
+          const r = data[i] / 255;
+          const g = data[i + 1] / 255;
+          const b = data[i + 2] / 255;
+          const k = 1 - Math.max(r, g, b);
+          const denom = 1 - k || 1;
+          const c0 = (1 - r - k) / denom;
+          const m0 = (1 - g - k) / denom;
+          const y0 = (1 - b - k) / denom;
+          const v = color === C ? c0 : color === M ? m0 : color === Y ? y0 : k;
+          if (v <= 0.02) continue;
+          const radius = Math.sqrt(v) * max;
+          const cx = x * cell + cell / 2 + ox;
+          const cy = y * cell + cell / 2 + oy;
+          dst.beginPath();
+          dst.arc(cx, cy, radius, 0, Math.PI * 2);
+          dst.fill();
+        }
+      }
+    }
+
+    dst.globalCompositeOperation = "source-over";
+  }
+
+  function loadAndRender(url: string | undefined) {
+    if (!canvas) return;
+    if (!url) {
+      lastImageUrl = null;
+      canvas.classList.add("hidden");
+      return;
+    }
+    if (url === lastImageUrl) return;
+    lastImageUrl = url;
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      try {
+        renderHalftone(canvas, img);
+        canvas.classList.remove("hidden");
+      } catch (e) {
+        console.error("Halftone render failed:", e);
+        canvas.classList.add("hidden");
+      }
+    };
+    img.onerror = () => canvas.classList.add("hidden");
+    img.src = url;
+  }
+
+  document.addEventListener("spotify:update", (e) => {
+    const detail = (e as CustomEvent<{ albumImage?: string }>).detail;
+    loadAndRender(detail?.albumImage);
+  });
+
+  // Re-render when theme toggles so colors track the active palette
+  new MutationObserver(() => {
+    if (lastImageUrl) {
+      const url = lastImageUrl;
+      lastImageUrl = null;
+      loadAndRender(url);
+    }
+  }).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["class"],
+  });
+</script>

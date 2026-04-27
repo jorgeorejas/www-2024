@@ -9,6 +9,8 @@ import vercel from "@astrojs/vercel";
 import pageInsight from "astro-page-insight";
 import { remarkCorrection } from "./src/lib/remark-correction.mjs";
 
+import tailwindcss from "@tailwindcss/vite";
+
 // https://astro.build/config
 export default defineConfig({
   site: "https://jorgeorejas.com",
@@ -28,10 +30,11 @@ export default defineConfig({
     webAnalytics: { enabled: true },
   }),
   vite: {
+    plugins: [tailwindcss()],
     server: {
       allowedHosts: [
-        'kyla-microporous-erna.ngrok-free.dev',
-        '.ngrok-free.dev', // Allow all ngrok domains
+        "kyla-microporous-erna.ngrok-free.dev",
+        ".ngrok-free.dev",
       ],
     },
   },

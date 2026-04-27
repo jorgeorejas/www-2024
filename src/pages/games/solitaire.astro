@@ -1,0 +1,26 @@
+---
+import Container from "@components/Container.astro";
+import SolitaireGame from "@components/games/solitaire";
+import Nav from "@components/Nav.astro";
+import PageLayout from "@layouts/PageLayout.astro";
+---
+
+<PageLayout
+  title="Klondike Solitaire"
+  description="Classic Klondike Solitaire with Easy (1 card) and Hard (3 cards) difficulty modes."
+>
+  <Container>
+    <div class="space-y-2">
+      <Nav
+        breadCrumbsItems={[
+          { href: "/games", label: "Games" },
+          { href: "/games/solitaire", label: "Solitaire" },
+        ]}
+      />
+    </div>
+
+    <div class="my-10">
+      <SolitaireGame client:load />
+    </div>
+  </Container>
+</PageLayout>

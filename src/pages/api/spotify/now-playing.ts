@@ -17,11 +17,25 @@ interface SpotifyTokenResponse {
   scope: string;
 }
 
+interface SpotifyImage {
+  url: string;
+  width: number;
+  height: number;
+}
+
 interface SpotifyNowPlayingResponse {
   is_playing: boolean;
+  progress_ms?: number;
   item?: {
     name: string;
+    duration_ms: number;
     artists: Array<{ name: string }>;
+    album: {
+      name: string;
+      album_type: string;
+      images: SpotifyImage[];
+      external_urls: { spotify: string };
+    };
     external_urls: {
       spotify: string;
     };
@@ -30,14 +44,27 @@ interface SpotifyNowPlayingResponse {
 
 interface SpotifyRecentlyPlayedResponse {
   items: Array<{
+    played_at: string;
     track: {
       name: string;
+      duration_ms: number;
       artists: Array<{ name: string }>;
+      album: {
+        name: string;
+        album_type: string;
+        images: SpotifyImage[];
+        external_urls: { spotify: string };
+      };
       external_urls: {
         spotify: string;
       };
     };
   }>;
+}
+
+function smallestImage(images: SpotifyImage[] | undefined): string | undefined {
+  if (!images || images.length === 0) return undefined;
+  return images.reduce((a, b) => (a.width <= b.width ? a : b)).url;
 }
 
 async function getAccessToken(): Promise<string> {
@@ -84,7 +111,13 @@ async function getNowPlaying(accessToken: string) {
     isPlaying: true,
     title: data.item.name,
     artist: data.item.artists.map((artist) => artist.name).join(", "),
+    album: data.item.album.name,
+    albumType: data.item.album.album_type,
+    albumUrl: data.item.album.external_urls.spotify,
+    albumImage: smallestImage(data.item.album.images),
     url: data.item.external_urls.spotify,
+    progressMs: data.progress_ms ?? 0,
+    durationMs: data.item.duration_ms,
   };
 }
 
@@ -105,13 +138,19 @@ async function getRecentlyPlayed(accessToken: string) {
     return null;
   }
 
-  const track = data.items[0].track;
+  const item = data.items[0];
+  const track = item.track;
 
   return {
     isPlaying: false,
     title: track.name,
     artist: track.artists.map((artist) => artist.name).join(", "),
+    album: track.album.name,
+    albumType: track.album.album_type,
+    albumUrl: track.album.external_urls.spotify,
+    albumImage: smallestImage(track.album.images),
     url: track.external_urls.spotify,
+    playedAt: item.played_at,
   };
 }
 

@@ -1,137 +1,228 @@
 ---
-interface SpotifyData {
-  isPlaying: boolean;
-  title?: string;
-  artist?: string;
-  url?: string;
-}
+// Polls /api/spotify/now-playing every 30s and renders a status + track row.
+// Dispatches `spotify:update` CustomEvent so SpotifyAlbumArt (extracted
+// for clarity) can react to the same payload without polling itself.
+import SpotifyAlbumArt from "@components/SpotifyAlbumArt.astro";
 
-// Fetch initial data server-side for immediate display
-let initialData: SpotifyData = { isPlaying: false };
-
-try {
-  const response = await fetch(`${Astro.url.origin}/api/spotify/now-playing`);
-  if (response.ok) {
-    initialData = await response.json();
-  }
-} catch (error) {
-  console.error('Failed to fetch initial Spotify data:', error);
-}
-
-const hasTrack = initialData.title && initialData.artist && initialData.url;
+const isDev = import.meta.env.DEV;
 ---
 
-{hasTrack && (
-  <div id="spotify-widget" class="mb-8" data-initial={JSON.stringify(initialData)}>
-    <div class="flex items-center gap-2 text-sm">
-      <span id="spotify-icon" class="flex items-center">
-        <!-- Music note icon for currently playing -->
-        <svg
-          id="icon-playing"
-          class={initialData.isPlaying ? '' : 'hidden'}
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M6 3v8.5a2.5 2.5 0 1 1-1-2V4.5L11 3v6.5a2.5 2.5 0 1 1-1-2V4l-4 1z"
-            fill="currentColor"
-          />
-          <circle cx="4.5" cy="11.5" r="1.5" fill="currentColor" />
-          <circle cx="10.5" cy="9.5" r="1.5" fill="currentColor" />
-        </svg>
-        <!-- Pause icon for last played -->
-        <svg
-          id="icon-paused"
-          class={!initialData.isPlaying ? '' : 'hidden'}
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <rect x="4" y="3" width="2.5" height="10" rx="0.5" fill="currentColor" />
-          <rect x="9.5" y="3" width="2.5" height="10" rx="0.5" fill="currentColor" />
-        </svg>
-      </span>
-      <span id="spotify-status" class="opacity-60">
-        {initialData.isPlaying ? 'Listening to' : 'Last played'}
-      </span>
+<div
+  id="spotify-widget"
+  data-dev={isDev ? "true" : "false"}
+  class="hidden text-sm"
+>
+  <div class="flex items-center gap-3">
+    <span class="flex items-center shrink-0">
+      <svg
+        id="spotify-icon-playing"
+        class="hidden"
+        width="16"
+        height="16"
+        viewBox="0 0 16 16"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M6 3v8.5a2.5 2.5 0 1 1-1-2V4.5L11 3v6.5a2.5 2.5 0 1 1-1-2V4l-4 1z"
+          fill="currentColor"></path>
+        <circle cx="4.5" cy="11.5" r="1.5" fill="currentColor"></circle>
+        <circle cx="10.5" cy="9.5" r="1.5" fill="currentColor"></circle>
+      </svg>
+      <svg
+        id="spotify-icon-paused"
+        width="16"
+        height="16"
+        viewBox="0 0 16 16"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <rect x="4" y="3" width="2.5" height="10" rx="0.5" fill="currentColor"
+        ></rect>
+        <rect x="9.5" y="3" width="2.5" height="10" rx="0.5" fill="currentColor"
+        ></rect>
+      </svg>
+    </span>
+    <SpotifyAlbumArt />
+    <div class="flex flex-col gap-0.5 min-w-0 flex-1">
+      <span id="spotify-status" class="opacity-60">Last played</span>
       <a
         id="spotify-track-link"
-        href={initialData.url}
+        href="#"
         target="_blank"
         rel="noopener noreferrer"
-        class="inline-block decoration-black/50 dark:decoration-white/30 hover:decoration-black/75 hover:dark:decoration-white/50 text-current hover:text-black hover:dark:text-white transition-colors duration-300 ease-in-out underline underline-offset-2"
+        class="truncate decoration-flexoki-base-300 dark:decoration-flexoki-base-700 hover:decoration-flexoki-base-500 text-current hover:text-flexoki-ink hover:dark:text-flexoki-base-50 transition-colors duration-300 ease-in-out underline underline-offset-2"
       >
-        <span id="spotify-track-title">{initialData.title}</span>
+        <span id="spotify-track-title"></span>
         <span class="opacity-60"> by </span>
-        <span id="spotify-track-artist">{initialData.artist}</span>
+        <span id="spotify-track-artist"></span>
       </a>
+      <a
+        id="spotify-album-link"
+        href="#"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="opacity-60 truncate hidden max-w-[24ch] decoration-flexoki-base-300 dark:decoration-flexoki-base-700 hover:decoration-flexoki-base-500 hover:opacity-100 hover:text-flexoki-ink hover:dark:text-flexoki-base-50 transition-colors duration-300 ease-in-out underline underline-offset-2"
+      >
+        <span id="spotify-album"></span>
+      </a>
+      <div
+        id="spotify-progress"
+        class="mt-1 h-1 hidden bg-flexoki-base-100 dark:bg-flexoki-base-900 overflow-hidden"
+      >
+        <div
+          id="spotify-progress-fill"
+          class="h-full pattern-hatch text-flexoki-ink dark:text-flexoki-base-50 transition-[width] duration-700 ease-linear"
+          style="width: 0%"
+        >
+        </div>
+      </div>
     </div>
   </div>
-)}
+</div>
 
 <script>
   interface SpotifyData {
     isPlaying: boolean;
     title?: string;
     artist?: string;
+    album?: string;
+    albumType?: string;
+    albumUrl?: string;
+    albumImage?: string;
     url?: string;
+    progressMs?: number;
+    durationMs?: number;
+    playedAt?: string;
   }
 
   const widget = document.getElementById("spotify-widget");
-  if (!widget) {
-    // Widget not initially rendered, we'll need to create it on first successful fetch
-    console.log('Spotify widget not initially rendered, will create on first fetch');
-  }
-
-  const trackLink = document.getElementById("spotify-track-link") as HTMLAnchorElement;
+  const isDev = widget?.dataset.dev === "true";
+  const trackLink = document.getElementById(
+    "spotify-track-link",
+  ) as HTMLAnchorElement;
   const trackTitle = document.getElementById("spotify-track-title");
   const trackArtist = document.getElementById("spotify-track-artist");
+  const trackAlbum = document.getElementById("spotify-album");
+  const trackAlbumLink = document.getElementById(
+    "spotify-album-link",
+  ) as HTMLAnchorElement | null;
   const statusText = document.getElementById("spotify-status");
-  const iconPlaying = document.getElementById("icon-playing");
-  const iconPaused = document.getElementById("icon-paused");
+  const iconPlaying = document.getElementById("spotify-icon-playing");
+  const iconPaused = document.getElementById("spotify-icon-paused");
+  const progress = document.getElementById("spotify-progress");
+  const progressFill = document.getElementById("spotify-progress-fill");
 
-  function updateWidgetDisplay(data: SpotifyData) {
+  function formatRelative(iso: string): string {
+    const then = new Date(iso).getTime();
+    if (Number.isNaN(then)) return "recently";
+    const diff = Date.now() - then;
+    const sec = Math.max(0, Math.round(diff / 1000));
+    if (sec < 60) return "just now";
+    const min = Math.round(sec / 60);
+    if (min < 60) return `${min}m ago`;
+    const hr = Math.round(min / 60);
+    if (hr < 24) return `${hr}h ago`;
+    const day = Math.round(hr / 24);
+    if (day === 1) return "yesterday";
+    if (day < 30) return `${day}d ago`;
+    const mo = Math.round(day / 30);
+    if (mo < 12) return `${mo}mo ago`;
+    return `${Math.round(mo / 12)}y ago`;
+  }
+
+  function render(data: SpotifyData) {
     if (!widget) return;
 
-    if (data.title && data.artist && data.url) {
-      // Show widget and update content
-      widget.classList.remove("hidden");
-      if (trackTitle) trackTitle.textContent = data.title;
-      if (trackArtist) trackArtist.textContent = data.artist;
-      if (trackLink) trackLink.href = data.url;
+    if (!data.title || !data.artist || !data.url) {
+      if (!isDev) widget.classList.add("hidden");
+      return;
+    }
 
-      // Update status and icon based on playing state
-      if (data.isPlaying) {
-        if (statusText) statusText.textContent = "Listening to";
-        iconPlaying?.classList.remove("hidden");
-        iconPaused?.classList.add("hidden");
+    widget.classList.remove("hidden");
+    if (trackTitle) trackTitle.textContent = data.title;
+    if (trackArtist) trackArtist.textContent = data.artist;
+    if (trackLink) trackLink.href = data.url;
+
+    if (trackAlbum && trackAlbumLink) {
+      if (data.album && data.album !== data.title && data.albumUrl) {
+        const type = data.albumType
+          ? data.albumType.charAt(0).toUpperCase() + data.albumType.slice(1)
+          : "";
+        trackAlbum.textContent = type
+          ? `${type} · ${data.album}`
+          : `${data.album}`;
+        trackAlbumLink.href = data.albumUrl;
+        trackAlbumLink.classList.remove("hidden");
       } else {
-        if (statusText) statusText.textContent = "Last played";
-        iconPlaying?.classList.add("hidden");
-        iconPaused?.classList.remove("hidden");
+        trackAlbumLink.classList.add("hidden");
+      }
+    }
+
+    if (data.isPlaying) {
+      if (statusText) statusText.textContent = "Listening to";
+      iconPlaying?.classList.remove("hidden");
+      iconPaused?.classList.add("hidden");
+
+      if (
+        progress &&
+        progressFill &&
+        data.durationMs &&
+        data.progressMs != null
+      ) {
+        const pct = Math.min(
+          100,
+          Math.max(0, (data.progressMs / data.durationMs) * 100),
+        );
+        progressFill.style.width = `${pct}%`;
+        progress.classList.remove("hidden");
+      } else {
+        progress?.classList.add("hidden");
       }
     } else {
-      // Hide widget when no data
-      widget.classList.add("hidden");
+      const suffix = data.playedAt ? ` ${formatRelative(data.playedAt)}` : "";
+      if (statusText) statusText.textContent = `Last played${suffix}`;
+      iconPlaying?.classList.add("hidden");
+      iconPaused?.classList.remove("hidden");
+      progress?.classList.add("hidden");
     }
   }
 
-  async function updateNowPlaying() {
+  async function poll() {
     try {
       const response = await fetch("/api/spotify/now-playing");
       const data: SpotifyData = await response.json();
-      updateWidgetDisplay(data);
+      render(data);
+      document.dispatchEvent(
+        new CustomEvent("spotify:update", { detail: data }),
+      );
     } catch (error) {
       console.error("Failed to fetch Spotify data:", error);
-      widget?.classList.add("hidden");
+      if (!isDev) widget?.classList.add("hidden");
+      document.dispatchEvent(new CustomEvent("spotify:update", { detail: {} }));
     }
   }
 
-  // Start polling every 30 seconds
-  setInterval(updateNowPlaying, 30000);
+  const PLACEHOLDER_IMAGE = "/img/acting-my-age.png";
+
+  if (isDev) {
+    const placeholder: SpotifyData = {
+      isPlaying: false,
+      title: "Track title",
+      artist: "Artist name",
+      album: "Album name",
+      albumType: "single",
+      albumUrl: "#",
+      albumImage: PLACEHOLDER_IMAGE,
+      url: "#",
+      playedAt: new Date(Date.now() - 1000 * 60 * 7).toISOString(),
+    };
+    render(placeholder);
+    document.dispatchEvent(
+      new CustomEvent("spotify:update", { detail: placeholder }),
+    );
+  }
+
+  poll();
+  setInterval(poll, 30000);
 </script>
