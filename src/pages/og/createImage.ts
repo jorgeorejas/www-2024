@@ -13,8 +13,8 @@ export async function SVG(component: JSX.Element) {
         weight: 600,
       },
       {
-        name: "Instrument Serif",
-        data: await fs.readFile("./node_modules/@fontsource/instrument-serif/files/instrument-serif-latin-400-normal.woff"),
+        name: "Asturica",
+        data: await fs.readFile("./public/fonts/asturica.ttf"),
         weight: 400,
       },
     ],

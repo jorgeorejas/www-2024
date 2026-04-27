@@ -21,7 +21,6 @@
     "@astrojs/vercel": "^8.2.10",
     "@fontsource-variable/caveat": "^5.1.0",
     "@fontsource/ibm-plex-mono": "^5.1.0",
-    "@fontsource/instrument-serif": "^5.2.8",
     "@tailwindcss/postcss": "^4.1.15",
     "@tailwindcss/typography": "0.5.19",
     "@types/react": "^18.3.9",

@@ -3,7 +3,7 @@
 
 @theme {
   --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-serif: Instrument Serif, ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-serif: Asturica, ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   --font-mono: Berkeley Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --font-handwritten: Caveat Variable, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
@@ -14,7 +14,10 @@
 
 /* Prevent flash of invisible text (FOIT) */
 @font-face {
-  font-family: "Instrument Serif";
+  font-family: "Asturica";
+  src: url("/fonts/asturica.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
   font-display: swap;
 }
 
