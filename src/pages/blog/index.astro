@@ -9,8 +9,10 @@ import { type CollectionEntry, getCollection } from "astro:content";
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 
+const isDev = import.meta.env.DEV;
+
 const data = (await getCollection("blog"))
-  .filter((post) => !post.data.draft && post.data.date <= today)
+  .filter((post) => !post.data.draft && (isDev || post.data.date <= today))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
 type Acc = {
@@ -35,17 +37,17 @@ const monthYears = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a));
     <div class="space-y-2">
       <Nav breadCrumbsItems={[{ href: "/blog", label: "Blog" }]} />
     </div>
-    <div class="space-y-10 my-10">
-      <div class="font-semibold text-flexoki-ink dark:text-flexoki-base-50 font-serif">
+    <div class="space-y-12 my-12">
+      <h1 class="text-3xl font-semibold text-flexoki-ink dark:text-flexoki-base-50 font-serif">
         Blog
-      </div>
-      <div class="space-y-4">
+      </h1>
+      <div class="space-y-8">
         {
           monthYears.map((year) => (
-            <section class=" space-y-4">
-              <div class="font-semibold text-flexoki-ink dark:text-flexoki-base-50 font-serif">
+            <section class="space-y-6">
+              <h2 class="text-xl font-semibold text-flexoki-ink dark:text-flexoki-base-50 font-serif">
                 {year}
-              </div>
+              </h2>
               <div>
                 <ul class="flex flex-col gap-4">
                   {posts[year].map((post) => (

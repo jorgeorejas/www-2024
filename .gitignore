@@ -22,3 +22,10 @@ pnpm-debug.log*
 .DS_Store
 
 .vercel/
+.vercel
+
+# Playwright cache
+.playwright-mcp
+
+# worktrees
+.worktrees/

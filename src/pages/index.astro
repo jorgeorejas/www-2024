@@ -1,17 +1,22 @@
 ---
-import { getCollection } from "astro:content";
-import Container from "@components/Container.astro";
-import PageLayout from "@layouts/PageLayout.astro";
+import AnimatedLink from "@components/AnimatedLink.astro";
 import ArrowCard from "@components/ArrowCard.astro";
-import Link from "@components/Link.astro";
-import { dateRange } from "@lib/utils";
-import { SITE, HOME, SOCIALS } from "@consts";
+import Container from "@components/Container.astro";
+import ContentBlock from "@components/ContentBlock.astro";
 import Nav from "@components/Nav.astro";
+import WorkTimeline from "@components/WorkTimeline.astro";
+import { HOME, SITE } from "@consts";
+import PageLayout from "@layouts/PageLayout.astro";
+import { getWorkDateRange, processWorkEntry } from "@lib/utils";
+import { generatePersonSchema } from "@lib/seo-utils";
+import { getCollection } from "astro:content";
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 
+const isDev = import.meta.env.DEV;
+
 const blog = (await getCollection("blog"))
-  .filter((post) => !post.data.draft && post.data.date <= today)
+  .filter((post) => !post.data.draft && (isDev || post.data.date <= today))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, SITE.NUM_POSTS_ON_HOMEPAGE);
 
@@ -23,59 +28,58 @@ const projects = (await getCollection("projects"))
 const games = [
   {
     title: "Klondike Solitaire",
-    description: "Classic Klondike Solitaire with Easy (1 card) and Hard (3 cards) difficulty modes.",
+    description:
+      "Classic Klondike Solitaire with Easy (1 card) and Hard (3 cards) difficulty modes.",
     href: "/games/solitaire",
   },
   {
     title: "Conway's Game of Life",
-    description: "A mesmerizing cellular automaton where simple rules create complex, beautiful patterns.",
+    description:
+      "A mesmerizing cellular automaton where simple rules create complex, beautiful patterns.",
     href: "/games/game-of-life",
   },
   {
     title: "Minesweeper",
-    description: "The classic logic puzzle. Reveal every safe square without detonating a mine.",
+    description:
+      "The classic logic puzzle. Reveal every safe square without detonating a mine.",
     href: "/games/minesweeper",
   },
 ].slice(0, SITE.NUM_GAMES_ON_HOMEPAGE);
 
 const allwork = (await getCollection("work"))
-  .sort(
-    (a, b) =>
-      new Date(b.data.dateStart).valueOf() -
-      new Date(a.data.dateStart).valueOf(),
-  )
+  .sort((a, b) => {
+    const aDateRange = getWorkDateRange(a.data.roles);
+    const bDateRange = getWorkDateRange(b.data.roles);
+    return bDateRange.startDate.valueOf() - aDateRange.startDate.valueOf();
+  })
   .slice(0, SITE.NUM_WORKS_ON_HOMEPAGE);
 
-const work = await Promise.all(
-  allwork.map(async (item) => {
-    const { Content } = await item.render();
-    return { ...item, Content };
-  }),
-);
+// Process work entries for timeline
+const processedWork = allwork.map((item) => processWorkEntry(item));
+
+// Generate Person schema for SEO
+const personSchema = generatePersonSchema(Astro.site!.toString());
 ---
 
-<PageLayout title={HOME.TITLE} description={HOME.DESCRIPTION}>
+<PageLayout
+  title={HOME.TITLE}
+  description={HOME.DESCRIPTION}
+  type="profile"
+  structuredData={personSchema}
+>
   <Container>
     <Nav />
-    <div class="space-y-16">
+    <div class="space-y-20">
       <section>
-        <article class="space-y-4">
-          <p>
-            I'm a {new Date().getFullYear() - 2003}-year-old developer and
-            entrepreneur from Asturias, Spain, passionate about leveraging
-            technology and innovation. With expertise in AI solutions, web
-            development, and building with business in mind, I focus on creating
-            impactful, creative and scalable solutions.
-          </p>
-        </article>
+        <ContentBlock slug="bio" class="space-y-4" />
       </section>
 
-      <section class="space-y-6">
+      <section class="space-y-8">
         <div class="flex flex-wrap gap-y-2 items-center justify-between">
-          <h5 class="font-semibold text-flexoki-ink dark:text-flexoki-base-50 font-serif">
+          <h2 class="text-2xl font-semibold text-flexoki-ink dark:text-flexoki-base-50 font-serif">
             Latest posts
-          </h5>
-          <Link href="/blog"> See all posts </Link>
+          </h2>
+          <AnimatedLink href="/blog"> See all posts </AnimatedLink>
         </div>
         <ul class="flex flex-col gap-4">
           {
@@ -88,12 +92,12 @@ const work = await Promise.all(
         </ul>
       </section>
 
-      <section class="space-y-6">
+      <section class="space-y-8">
         <div class="flex flex-wrap gap-y-2 items-center justify-between">
-          <h5 class="font-semibold text-flexoki-ink font-serif dark:text-flexoki-base-50">
+          <h2 class="text-2xl font-semibold text-flexoki-ink font-serif dark:text-flexoki-base-50">
             Recent projects
-          </h5>
-          <Link href="/projects"> See all projects </Link>
+          </h2>
+          <AnimatedLink href="/projects"> See all projects </AnimatedLink>
         </div>
         <ul class="flex flex-col gap-4">
           {
@@ -108,12 +112,12 @@ const work = await Promise.all(
 
       {/* TODO: re-enable Games section on homepage */}
       {false && (
-        <section class="space-y-6">
+        <section class="space-y-8">
           <div class="flex flex-wrap gap-y-2 items-center justify-between">
-            <h5 class="font-semibold text-flexoki-ink font-serif dark:text-flexoki-base-50">
+            <h2 class="text-2xl font-semibold text-flexoki-ink font-serif dark:text-flexoki-base-50">
               Games
-            </h5>
-            <Link href="/games"> See all games </Link>
+            </h2>
+            <AnimatedLink href="/games"> See all games </AnimatedLink>
           </div>
           <ul class="flex flex-col gap-4">
             {games.map((game) => (
@@ -150,72 +154,14 @@ const work = await Promise.all(
         </section>
       )}
 
-      <section class="space-y-6">
+      <section class="space-y-8">
         <div class="flex flex-wrap gap-y-2 items-center justify-between">
-          <h5 class="font-semibold text-flexoki-ink font-serif dark:text-flexoki-base-50">
+          <h2 class="text-2xl font-semibold text-flexoki-ink font-serif dark:text-flexoki-base-50">
             Work Experience
-          </h5>
-          <Link href="/work"> See all work </Link>
+          </h2>
+          <AnimatedLink href="/work"> See all work </AnimatedLink>
         </div>
-        <ul class="flex flex-col space-y-4">
-          {
-            work.map((entry) => (
-              <li>
-                <div class="flex md:gap-2 md:items-center flex-col md:flex-row">
-                  <div class="font-semibold font-serif">
-                    {entry.data.company}
-                  </div>
-                  <div class="text-sm text-flexoki-base-500 dark:text-flexoki-base-500">
-                    <span class="hidden md:inline"> - </span>
-                    {dateRange(entry.data.dateStart, entry.data.dateEnd)}
-                  </div>
-                </div>
-                <div class="text-sm opacity-75">{entry.data.role}</div>
-                <article>
-                  <entry.Content />
-                </article>
-              </li>
-            ))
-          }
-        </ul>
-      </section>
-
-      <hr class="border-flexoki-base-200 dark:border-flexoki-base-800" />
-
-      <section class="space-y-4">
-        <h5 class="font-semibold text-flexoki-ink dark:text-flexoki-base-50 font-serif">
-          Let's Connect
-        </h5>
-        <article>
-          <p>
-            If you want to get in touch with me about something or just to say
-            hi, reach out on social media or send me an email.
-          </p>
-        </article>
-        <ul class="flex flex-wrap gap-2">
-          {
-            SOCIALS.map((SOCIAL) => (
-              <li class="flex gap-x-2 text-nowrap">
-                <Link
-                  href={SOCIAL.HREF}
-                  external
-                  aria-label={`${SITE.NAME} on ${SOCIAL.NAME}`}
-                >
-                  {SOCIAL.NAME}
-                </Link>
-                {"/"}
-              </li>
-            ))
-          }
-          <li class="line-clamp-1">
-            <Link
-              href={`mailto:${SITE.EMAIL}`}
-              aria-label={`Email ${SITE.NAME}`}
-            >
-              {SITE.EMAIL}
-            </Link>
-          </li>
-        </ul>
+        <WorkTimeline processedWork={processedWork} />
       </section>
     </div>
   </Container>

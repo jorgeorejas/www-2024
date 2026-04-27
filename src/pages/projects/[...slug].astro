@@ -6,13 +6,19 @@ import Link from "@components/Link.astro";
 import Nav from "@components/Nav.astro";
 import PageLayout from "@layouts/PageLayout.astro";
 import { readingTime } from "@lib/utils";
+import { generateProjectSchema, generateBreadcrumbSchema } from "@lib/seo-utils";
 import { type CollectionEntry, getCollection } from "astro:content";
+
+export const prerender = true;
 
 export async function getStaticPaths() {
   const projects = (await getCollection("projects"))
-    .filter((post) => !post.data.draft)
-    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-  return projects.map((project) => ({
+    .filter((project: CollectionEntry<"projects">) => !project.data.draft)
+    .sort(
+      (a: CollectionEntry<"projects">, b: CollectionEntry<"projects">) =>
+        b.data.date.valueOf() - a.data.date.valueOf(),
+    );
+  return projects.map((project: CollectionEntry<"projects">) => ({
     params: { slug: project.slug },
     props: project,
   }));
@@ -21,9 +27,24 @@ type Props = CollectionEntry<"projects">;
 
 const project = Astro.props;
 const { Content } = await project.render();
+
+// Generate structured data for SEO
+const projectSchema = generateProjectSchema(project, Astro.site!.toString());
+const breadcrumbSchema = generateBreadcrumbSchema(
+  [
+    { href: "/", label: "Home" },
+    { href: "/projects", label: "Projects" },
+    { href: `/projects/${project.slug}`, label: project.data.title },
+  ],
+  Astro.site!.toString()
+);
 ---
 
-<PageLayout title={project.data.title} description={project.data.description}>
+<PageLayout
+  title={project.data.title}
+  description={project.data.description}
+  structuredData={[projectSchema, breadcrumbSchema]}
+>
   <Container>
     <div class="space-y-2">
       <Nav

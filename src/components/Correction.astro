@@ -21,7 +21,7 @@ const {
 <span class={cn("flex flex-col relative", correctionClass)}>
   <span
     class={cn(
-      "font-handwritten font-bold",
+      "font-handwritten font-bold relative inline-block",
       "absolute -top-4 whitespace-nowrap",
       {
         "-rotate-6": rotate,
@@ -36,6 +36,9 @@ const {
     )}
   >
     {text}
+    <span
+      class="absolute left-0 bottom-1 w-full h-[1px] bg-blue-800 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-in-out"
+    ></span>
   </span>
   <span
     class={cn("line-through", {

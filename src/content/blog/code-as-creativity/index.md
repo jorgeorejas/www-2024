@@ -4,7 +4,7 @@ description: "Coding isn’t just technical; it’s deeply creative. Like artist
 date: "Nov 5 2024"
 ---
 
-When people talk about creativity, they usually mean art, music, writing—things associated with images or emotions. But programming is just as creative, maybe even more so, because you’re creating something out of nothing, and the process involves a lot of the same steps artists use.
+When people talk about creativity, they usually mean art, music, writing, things associated with images or emotions. But programming is just as creative, maybe even more so, because you’re creating something out of nothing, and the process involves a lot of the same steps artists use.
 
 Coding starts with a blank screen, which is the programmer’s version of a blank canvas. Like an artist facing a blank canvas, a programmer faces a set of choices, an empty world with no inherent structure. Every line of code, every function, every loop, is a deliberate decision that brings some new function, some new form, into existence. And those choices are rarely linear or straightforward. Good code isn’t just efficient; it’s elegant, much like a well-designed building or a painting. There's a kind of flow to it, a structure that feels intuitive even though it’s built from abstract logic.
 

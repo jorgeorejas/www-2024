@@ -13,9 +13,9 @@ export async function SVG(component: JSX.Element) {
         weight: 600,
       },
       {
-        name: "Rza Light",
-        data: await fs.readFile("./public/fonts/Rza-Light.otf"),
-        weight: 600,
+        name: "Instrument Serif",
+        data: await fs.readFile("./node_modules/@fontsource/instrument-serif/files/instrument-serif-latin-400-normal.woff"),
+        weight: 400,
       },
     ],
   });

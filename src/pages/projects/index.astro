@@ -16,10 +16,10 @@ const projects = (await getCollection("projects"))
     <div class="space-y-2">
       <Nav breadCrumbsItems={[{ href: "/projects", label: "Projects" }]} />
     </div>
-    <div class="space-y-10 my-10">
-      <div class="font-semibold text-flexoki-ink dark:text-flexoki-base-50 font-serif">
+    <div class="space-y-12 my-12">
+      <h1 class="text-3xl font-semibold text-flexoki-ink dark:text-flexoki-base-50 font-serif">
         Projects
-      </div>
+      </h1>
       <ul class="flex flex-col gap-4">
         {
           projects.map((project) => (

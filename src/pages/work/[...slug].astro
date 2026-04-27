@@ -1,0 +1,94 @@
+---
+import Container from "@components/Container.astro";
+import Nav from "@components/Nav.astro";
+import WorkEntry from "@components/WorkEntry.astro";
+import PageLayout from "@layouts/PageLayout.astro";
+import { dateRange, getWorkDateRange } from "@lib/utils";
+import { type CollectionEntry, getCollection } from "astro:content";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const workEntries = (await getCollection("work")).sort(
+    (a: CollectionEntry<"work">, b: CollectionEntry<"work">) => {
+      const aDateRange = getWorkDateRange(a.data.roles);
+      const bDateRange = getWorkDateRange(b.data.roles);
+      return bDateRange.startDate.valueOf() - aDateRange.startDate.valueOf();
+    },
+  );
+  return workEntries.map((work: CollectionEntry<"work">) => ({
+    params: { slug: work.slug },
+    props: work,
+  }));
+}
+type Props = CollectionEntry<"work">;
+
+const work = Astro.props;
+const { Content } = await work.render();
+
+// Derive the overall date range from roles
+const { startDate, endDate } = getWorkDateRange(work.data.roles);
+---
+
+<PageLayout
+  title={`${work.data.company} - Work Experience`}
+  description={`Work experience at ${work.data.company}`}
+>
+  <Container>
+    <div class="space-y-2">
+      <Nav
+        breadCrumbsItems={[
+          { href: "/work", label: "Work" },
+          { href: `/work/${work.slug}`, label: work.data.company },
+        ]}
+      />
+    </div>
+    <div class="space-y-4 my-10">
+      <div class="flex items-center gap-1.5">
+        <div class="font-base text-sm">
+          {dateRange(startDate, endDate)}
+        </div>
+      </div>
+
+      <div class="text-2xl font-semibold font-serif text-black dark:text-white">
+        {work.data.company}
+      </div>
+
+      <div class="prose prose-neutral dark:prose-invert max-w-none">
+        <Content />
+      </div>
+
+      <div class="space-y-4">
+        <h3 class="text-lg font-semibold font-serif">Positions</h3>
+        <div class="space-y-3">
+          {
+            work.data.roles
+              .sort((a, b) => b.dateStart.valueOf() - a.dateStart.valueOf())
+              .map((position, i) => (
+                <div class="space-y-2">
+                  <div class="text-sm text-black/50 dark:text-white/50">
+                    {position.dateEnd
+                      ? new Date(position.dateEnd).toLocaleDateString("es-ES")
+                      : "Present"}
+                  </div>
+                  <div class="border-l border-black/15 dark:border-white/20 pl-4 space-y-2">
+                    <div class="font-medium font-serif">{position.title}</div>
+                    {position.description && (
+                      <div class="text-sm opacity-60">
+                        {position.description}
+                      </div>
+                    )}
+                  </div>
+                  {i === work.data.roles.length - 1 && (
+                    <div class="text-sm text-black/50 dark:text-white/50">
+                      {position.dateStart.toLocaleDateString("es-ES")}
+                    </div>
+                  )}
+                </div>
+              ))
+          }
+        </div>
+      </div>
+    </div>
+  </Container>
+</PageLayout>

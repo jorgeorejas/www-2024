@@ -1,0 +1,80 @@
+---
+import { dateRange, getWorkDateRange } from "@lib/utils";
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  entry: CollectionEntry<"work"> & { Content: any }; // eslint-disable-line @typescript-eslint/no-explicit-any
+  showTimeline?: boolean;
+  showDescription?: boolean;
+  linkToDetail?: boolean;
+}
+
+const {
+  entry,
+  showTimeline = false,
+  showDescription = true,
+  linkToDetail = false,
+} = Astro.props;
+
+// Derive the overall date range from roles
+const { startDate, endDate } = getWorkDateRange(entry.data.roles);
+---
+
+<li class="work-entry">
+  <div class="flex md:gap-2 md:items-center flex-col md:flex-row">
+    {
+      linkToDetail ? (
+        <a
+          href={`/work/${entry.slug}`}
+          class="font-semibold font-serif hover:opacity-70 transition-opacity"
+        >
+          {entry.data.company}
+        </a>
+      ) : (
+        <div class="font-semibold font-serif">{entry.data.company}</div>
+      )
+    }
+    <div class="text-sm text-black/50 dark:text-white/50">
+      <span class="hidden md:inline"> - </span>
+      {dateRange(startDate, endDate)}
+    </div>
+  </div>
+
+  {
+    showDescription && (
+      <div class="text-sm opacity-75">
+        {entry.data.roles[entry.data.roles.length - 1].title}
+      </div>
+    )
+  }
+
+  {
+    showTimeline && (
+      <div class="space-y-3 mt-2">
+        {entry.data.roles.map((role) => (
+          <div class="flex flex-col md:flex-row md:items-start md:gap-4">
+            <div class="flex-1">
+              <div class="font-medium text-md">{role.title}</div>
+              {role.description && (
+                <div class="text-sm opacity-60 mt-1">{role.description}</div>
+              )}
+            </div>
+            <div class="text-sm text-black/50 dark:text-white/50 md:mt-0.5">
+              {dateRange(role.dateStart, role.dateEnd)}
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  <article class="mt-4">
+    <entry.Content />
+  </article>
+</li>
+
+<style>
+  .work-entry {
+    @apply space-y-2;
+  }
+</style>

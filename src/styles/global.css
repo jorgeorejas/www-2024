@@ -1,25 +1,25 @@
-@import 'tailwindcss';
-
-@plugin '@tailwindcss/typography';
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
   --font-sans:
-    Inter, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
-    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-serif:
-    Rza Light, Lora, ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+    Instrument Serif, ui-serif, Georgia, Cambria, "Times New Roman", Times,
+    serif;
   --font-mono:
-    IBM Plex Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    'Liberation Mono', 'Courier New', monospace;
+    Berkeley Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
   --font-handwritten:
     Caveat Variable, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    'Liberation Mono', 'Courier New', monospace;
+    "Liberation Mono", "Courier New", monospace;
 
   --color-international-orange: #ff4f00;
 
-  --margin-full: 100%;
+  --spacing-full: 100%;
 
   /* Flexoki — https://stephango.com/flexoki */
   --color-flexoki-paper: #fffcf0;
@@ -56,13 +56,26 @@
   --color-flexoki-magenta-400: #ce5d97;
 }
 
+/* Prevent flash of invisible text (FOIT) */
+@font-face {
+  font-family: "Instrument Serif";
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Caveat Variable";
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Berkeley Mono";
+  font-display: swap;
+}
+
 /*
   The default border color has changed to `currentcolor` in Tailwind CSS v4,
   so we've added these compatibility styles to make sure everything still
   looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
 */
 @layer base {
   *,
@@ -113,8 +126,9 @@
 
   article {
     @apply max-w-full prose dark:prose-invert prose-img:mx-auto prose-img:my-auto;
-    @apply prose-headings:font-semibold prose-p:font-mono;
+    @apply prose-headings:font-serif prose-headings:font-semibold prose-p:font-mono;
     @apply prose-headings:text-flexoki-ink dark:prose-headings:text-flexoki-base-50;
+    @apply prose-p:text-flexoki-base-800 dark:prose-p:text-flexoki-base-200;
   }
 }
 
@@ -131,7 +145,19 @@
 }
 
 ::selection {
-  @apply text-black bg-international-orange/80;
+  @apply text-flexoki-ink bg-international-orange/80;
+}
+
+/* Keyboard navigation focus styles */
+*:focus-visible {
+  outline: 2px solid var(--color-international-orange);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Remove default focus outline for mouse users */
+*:focus:not(:focus-visible) {
+  outline: none;
 }
 
 @utility pattern-dots {

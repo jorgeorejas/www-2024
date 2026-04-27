@@ -7,18 +7,35 @@ import { defineConfig } from "astro/config";
 import vercel from "@astrojs/vercel";
 
 import pageInsight from "astro-page-insight";
+import { remarkCorrection } from "./src/lib/remark-correction.mjs";
 
 import tailwindcss from "@tailwindcss/vite";
 
 // https://astro.build/config
 export default defineConfig({
   site: "https://jorgeorejas.com",
-  integrations: [mdx(), sitemap(), react(), pageInsight()],
+  integrations: [
+    mdx({
+      remarkPlugins: [remarkCorrection],
+    }),
+    sitemap(),
+    react(),
+    pageInsight(),
+  ],
+  markdown: {
+    remarkPlugins: [remarkCorrection],
+  },
   output: "server",
   adapter: vercel({
     webAnalytics: { enabled: true },
   }),
   vite: {
     plugins: [tailwindcss()],
+    server: {
+      allowedHosts: [
+        "kyla-microporous-erna.ngrok-free.dev",
+        ".ngrok-free.dev",
+      ],
+    },
   },
 });

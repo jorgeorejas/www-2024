@@ -2,6 +2,7 @@
 import type { CollectionEntry } from "astro:content";
 import FormattedDate from "./FormattedDate.astro";
 import Correction from "./Correction.astro";
+import AnimatedArrow from "./AnimatedArrow.astro";
 
 type Props = {
   entry: CollectionEntry<"blog"> | CollectionEntry<"projects">;
@@ -19,11 +20,16 @@ const { entry, dateFormat } = Astro.props;
     <div class="flex md:gap-2 md:items-center flex-col md:flex-row">
       {
         entry.data.titleCorrection ? (
-          <Correction text={entry.data.titleCorrection} rotate>
-            <div class="font-semibold font-serif">{entry.data.title}</div>
-          </Correction>
+          <div class="font-semibold font-serif">
+            <Correction text={entry.data.titleCorrection} rotate>
+              {entry.data.title}
+            </Correction>
+          </div>
         ) : (
-          <div class="font-semibold font-serif">{entry.data.title}</div>
+          <div class="font-semibold font-serif relative inline-block">
+            {entry.data.title}
+            <span class="absolute left-0 bottom-0 w-full h-[1px] bg-blue-800 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-in-out" />
+          </div>
         )
       }
       <div class="text-sm text-flexoki-base-500 dark:text-flexoki-base-500">
@@ -36,21 +42,5 @@ const { entry, dateFormat } = Astro.props;
       {entry.data.description}
     </div>
   </div>
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    class="absolute top-1/2 right-2 -translate-y-1/2 size-5 stroke-2 fill-none stroke-current"
-  >
-    <line
-      x1="5"
-      y1="12"
-      x2="19"
-      y2="12"
-      class="translate-x-3 group-hover:translate-x-0 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out"
-    ></line>
-    <polyline
-      points="12 5 19 12 12 19"
-      class="-translate-x-1 group-hover:translate-x-0 transition-transform duration-300 ease-in-out"
-    ></polyline>
-  </svg>
+  <AnimatedArrow />
 </a>

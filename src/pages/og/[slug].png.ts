@@ -31,7 +31,7 @@ export const GET: APIRoute = async ({ params }) => {
     }
 
     const image = await PNG(OG(entry.data.title, entry.data.description));
-    return new Response(image, {
+    return new Response(new Uint8Array(image), {
       status: 200,
       headers: { "Content-Type": "image/png" },
     });

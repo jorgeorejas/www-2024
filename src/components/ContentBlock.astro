@@ -1,0 +1,24 @@
+---
+import { getEntry } from "astro:content";
+
+interface Props {
+  slug: string;
+  class?: string;
+}
+
+const { slug, class: className = "" } = Astro.props as Props;
+
+const entry = await getEntry("blocks", slug);
+let Content: any = null;
+if (entry) {
+  const rendered = await entry.render();
+  Content = rendered.Content;
+}
+---
+{entry && Content ? (
+  <article class={className}>
+    <Content />
+  </article>
+) : null}
+
+
