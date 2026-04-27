@@ -25,7 +25,7 @@ export default function OG(
           fontSize: "3rem",
           width: "100%",
           fontWeight: "bold",
-          fontFamily: "Instrument Serif, serif",
+          fontFamily: "Asturica, serif",
           overflow: "hidden",
           padding: "2rem 4rem",
         }}
