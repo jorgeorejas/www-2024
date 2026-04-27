@@ -87,6 +87,7 @@ const isDev = import.meta.env.DEV;
     title?: string;
     artist?: string;
     album?: string;
+    albumType?: string;
     albumUrl?: string;
     albumImage?: string;
     url?: string;
@@ -145,7 +146,12 @@ const isDev = import.meta.env.DEV;
 
     if (trackAlbum && trackAlbumLink) {
       if (data.album && data.album !== data.title && data.albumUrl) {
-        trackAlbum.textContent = data.album;
+        const type = data.albumType
+          ? data.albumType.charAt(0).toUpperCase() + data.albumType.slice(1)
+          : "";
+        trackAlbum.textContent = type
+          ? `· ${type} · ${data.album}`
+          : `· ${data.album}`;
         trackAlbumLink.href = data.albumUrl;
         trackAlbumLink.classList.remove("hidden");
       } else {
@@ -205,6 +211,7 @@ const isDev = import.meta.env.DEV;
       title: "Track title",
       artist: "Artist name",
       album: "Album name",
+      albumType: "single",
       albumUrl: "#",
       albumImage: PLACEHOLDER_IMAGE,
       url: "#",
