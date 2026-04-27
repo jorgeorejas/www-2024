@@ -30,7 +30,11 @@ interface SpotifyNowPlayingResponse {
     name: string;
     duration_ms: number;
     artists: Array<{ name: string }>;
-    album: { name: string; images: SpotifyImage[] };
+    album: {
+      name: string;
+      images: SpotifyImage[];
+      external_urls: { spotify: string };
+    };
     external_urls: {
       spotify: string;
     };
@@ -44,7 +48,11 @@ interface SpotifyRecentlyPlayedResponse {
       name: string;
       duration_ms: number;
       artists: Array<{ name: string }>;
-      album: { name: string; images: SpotifyImage[] };
+      album: {
+        name: string;
+        images: SpotifyImage[];
+        external_urls: { spotify: string };
+      };
       external_urls: {
         spotify: string;
       };
@@ -102,6 +110,7 @@ async function getNowPlaying(accessToken: string) {
     title: data.item.name,
     artist: data.item.artists.map((artist) => artist.name).join(", "),
     album: data.item.album.name,
+    albumUrl: data.item.album.external_urls.spotify,
     albumImage: smallestImage(data.item.album.images),
     url: data.item.external_urls.spotify,
     progressMs: data.progress_ms ?? 0,
@@ -134,6 +143,7 @@ async function getRecentlyPlayed(accessToken: string) {
     title: track.name,
     artist: track.artists.map((artist) => artist.name).join(", "),
     album: track.album.name,
+    albumUrl: track.album.external_urls.spotify,
     albumImage: smallestImage(track.album.images),
     url: track.external_urls.spotify,
     playedAt: item.played_at,

@@ -51,7 +51,15 @@ import SpotifyAlbumArt from "@components/SpotifyAlbumArt.astro";
           <span class="opacity-60"> by </span>
           <span id="spotify-track-artist"></span>
         </a>
-        <span id="spotify-album" class="opacity-60 truncate hidden shrink-0 max-w-[16ch]"></span>
+        <a
+          id="spotify-album-link"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="opacity-60 truncate hidden shrink-0 max-w-[16ch] decoration-flexoki-base-300 dark:decoration-flexoki-base-700 hover:decoration-flexoki-base-500 hover:opacity-100 hover:text-flexoki-ink hover:dark:text-flexoki-base-50 transition-colors duration-300 ease-in-out underline underline-offset-2"
+        >
+          <span id="spotify-album"></span>
+        </a>
       </div>
       <div
         id="spotify-progress"
@@ -73,6 +81,7 @@ import SpotifyAlbumArt from "@components/SpotifyAlbumArt.astro";
     title?: string;
     artist?: string;
     album?: string;
+    albumUrl?: string;
     albumImage?: string;
     url?: string;
     progressMs?: number;
@@ -85,6 +94,7 @@ import SpotifyAlbumArt from "@components/SpotifyAlbumArt.astro";
   const trackTitle = document.getElementById("spotify-track-title");
   const trackArtist = document.getElementById("spotify-track-artist");
   const trackAlbum = document.getElementById("spotify-album");
+  const trackAlbumLink = document.getElementById("spotify-album-link") as HTMLAnchorElement | null;
   const statusText = document.getElementById("spotify-status");
   const iconPlaying = document.getElementById("spotify-icon-playing");
   const iconPaused = document.getElementById("spotify-icon-paused");
@@ -122,12 +132,13 @@ import SpotifyAlbumArt from "@components/SpotifyAlbumArt.astro";
     if (trackArtist) trackArtist.textContent = data.artist;
     if (trackLink) trackLink.href = data.url;
 
-    if (trackAlbum) {
-      if (data.album && data.album !== data.title) {
+    if (trackAlbum && trackAlbumLink) {
+      if (data.album && data.album !== data.title && data.albumUrl) {
         trackAlbum.textContent = `· ${data.album}`;
-        trackAlbum.classList.remove("hidden");
+        trackAlbumLink.href = data.albumUrl;
+        trackAlbumLink.classList.remove("hidden");
       } else {
-        trackAlbum.classList.add("hidden");
+        trackAlbumLink.classList.add("hidden");
       }
     }
 
