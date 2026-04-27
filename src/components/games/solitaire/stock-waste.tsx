@@ -1,5 +1,6 @@
 import Card from "./Card";
 import { useSolitaire } from "./provider";
+import type { Card as CardType } from "./types";
 
 export default function StockWaste() {
   const {
@@ -38,29 +39,29 @@ export default function StockWaste() {
   return (
     <>
       <div className="flex flex-col items-center gap-2">
-        <div className="text-xs text-zinc-50 font-medium font-mono select-none">
+        <div className="text-xs text-flexoki-base-700 dark:text-flexoki-base-300 font-medium font-mono select-none">
           Stock
         </div>
         <div className="cursor-grab w-full" onClick={handleStockClick}>
           {stockCard ? (
             <Card card={stockCard} />
           ) : (
-            <div className="w-full aspect-5/7 border border-dashed border-zinc-700/50 rounded-sm flex items-center justify-center">
+            <div className="w-full aspect-5/7 border border-dashed border-flexoki-base-300 dark:border-flexoki-base-700 rounded-sm flex items-center justify-center">
               {canRecycle && (
-                <span className="text-zinc-700/50 text-2xl">↻</span>
+                <span className="text-flexoki-base-400 text-2xl">↻</span>
               )}
             </div>
           )}
         </div>
       </div>
       <div className="flex flex-col items-center gap-2">
-        <div className="text-xs text-zinc-50 font-medium font-mono select-none">
+        <div className="text-xs text-flexoki-base-700 dark:text-flexoki-base-300 font-medium font-mono select-none">
           Waste
         </div>
         <div className="cursor-grab w-full relative aspect-5/7" onClick={handleWasteClick}>
           {wasteStack.length > 0 ? (
             <>
-              {wasteStack.map((card, index) => {
+              {wasteStack.map((card: CardType, index: number) => {
                 const isTopCard = index === wasteStack.length - 1;
                 // Diagonal displacement - each card moves both right and down
                 const offsetX = index * 16; // 16px horizontal offset for each card
@@ -103,7 +104,7 @@ export default function StockWaste() {
               })}
             </>
           ) : (
-            <div className="w-full h-full border border-dashed border-zinc-700/50 rounded-sm flex items-center justify-center" />
+            <div className="w-full h-full border border-dashed border-flexoki-base-300 dark:border-flexoki-base-700 rounded-sm flex items-center justify-center" />
           )}
         </div>
       </div>

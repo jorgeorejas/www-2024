@@ -110,10 +110,10 @@ export default function Tableau() {
           onDragOver={(e) => e.preventDefault()}
         >
           {tableau.length === 0 ? (
-            <div className={`w-full aspect-5/7 border border-dashed border-zinc-700/50 rounded-sm flex items-center justify-center transition-all duration-200 ${
-              isValidTarget ? "ring-2 ring-green-400 ring-offset-2 rounded-sm" : ""
+            <div className={`w-full aspect-5/7 border border-dashed border-flexoki-base-300 dark:border-flexoki-base-700 rounded-sm flex items-center justify-center transition-all duration-200 ${
+              isValidTarget ? "ring-2 ring-flexoki-blue-600 dark:ring-flexoki-blue-400 ring-offset-2 ring-offset-transparent rounded-sm" : ""
             }`}>
-              <span className="text-zinc-700/50 text-lg">K</span>
+              <span className="text-flexoki-base-400 text-lg">K</span>
             </div>
           ) : (
             tableau.map((card: CardType, cardIndex: number) => {
@@ -122,7 +122,7 @@ export default function Tableau() {
                 <div
                   key={card.id}
                   className={`-mt-8 md:-mt-20 first:mt-0 ${card.faceUp ? "cursor-grab" : ""} transition-all duration-200 ${
-                    isTopCard && isValidTarget ? "ring-2 ring-green-400 ring-offset-2 rounded-sm" : ""
+                    isTopCard && isValidTarget ? "ring-2 ring-flexoki-blue-600 dark:ring-flexoki-blue-400 ring-offset-2 ring-offset-transparent rounded-sm" : ""
                   }`}
                   draggable={card.faceUp}
                   onDragStart={(e) =>

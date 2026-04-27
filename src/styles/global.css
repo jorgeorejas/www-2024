@@ -20,6 +20,40 @@
   --color-international-orange: #ff4f00;
 
   --margin-full: 100%;
+
+  /* Flexoki — https://stephango.com/flexoki */
+  --color-flexoki-paper: #fffcf0;
+  --color-flexoki-ink: #100f0f;
+  --color-flexoki-base-50: #f2f0e5;
+  --color-flexoki-base-100: #e6e4d9;
+  --color-flexoki-base-150: #dad8ce;
+  --color-flexoki-base-200: #cecdc3;
+  --color-flexoki-base-300: #b7b5ac;
+  --color-flexoki-base-400: #9f9d96;
+  --color-flexoki-base-500: #878580;
+  --color-flexoki-base-600: #6f6e69;
+  --color-flexoki-base-700: #575653;
+  --color-flexoki-base-800: #403e3c;
+  --color-flexoki-base-850: #343331;
+  --color-flexoki-base-900: #282726;
+  --color-flexoki-base-950: #1c1b1a;
+
+  --color-flexoki-red-600: #af3029;
+  --color-flexoki-red-400: #d14d41;
+  --color-flexoki-orange-600: #bc5215;
+  --color-flexoki-orange-400: #da702c;
+  --color-flexoki-yellow-600: #ad8301;
+  --color-flexoki-yellow-400: #d0a215;
+  --color-flexoki-green-600: #66800b;
+  --color-flexoki-green-400: #879a39;
+  --color-flexoki-cyan-600: #24837b;
+  --color-flexoki-cyan-400: #3aa99f;
+  --color-flexoki-blue-600: #205ea6;
+  --color-flexoki-blue-400: #4385be;
+  --color-flexoki-purple-600: #5e409d;
+  --color-flexoki-purple-400: #8b7ec8;
+  --color-flexoki-magenta-600: #a02f6f;
+  --color-flexoki-magenta-400: #ce5d97;
 }
 
 /*
@@ -98,4 +132,53 @@
 
 ::selection {
   @apply text-black bg-international-orange/80;
+}
+
+@utility pattern-dots {
+  background-image: radial-gradient(currentColor 0.75px, transparent 0.75px);
+  background-size: 6px 6px;
+  background-position: 0 0;
+}
+
+@utility pattern-grain {
+  background-image: radial-gradient(currentColor 0.5px, transparent 0.5px);
+  background-size: 4px 4px;
+}
+
+@utility pattern-hatch {
+  background-image: repeating-linear-gradient(
+    45deg,
+    currentColor 0,
+    currentColor 1px,
+    transparent 1px,
+    transparent 6px
+  );
+}
+
+@utility pattern-cross {
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      currentColor 0,
+      currentColor 1px,
+      transparent 1px,
+      transparent 6px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      currentColor 0,
+      currentColor 1px,
+      transparent 1px,
+      transparent 6px
+    );
+}
+
+@utility pattern-weave {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    currentColor 0,
+    currentColor 1px,
+    transparent 1px,
+    transparent 4px
+  );
 }

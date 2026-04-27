@@ -155,7 +155,7 @@ function exposedRun(s: GameState, col: number, countFromTail: number): Card[] {
 }
 
 function isWin(foundations: Foundations): boolean {
-  return Object.values(foundations).every((pile: Card[]) => pile.length === 13);
+  return (Object.values(foundations) as Card[][]).every((pile) => pile.length === 13);
 }
 
 // Apply engine operations

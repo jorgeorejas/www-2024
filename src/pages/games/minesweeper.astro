@@ -1,0 +1,46 @@
+---
+import Container from "@components/Container.astro";
+import Nav from "@components/Nav.astro";
+import PageLayout from "@layouts/PageLayout.astro";
+import MinesweeperGame from "@components/games/Minesweeper.tsx";
+---
+
+<PageLayout
+  title="Minesweeper"
+  description="The classic logic puzzle. Beginner, Intermediate, and Expert boards. Right-click to flag."
+>
+  <Container>
+    <div class="space-y-2">
+      <Nav
+        breadCrumbsItems={[
+          { href: "/games", label: "Games" },
+          { href: "/games/minesweeper", label: "Minesweeper" },
+        ]}
+      />
+    </div>
+
+    <div class="space-y-4 my-10">
+      <div class="flex items-center gap-1.5">
+        <div class="font-base text-sm">Easy → Hard</div>
+        &bull;
+        <div class="font-base text-sm">Logic</div>
+      </div>
+      <div class="text-2xl font-semibold font-serif text-black dark:text-white">
+        Minesweeper
+      </div>
+    </div>
+
+    <article class="space-y-6">
+      <section>
+        <p class="text-sm text-black/75 dark:text-white/75 max-w-md">
+          Reveal every safe cell without detonating a mine. Numbers tell you how
+          many mines border that square. The first click is always safe.
+        </p>
+      </section>
+
+      <section class="py-8">
+        <MinesweeperGame client:only="react" />
+      </section>
+    </article>
+  </Container>
+</PageLayout>

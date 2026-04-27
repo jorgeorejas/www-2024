@@ -69,9 +69,9 @@ export default function Hint() {
   };
 
   const getScoreColor = (score: number): string => {
-    if (score > 0) return "text-green-600";
-    if (score < 0) return "text-red-600";
-    return "text-zinc-600";
+    if (score > 0) return "text-flexoki-green-600 dark:text-flexoki-green-400 font-medium";
+    if (score < 0) return "text-flexoki-red-600 dark:text-flexoki-red-400";
+    return "text-flexoki-base-600 dark:text-flexoki-base-400";
   };
 
   const applyHint = (hint: MoveHint) => {
@@ -118,42 +118,42 @@ export default function Hint() {
   };
 
   return (
-    <div className="bg-white border border-zinc-200 rounded-lg shadow-sm col-span-7">
+    <div className="border border-flexoki-base-200 dark:border-flexoki-base-800 col-span-7">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-4 py-3 text-left flex items-center justify-between hover:bg-zinc-50 transition-colors"
+        className="w-full px-4 py-3 text-left flex items-center justify-between hover:text-flexoki-ink dark:hover:text-flexoki-base-100 transition-colors"
       >
         <div className="flex items-center gap-2">
-          <span className="text-lg">💡</span>
-          <span className="text-sm font-medium text-zinc-700">Hint</span>
+          <span className="text-lg text-flexoki-yellow-600 dark:text-flexoki-yellow-400">◆</span>
+          <span className="text-sm font-medium text-flexoki-ink dark:text-flexoki-base-100">Hint</span>
           {hint && !isOpen && (
-            <span className="text-xs text-zinc-500">
+            <span className="text-xs text-flexoki-base-500 dark:text-flexoki-base-500">
               ({hint.kind.replace("→", " → ").toLowerCase()})
             </span>
           )}
         </div>
         <div
-          className={`text-zinc-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+          className={`text-flexoki-base-500 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
         >
           ▼
         </div>
       </button>
 
       {isOpen && (
-        <div className="border-t border-zinc-200 p-4">
+        <div className="border-t border-flexoki-base-200 dark:border-flexoki-base-800 p-4">
           {!hint ? (
-            <div className="text-center text-zinc-600 text-sm py-2">
-              🤔 No moves available right now
+            <div className="text-center text-flexoki-base-600 dark:text-flexoki-base-400 text-sm py-2">
+              No moves available right now.
             </div>
           ) : (
             <div className="space-y-3">
               <div className="flex items-start gap-3">
-                <div className="text-blue-600 text-lg">💡</div>
+                <div className="text-flexoki-yellow-600 dark:text-flexoki-yellow-400 text-lg">◆</div>
                 <div className="flex-1">
-                  <div className="text-blue-900 font-medium text-sm mb-1">
+                  <div className="text-flexoki-ink dark:text-flexoki-base-50 font-medium text-sm mb-1">
                     Suggested Move
                   </div>
-                  <div className="text-blue-800 text-sm mb-2">
+                  <div className="text-flexoki-base-700 dark:text-flexoki-base-300 text-sm mb-2">
                     {formatHint(hint)}
                   </div>
                   <div
@@ -166,7 +166,7 @@ export default function Hint() {
               <div className="flex justify-end">
                 <button
                   onClick={() => applyHint(hint)}
-                  className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors"
+                  className="px-3 py-1 text-flexoki-ink dark:text-flexoki-base-50 border border-flexoki-ink dark:border-flexoki-base-100 font-medium text-sm hover:border-flexoki-ink dark:hover:border-flexoki-base-50 transition-colors"
                 >
                   Apply Hint
                 </button>

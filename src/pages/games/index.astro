@@ -1,16 +1,9 @@
 ---
-import ArrowCard from "@components/ArrowCard.astro";
 import Container from "@components/Container.astro";
 import Nav from "@components/Nav.astro";
 import { GAMES } from "@consts";
 import PageLayout from "@layouts/PageLayout.astro";
-import { getCollection } from "astro:content";
 
-const games = (await getCollection("games"))
-  .filter((game) => !game.data.draft)
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-
-// Static games list for games that have custom pages
 const staticGames = [
   {
     title: "Klondike Solitaire",
@@ -18,7 +11,7 @@ const staticGames = [
     href: "/games/solitaire",
     date: new Date("2025-08-13"),
     difficulty: "Easy/Hard",
-    category: "Card Game"
+    category: "Card Game",
   },
   {
     title: "Conway's Game of Life",
@@ -26,8 +19,16 @@ const staticGames = [
     href: "/games/game-of-life",
     date: new Date("2025-08-13"),
     difficulty: "Easy",
-    category: "Simulation"
-  }
+    category: "Simulation",
+  },
+  {
+    title: "Minesweeper",
+    description: "The classic logic puzzle. Reveal every safe square without detonating a mine.",
+    href: "/games/minesweeper",
+    date: new Date("2026-04-27"),
+    difficulty: "Easy/Hard",
+    category: "Logic",
+  },
 ];
 ---
 
@@ -86,19 +87,7 @@ const staticGames = [
             </li>
           ))
         }
-        {
-          games.map((game) => (
-            <li>
-              <ArrowCard entry={game} />
-            </li>
-          ))
-        }
       </ul>
-      {staticGames.length === 0 && games.length === 0 && (
-        <div class="text-black/50 dark:text-white/50 text-center py-10">
-          Games are coming soon! Check back later.
-        </div>
-      )}
     </div>
   </Container>
 </PageLayout>

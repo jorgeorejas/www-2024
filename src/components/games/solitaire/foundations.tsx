@@ -58,7 +58,7 @@ export default function Foundations() {
 
   return (
     <div className="col-span-4 col-start-4 space-y-2">
-      <div className="text-xs text-zinc-50 text-center font-medium font-mono select-none">
+      <div className="text-xs text-flexoki-base-700 dark:text-flexoki-base-300 text-center font-medium font-mono select-none">
         Foundations
       </div>
       <div className="grid grid-cols-4 gap-4">
@@ -68,7 +68,7 @@ export default function Foundations() {
             <div
               key={suit}
               className={`cursor-pointer transition-all duration-200 ${
-                isValidTarget ? "ring-2 ring-green-400 ring-offset-2 ring-offset-green-800/90 rounded-sm" : ""
+                isValidTarget ? "ring-2 ring-flexoki-blue-600 dark:ring-flexoki-blue-400 ring-offset-2 ring-offset-transparent rounded-sm" : ""
               }`}
               onDrop={(e) => handleFoundationDrop(e)}
               onDragOver={(e) => e.preventDefault()}

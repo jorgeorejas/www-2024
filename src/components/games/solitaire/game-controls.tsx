@@ -11,13 +11,16 @@ export default function GameControls() {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
+  const btn =
+    "px-3 py-1 border border-flexoki-base-200 dark:border-flexoki-base-800 text-sm font-mono text-flexoki-base-700 dark:text-flexoki-base-300 hover:text-flexoki-ink dark:hover:text-flexoki-base-100 transition-colors disabled:opacity-40 disabled:cursor-not-allowed";
+
   return (
     <div className="col-span-7 space-y-4 min-h-[180px]">
       <div>
-        <h1 className="font-serif font-bold text-black text-2xl">
+        <h1 className="font-serif font-bold text-flexoki-ink dark:text-flexoki-base-50 text-2xl">
           Klondike Solitaire
         </h1>
-        <div className="flex gap-6 text-sm text-zinc-600 font-mono">
+        <div className="flex gap-6 text-sm text-flexoki-base-600 dark:text-flexoki-base-400 font-mono">
           <span>Score: {stats.score}</span>
           <span>Moves: {stats.moves}</span>
           <span>Time: {formatTime(stats.time)}</span>
@@ -25,47 +28,41 @@ export default function GameControls() {
       </div>
 
       <div className="flex gap-2 flex-wrap">
-        <button
-          onClick={() => startNewGame()}
-          className="px-3 py-1 bg-zinc-600 text-white rounded text-sm hover:bg-zinc-700 transition-colors"
-        >
+        <button onClick={() => startNewGame()} className={btn}>
           New Game
         </button>
 
-        <button
-          onClick={undo}
-          disabled={!stats.canUndo}
-          className="px-3 py-1 bg-zinc-600 text-white rounded text-sm hover:bg-zinc-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+        <button onClick={undo} disabled={!stats.canUndo} className={btn}>
           Undo
         </button>
 
-        <button
-          onClick={autoMove}
-          disabled={!canAutoMove}
-          className="px-3 py-1 bg-zinc-600 text-white rounded text-sm hover:bg-zinc-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+        <button onClick={autoMove} disabled={!canAutoMove} className={btn}>
           Auto Move
         </button>
       </div>
 
-      {/* Fixed height container for status messages to prevent layout shifts */}
       <div className="min-h-[60px]">
         {stats.won && (
-          <div className="text-zinc-700 bg-zinc-50 p-3 rounded border border-zinc-200">
-            <strong>Congratulations!</strong> You won with a score of{" "}
-            {stats.score} in {stats.moves} moves!
+          <div className="relative p-3 border border-flexoki-green-600 dark:border-flexoki-green-400 overflow-hidden">
+            <div className="pattern-hatch text-flexoki-green-600/15 dark:text-flexoki-green-400/15 absolute inset-0 pointer-events-none" />
+            <div className="relative text-flexoki-green-600 dark:text-flexoki-green-400">
+              <strong>Congratulations!</strong> You won with a score of{" "}
+              {stats.score} in {stats.moves} moves!
+            </div>
           </div>
         )}
 
         {stats.lost && (
-          <div className="text-zinc-700 bg-zinc-50 p-3 rounded border border-zinc-200">
-            <strong>Game Over</strong> - No more moves available.
+          <div className="relative p-3 border border-flexoki-red-600 dark:border-flexoki-red-400 overflow-hidden">
+            <div className="pattern-cross text-flexoki-red-600/15 dark:text-flexoki-red-400/15 absolute inset-0 pointer-events-none" />
+            <div className="relative text-flexoki-red-600 dark:text-flexoki-red-400">
+              <strong>Game Over</strong> — No more moves available.
+            </div>
           </div>
         )}
       </div>
 
-      <div className="text-xs text-zinc-500">
+      <div className="text-xs text-flexoki-base-500 dark:text-flexoki-base-500 font-mono">
         Foundation Progress: {stats.foundationProgress.total}/52 cards
         <div className="flex gap-2 mt-1">
           <span>♠ {stats.foundationProgress.S}</span>

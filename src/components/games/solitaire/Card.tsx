@@ -28,8 +28,8 @@ const cardVariants = cva(
   {
     variants: {
       faceDown: {
-        true: "bg-linear-to-tl from-zinc-500 to-zinc-700 border-zinc-600",
-        false: "bg-zinc-50 border-zinc-200",
+        true: "pattern-cross text-flexoki-base-300 dark:text-flexoki-base-700 border-flexoki-base-300 dark:border-flexoki-base-700",
+        false: "bg-flexoki-paper dark:bg-flexoki-base-50 border-flexoki-base-200",
       },
       size: {
         sm: "p-2",
@@ -47,8 +47,8 @@ const cardVariants = cva(
 const suitVariants = cva("text-sm", {
   variants: {
     color: {
-      red: "text-red-600/75",
-      black: "text-zinc-800/75",
+      red: "text-flexoki-red-600",
+      black: "text-flexoki-ink",
     },
   },
   defaultVariants: {
@@ -120,8 +120,8 @@ export default function Card({
 
 function EmptyCardStack({ suit }: { suit: keyof typeof suits }) {
   return (
-    <div className="w-full aspect-5/7 border border-dashed border-zinc-700/50 rounded-sm flex items-center justify-center select-none">
-      <span className="text-zinc-700/50 text-2xl">{suits[suit]}</span>
+    <div className="w-full aspect-5/7 border border-dashed border-flexoki-base-300 dark:border-flexoki-base-700 rounded-sm flex items-center justify-center select-none">
+      <span className="text-flexoki-base-400 text-2xl">{suits[suit]}</span>
     </div>
   );
 }
