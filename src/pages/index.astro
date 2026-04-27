@@ -23,20 +23,17 @@ const projects = (await getCollection("projects"))
 const games = [
   {
     title: "Klondike Solitaire",
-    description:
-      "Classic Klondike Solitaire with Easy (1 card) and Hard (3 cards) difficulty modes.",
+    description: "Classic Klondike Solitaire with Easy (1 card) and Hard (3 cards) difficulty modes.",
     href: "/games/solitaire",
   },
   {
     title: "Conway's Game of Life",
-    description:
-      "A mesmerizing cellular automaton where simple rules create complex, beautiful patterns.",
+    description: "A mesmerizing cellular automaton where simple rules create complex, beautiful patterns.",
     href: "/games/game-of-life",
   },
   {
     title: "Minesweeper",
-    description:
-      "The classic logic puzzle. Reveal every safe square without detonating a mine.",
+    description: "The classic logic puzzle. Reveal every safe square without detonating a mine.",
     href: "/games/minesweeper",
   },
 ].slice(0, SITE.NUM_GAMES_ON_HOMEPAGE);
@@ -75,7 +72,7 @@ const work = await Promise.all(
 
       <section class="space-y-6">
         <div class="flex flex-wrap gap-y-2 items-center justify-between">
-          <h5 class="font-semibold text-black dark:text-white font-serif">
+          <h5 class="font-semibold text-flexoki-ink dark:text-flexoki-base-50 font-serif">
             Latest posts
           </h5>
           <Link href="/blog"> See all posts </Link>
@@ -93,7 +90,7 @@ const work = await Promise.all(
 
       <section class="space-y-6">
         <div class="flex flex-wrap gap-y-2 items-center justify-between">
-          <h5 class="font-semibold text-black font-serif dark:text-white">
+          <h5 class="font-semibold text-flexoki-ink font-serif dark:text-flexoki-base-50">
             Recent projects
           </h5>
           <Link href="/projects"> See all projects </Link>
@@ -109,20 +106,21 @@ const work = await Promise.all(
         </ul>
       </section>
 
-      <section class="space-y-6">
-        <div class="flex flex-wrap gap-y-2 items-center justify-between">
-          <h5 class="font-semibold text-black font-serif dark:text-white">
-            Games
-          </h5>
-          <Link href="/games"> See all games </Link>
-        </div>
-        <ul class="flex flex-col gap-4">
-          {
-            games.map((game) => (
+      {/* TODO: re-enable Games section on homepage */}
+      {false && (
+        <section class="space-y-6">
+          <div class="flex flex-wrap gap-y-2 items-center justify-between">
+            <h5 class="font-semibold text-flexoki-ink font-serif dark:text-flexoki-base-50">
+              Games
+            </h5>
+            <Link href="/games"> See all games </Link>
+          </div>
+          <ul class="flex flex-col gap-4">
+            {games.map((game) => (
               <li>
                 <a
                   href={game.href}
-                  class="relative group flex flex-nowrap py-3 px-4 pr-10 border-l border-black/15 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-colors duration-300 ease-in-out"
+                  class="relative group flex flex-nowrap py-3 px-4 pr-10 border-l border-flexoki-base-200 dark:border-flexoki-base-800 hover:bg-flexoki-base-100 dark:hover:bg-flexoki-base-900 hover:text-flexoki-ink dark:hover:text-flexoki-base-50 transition-colors duration-300 ease-in-out"
                 >
                   <div class="flex flex-col gap-1 flex-1">
                     <div class="font-semibold font-serif">{game.title}</div>
@@ -147,14 +145,14 @@ const work = await Promise.all(
                   </svg>
                 </a>
               </li>
-            ))
-          }
-        </ul>
-      </section>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section class="space-y-6">
         <div class="flex flex-wrap gap-y-2 items-center justify-between">
-          <h5 class="font-semibold text-black font-serif dark:text-white">
+          <h5 class="font-semibold text-flexoki-ink font-serif dark:text-flexoki-base-50">
             Work Experience
           </h5>
           <Link href="/work"> See all work </Link>
@@ -167,7 +165,7 @@ const work = await Promise.all(
                   <div class="font-semibold font-serif">
                     {entry.data.company}
                   </div>
-                  <div class="text-sm text-black/50 dark:text-white/50">
+                  <div class="text-sm text-flexoki-base-500 dark:text-flexoki-base-500">
                     <span class="hidden md:inline"> - </span>
                     {dateRange(entry.data.dateStart, entry.data.dateEnd)}
                   </div>
@@ -182,10 +180,10 @@ const work = await Promise.all(
         </ul>
       </section>
 
-      <hr class="border-black/15 dark:border-white/20" />
+      <hr class="border-flexoki-base-200 dark:border-flexoki-base-800" />
 
       <section class="space-y-4">
-        <h5 class="font-semibold text-black dark:text-white font-serif">
+        <h5 class="font-semibold text-flexoki-ink dark:text-flexoki-base-50 font-serif">
           Let's Connect
         </h5>
         <article>

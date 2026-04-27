@@ -13,7 +13,7 @@ const { entry, dateFormat } = Astro.props;
 
 <a
   href={`/${entry.collection}/${entry.slug}`}
-  class="relative group flex flex-nowrap py-3 px-4 pr-10 border-l border-black/15 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-colors duration-300 ease-in-out"
+  class="relative group flex flex-nowrap py-3 px-4 pr-10 border-l border-flexoki-base-200 dark:border-flexoki-base-800 hover:bg-flexoki-base-100 dark:hover:bg-flexoki-base-900 hover:text-flexoki-ink dark:hover:text-flexoki-base-50 transition-colors duration-300 ease-in-out"
 >
   <div class="flex flex-col gap-2 flex-1">
     <div class="flex md:gap-2 md:items-center flex-col md:flex-row">
@@ -26,7 +26,7 @@ const { entry, dateFormat } = Astro.props;
           <div class="font-semibold font-serif">{entry.data.title}</div>
         )
       }
-      <div class="text-sm text-black/50 dark:text-white/50">
+      <div class="text-sm text-flexoki-base-500 dark:text-flexoki-base-500">
         <span class="hidden md:inline"> - </span>
         <FormattedDate date={entry.data.date} detail={dateFormat} />
       </div>

@@ -52,18 +52,18 @@ const { Content } = await post.render();
             text={post.data.titleCorrection}
             textClass="text-2xl -top-6"
           >
-            <div class="text-2xl font-semibold font-serif text-black dark:text-white">
+            <div class="text-2xl font-semibold font-serif text-flexoki-ink dark:text-flexoki-base-50">
               {post.data.title}
             </div>
           </Correction>
         ) : (
-          <div class="text-2xl font-semibold font-serif text-black dark:text-white">
+          <div class="text-2xl font-semibold font-serif text-flexoki-ink dark:text-flexoki-base-50">
             {post.data.title}
           </div>
         )
       }
 
-      <div class="border-b border-black/15 dark:border-white/20 pb-4">
+      <div class="border-b border-flexoki-base-200 dark:border-flexoki-base-800 pb-4">
         {post.data.description}
       </div>
     </div>

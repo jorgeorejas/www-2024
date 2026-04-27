@@ -78,11 +78,12 @@
   html {
     overflow-y: scroll;
     color-scheme: light;
-    background-color: oklch(98.5% 0 0);
+    background-color: var(--color-flexoki-paper);
   }
 
   html.dark {
     color-scheme: dark;
+    background-color: var(--color-flexoki-base-950);
   }
 
   html,
@@ -93,13 +94,12 @@
   body {
     @apply font-mono antialiased;
     @apply flex flex-col;
-    /* @apply bg-stone-100 dark:bg-stone-900; */
-    @apply text-black/75 dark:text-white/75;
+    @apply text-flexoki-base-800 dark:text-flexoki-base-200;
   }
 
   header {
     @apply fixed top-0 left-0 right-0 z-50 py-5;
-    @apply bg-stone-100/75 dark:bg-stone-900/25;
+    @apply bg-flexoki-paper/75 dark:bg-flexoki-base-950/75;
     @apply backdrop-blur-xs saturate-200;
   }
 
@@ -114,19 +114,19 @@
   article {
     @apply max-w-full prose dark:prose-invert prose-img:mx-auto prose-img:my-auto;
     @apply prose-headings:font-semibold prose-p:font-mono;
-    @apply prose-headings:text-black dark:prose-headings:text-white;
+    @apply prose-headings:text-flexoki-ink dark:prose-headings:text-flexoki-base-50;
   }
 }
 
 @layer utilities {
   article a {
     @apply font-mono text-current underline underline-offset-2;
-    @apply decoration-black/15 dark:decoration-white/30;
+    @apply decoration-flexoki-base-300 dark:decoration-flexoki-base-700;
     @apply transition-colors duration-300 ease-in-out;
   }
   article a:hover {
-    @apply text-black dark:text-white;
-    @apply decoration-black/25 dark:decoration-white/50;
+    @apply text-flexoki-ink dark:text-flexoki-base-50;
+    @apply decoration-flexoki-base-500;
   }
 }
 
