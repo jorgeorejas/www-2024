@@ -96,7 +96,7 @@
 
   html.dark {
     color-scheme: dark;
-    background-color: var(--color-flexoki-base-950);
+    background-color: var(--color-flexoki-ink);
   }
 
   html,
@@ -107,12 +107,12 @@
   body {
     @apply font-mono antialiased;
     @apply flex flex-col;
-    @apply text-flexoki-base-800 dark:text-flexoki-base-200;
+    @apply text-flexoki-base-800 dark:text-flexoki-base-100;
   }
 
   header {
     @apply fixed top-0 left-0 right-0 z-50 py-5;
-    @apply bg-flexoki-paper/75 dark:bg-flexoki-base-950/75;
+    @apply bg-flexoki-paper/75 dark:bg-flexoki-ink/75;
     @apply backdrop-blur-xs saturate-200;
   }
 
@@ -128,7 +128,7 @@
     @apply max-w-full prose dark:prose-invert prose-img:mx-auto prose-img:my-auto;
     @apply prose-headings:font-serif prose-headings:font-semibold prose-p:font-mono;
     @apply prose-headings:text-flexoki-ink dark:prose-headings:text-flexoki-base-50;
-    @apply prose-p:text-flexoki-base-800 dark:prose-p:text-flexoki-base-200;
+    @apply prose-p:text-flexoki-base-800 dark:prose-p:text-flexoki-base-100;
   }
 }
 
