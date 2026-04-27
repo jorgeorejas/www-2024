@@ -7,11 +7,13 @@
   id="spotify-art"
   width="96"
   height="96"
-  class="hidden w-12 h-12 shrink-0 bg-flexoki-paper dark:bg-flexoki-ink"
+  class="hidden w-14 h-14 shrink-0 bg-flexoki-paper dark:bg-flexoki-ink"
 ></canvas>
 
 <script>
-  const canvas = document.getElementById("spotify-art") as HTMLCanvasElement | null;
+  const canvas = document.getElementById(
+    "spotify-art",
+  ) as HTMLCanvasElement | null;
   let lastImageUrl: string | null = null;
 
   function isDark(): boolean {

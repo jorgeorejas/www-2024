@@ -12,8 +12,8 @@ const isDev = import.meta.env.DEV;
   data-dev={isDev ? "true" : "false"}
   class="hidden text-sm"
 >
-  <div class="grid grid-rows-3 gap-3">
-    <span class="flex items-center shrink-0 row-span-3">
+  <div class="flex items-center gap-3">
+    <span class="flex items-center shrink-0">
       <svg
         id="spotify-icon-playing"
         class="hidden"
@@ -46,28 +46,26 @@ const isDev = import.meta.env.DEV;
     <SpotifyAlbumArt />
     <div class="flex flex-col gap-0.5 min-w-0 flex-1">
       <span id="spotify-status" class="opacity-60">Last played</span>
-      <div class="flex items-baseline gap-2 min-w-0">
-        <a
-          id="spotify-track-link"
-          href="#"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="truncate decoration-flexoki-base-300 dark:decoration-flexoki-base-700 hover:decoration-flexoki-base-500 text-current hover:text-flexoki-ink hover:dark:text-flexoki-base-50 transition-colors duration-300 ease-in-out underline underline-offset-2"
-        >
-          <span id="spotify-track-title"></span>
-          <span class="opacity-60"> by </span>
-          <span id="spotify-track-artist"></span>
-        </a>
-        <a
-          id="spotify-album-link"
-          href="#"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="opacity-60 truncate hidden shrink-0 max-w-[16ch] decoration-flexoki-base-300 dark:decoration-flexoki-base-700 hover:decoration-flexoki-base-500 hover:opacity-100 hover:text-flexoki-ink hover:dark:text-flexoki-base-50 transition-colors duration-300 ease-in-out underline underline-offset-2"
-        >
-          <span id="spotify-album"></span>
-        </a>
-      </div>
+      <a
+        id="spotify-track-link"
+        href="#"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="truncate decoration-flexoki-base-300 dark:decoration-flexoki-base-700 hover:decoration-flexoki-base-500 text-current hover:text-flexoki-ink hover:dark:text-flexoki-base-50 transition-colors duration-300 ease-in-out underline underline-offset-2"
+      >
+        <span id="spotify-track-title"></span>
+        <span class="opacity-60"> by </span>
+        <span id="spotify-track-artist"></span>
+      </a>
+      <a
+        id="spotify-album-link"
+        href="#"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="opacity-60 truncate hidden max-w-[24ch] decoration-flexoki-base-300 dark:decoration-flexoki-base-700 hover:decoration-flexoki-base-500 hover:opacity-100 hover:text-flexoki-ink hover:dark:text-flexoki-base-50 transition-colors duration-300 ease-in-out underline underline-offset-2"
+      >
+        <span id="spotify-album"></span>
+      </a>
       <div
         id="spotify-progress"
         class="mt-1 h-1 hidden bg-flexoki-base-100 dark:bg-flexoki-base-900 overflow-hidden"
