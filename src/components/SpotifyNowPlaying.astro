@@ -5,7 +5,13 @@
 ---
 
 <div id="spotify-widget" class="mb-8 hidden">
-  <div class="flex items-center gap-2 text-sm flex-wrap">
+  <div class="flex items-center gap-3 text-sm flex-wrap">
+    <canvas
+      id="spotify-art"
+      width="96"
+      height="96"
+      class="hidden w-12 h-12 shrink-0 bg-flexoki-paper dark:bg-flexoki-ink"
+    ></canvas>
     <span id="spotify-icon" class="flex items-center">
       <!-- Music note icon for currently playing -->
       <svg
@@ -53,7 +59,7 @@
   </div>
   <div
     id="spotify-progress"
-    class="mt-1 ml-6 h-1 hidden bg-flexoki-base-100 dark:bg-flexoki-base-900 overflow-hidden"
+    class="mt-1 ml-[60px] h-1 hidden bg-flexoki-base-100 dark:bg-flexoki-base-900 overflow-hidden"
   >
     <div
       id="spotify-progress-fill"
@@ -69,6 +75,7 @@
     title?: string;
     artist?: string;
     album?: string;
+    albumImage?: string;
     url?: string;
     progressMs?: number;
     durationMs?: number;
@@ -85,6 +92,9 @@
   const iconPaused = document.getElementById("icon-paused");
   const progress = document.getElementById("spotify-progress");
   const progressFill = document.getElementById("spotify-progress-fill");
+  const artCanvas = document.getElementById("spotify-art") as HTMLCanvasElement | null;
+
+  let lastImageUrl: string | null = null;
 
   function formatRelative(iso: string): string {
     const then = new Date(iso).getTime();
@@ -102,6 +112,103 @@
     const mo = Math.round(day / 30);
     if (mo < 12) return `${mo}mo ago`;
     return `${Math.round(mo / 12)}y ago`;
+  }
+
+  function isDark(): boolean {
+    return document.documentElement.classList.contains("dark");
+  }
+
+  // Halftone CMYK rasterizer using Flexoki tones.
+  function renderHalftone(canvas: HTMLCanvasElement, img: HTMLImageElement) {
+    const dst = canvas.getContext("2d");
+    if (!dst) return;
+    const W = canvas.width;
+    const H = canvas.height;
+
+    const SAMPLE = 24; // sample grid resolution
+    const cell = W / SAMPLE; // pixel size of each output cell
+
+    // Off-screen sampler
+    const src = document.createElement("canvas");
+    src.width = SAMPLE;
+    src.height = SAMPLE;
+    const sctx = src.getContext("2d");
+    if (!sctx) return;
+    sctx.drawImage(img, 0, 0, SAMPLE, SAMPLE);
+    const data = sctx.getImageData(0, 0, SAMPLE, SAMPLE).data;
+
+    const dark = isDark();
+    // Flexoki CMYK approximations
+    const C = dark ? "#3aa99f" : "#24837b"; // cyan
+    const M = dark ? "#ce5d97" : "#a02f6f"; // magenta
+    const Y = dark ? "#d0a215" : "#ad8301"; // yellow
+    const K = dark ? "#f2f0e5" : "#100f0f"; // ink/paper
+
+    // Background (paper or ink) so dots have something to land on
+    dst.fillStyle = dark ? "#100f0f" : "#fbfaf6";
+    dst.fillRect(0, 0, W, H);
+
+    // Use multiply on light bg so dots darken; screen on dark bg so dots lighten
+    dst.globalCompositeOperation = dark ? "screen" : "multiply";
+
+    const max = cell * 0.62; // max dot radius
+    // Slight per-channel offset to avoid moiré stack
+    const offsets: Array<[number, number, string]> = [
+      [0, 0, C],
+      [cell * 0.25, cell * 0.25, M],
+      [cell * 0.5, 0, Y],
+      [0, cell * 0.5, K],
+    ];
+
+    for (const [ox, oy, color] of offsets) {
+      dst.fillStyle = color;
+      for (let y = 0; y < SAMPLE; y++) {
+        for (let x = 0; x < SAMPLE; x++) {
+          const i = (y * SAMPLE + x) * 4;
+          const r = data[i] / 255;
+          const g = data[i + 1] / 255;
+          const b = data[i + 2] / 255;
+          // Convert RGB -> CMYK
+          const k = 1 - Math.max(r, g, b);
+          const denom = 1 - k || 1;
+          const c = (1 - r - k) / denom;
+          const m = (1 - g - k) / denom;
+          const yy = (1 - b - k) / denom;
+          const v =
+            color === C ? c : color === M ? m : color === Y ? yy : k;
+          if (v <= 0.02) continue;
+          const radius = Math.sqrt(v) * max;
+          const cx = x * cell + cell / 2 + ox;
+          const cy = y * cell + cell / 2 + oy;
+          dst.beginPath();
+          dst.arc(cx, cy, radius, 0, Math.PI * 2);
+          dst.fill();
+        }
+      }
+    }
+
+    dst.globalCompositeOperation = "source-over";
+  }
+
+  function loadAndRender(url: string) {
+    if (!artCanvas) return;
+    if (url === lastImageUrl) return;
+    lastImageUrl = url;
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      try {
+        renderHalftone(artCanvas, img);
+        artCanvas.classList.remove("hidden");
+      } catch (e) {
+        console.error("Halftone render failed:", e);
+        artCanvas.classList.add("hidden");
+      }
+    };
+    img.onerror = () => {
+      artCanvas.classList.add("hidden");
+    };
+    img.src = url;
   }
 
   function updateWidgetDisplay(data: SpotifyData) {
@@ -125,6 +232,13 @@
         trackAlbum.textContent = "";
         trackAlbum.classList.add("hidden");
       }
+    }
+
+    if (data.albumImage) {
+      loadAndRender(data.albumImage);
+    } else {
+      lastImageUrl = null;
+      artCanvas?.classList.add("hidden");
     }
 
     if (data.isPlaying) {
@@ -158,6 +272,19 @@
       widget?.classList.add("hidden");
     }
   }
+
+  // Re-render halftone on theme change so colors track the active palette
+  const themeObserver = new MutationObserver(() => {
+    if (lastImageUrl) {
+      const url = lastImageUrl;
+      lastImageUrl = null;
+      loadAndRender(url);
+    }
+  });
+  themeObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["class"],
+  });
 
   updateNowPlaying();
   setInterval(updateNowPlaying, 30000);
