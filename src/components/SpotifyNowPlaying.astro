@@ -145,7 +145,7 @@ const isDev = import.meta.env.DEV;
 
     if (trackAlbum && trackAlbumLink) {
       if (data.album && data.album !== data.title && data.albumUrl) {
-        trackAlbum.textContent = `· ${data.album}`;
+        trackAlbum.textContent = data.album;
         trackAlbumLink.href = data.albumUrl;
         trackAlbumLink.classList.remove("hidden");
       } else {
