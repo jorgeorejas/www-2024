@@ -18,6 +18,12 @@
     return document.documentElement.classList.contains("dark");
   }
 
+  function flex(token: string): string {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(`--color-flexoki-${token}`)
+      .trim();
+  }
+
   function renderHalftone(c: HTMLCanvasElement, img: HTMLImageElement) {
     const dst = c.getContext("2d");
     if (!dst) return;
@@ -36,12 +42,12 @@
     const data = sctx.getImageData(0, 0, SAMPLE, SAMPLE).data;
 
     const dark = isDark();
-    const C = dark ? "#3aa99f" : "#24837b";
-    const M = dark ? "#ce5d97" : "#a02f6f";
-    const Y = dark ? "#d0a215" : "#ad8301";
-    const K = dark ? "#f2f0e5" : "#100f0f";
+    const C = flex(dark ? "cyan-400" : "cyan-600");
+    const M = flex(dark ? "magenta-400" : "magenta-600");
+    const Y = flex(dark ? "yellow-400" : "yellow-600");
+    const K = flex(dark ? "base-50" : "ink");
 
-    dst.fillStyle = dark ? "#100f0f" : "#fbfaf6";
+    dst.fillStyle = flex(dark ? "ink" : "paper");
     dst.fillRect(0, 0, W, H);
     dst.globalCompositeOperation = dark ? "screen" : "multiply";
 

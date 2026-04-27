@@ -180,6 +180,12 @@ const isDev = import.meta.env.DEV;
 
   const isDev = widget?.dataset.dev === "true";
 
+  function flex(token: string): string {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(`--color-flexoki-${token}`)
+      .trim();
+  }
+
   function makePlaceholderImage(): string {
     const c = document.createElement("canvas");
     c.width = 64;
@@ -187,9 +193,9 @@ const isDev = import.meta.env.DEV;
     const ctx = c.getContext("2d");
     if (!ctx) return "";
     const grad = ctx.createLinearGradient(0, 0, 64, 64);
-    grad.addColorStop(0, "#ce5d97");
-    grad.addColorStop(0.5, "#d0a215");
-    grad.addColorStop(1, "#3aa99f");
+    grad.addColorStop(0, flex("magenta-400"));
+    grad.addColorStop(0.5, flex("yellow-400"));
+    grad.addColorStop(1, flex("cyan-400"));
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, 64, 64);
     return c.toDataURL();
