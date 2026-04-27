@@ -3,9 +3,11 @@
 // Dispatches `spotify:update` CustomEvent so SpotifyAlbumArt (extracted
 // for clarity) can react to the same payload without polling itself.
 import SpotifyAlbumArt from "@components/SpotifyAlbumArt.astro";
+
+const isDev = import.meta.env.DEV;
 ---
 
-<div id="spotify-widget" class="hidden text-sm">
+<div id="spotify-widget" data-dev={isDev ? "true" : "false"} class="hidden text-sm">
   <div class="flex items-center gap-3">
     <span class="flex items-center shrink-0">
       <svg
@@ -174,6 +176,38 @@ import SpotifyAlbumArt from "@components/SpotifyAlbumArt.astro";
       widget?.classList.add("hidden");
       document.dispatchEvent(new CustomEvent("spotify:update", { detail: {} }));
     }
+  }
+
+  const isDev = widget?.dataset.dev === "true";
+
+  function makePlaceholderImage(): string {
+    const c = document.createElement("canvas");
+    c.width = 64;
+    c.height = 64;
+    const ctx = c.getContext("2d");
+    if (!ctx) return "";
+    const grad = ctx.createLinearGradient(0, 0, 64, 64);
+    grad.addColorStop(0, "#ce5d97");
+    grad.addColorStop(0.5, "#d0a215");
+    grad.addColorStop(1, "#3aa99f");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 64, 64);
+    return c.toDataURL();
+  }
+
+  if (isDev) {
+    const placeholder: SpotifyData = {
+      isPlaying: false,
+      title: "Track title",
+      artist: "Artist name",
+      album: "Album name",
+      albumUrl: "#",
+      albumImage: makePlaceholderImage(),
+      url: "#",
+      playedAt: new Date(Date.now() - 1000 * 60 * 7).toISOString(),
+    };
+    render(placeholder);
+    document.dispatchEvent(new CustomEvent("spotify:update", { detail: placeholder }));
   }
 
   poll();
