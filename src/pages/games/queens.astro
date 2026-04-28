@@ -1,0 +1,26 @@
+---
+import Container from "@components/Container.astro";
+import QueensGame from "@components/games/linkedin/queens";
+import Nav from "@components/Nav.astro";
+import PageLayout from "@layouts/PageLayout.astro";
+---
+
+<PageLayout
+  title="Queens"
+  description="An infinite, procedurally-generated take on LinkedIn's Queens puzzle. Play today's daily or roll an unlimited supply of fresh boards."
+>
+  <Container>
+    <div class="space-y-2">
+      <Nav
+        breadCrumbsItems={[
+          { href: "/games", label: "Games" },
+          { href: "/games/queens", label: "Queens" },
+        ]}
+      />
+    </div>
+
+    <div class="my-10">
+      <QueensGame client:only="react" />
+    </div>
+  </Container>
+</PageLayout>

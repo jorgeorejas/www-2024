@@ -29,6 +29,7 @@ import {
   fromSaveBlob,
   SAVE_KEY,
 } from "./engine.js";
+import { debounce } from "../_shared/debounce";
 
 interface DragState {
   isDragging: boolean;
@@ -445,19 +446,6 @@ export function useSolitaire(): SolitaireContextValue {
     throw new Error("useSolitaire must be used within a SolitaireProvider");
   }
   return context;
-}
-
-// Utility function for debouncing
-function debounce<T extends (...args: any[]) => any>(
-  func: T,
-  wait: number,
-): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout | null = null;
-
-  return (...args: Parameters<T>) => {
-    if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  };
 }
 
 // Hook for game statistics
