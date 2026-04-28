@@ -12,41 +12,7 @@ import {
   OptionsZ,
   SaveBlobZ,
 } from "./types.js";
-
-// PRNG: xorshift32 from string seed (deterministic)
-class PRNG {
-  private state: number;
-
-  constructor(seed: string) {
-    this.state = this.hashSeed(seed);
-  }
-
-  private hashSeed(seed: string): number {
-    let hash = 2166136261;
-    for (let i = 0; i < seed.length; i++) {
-      hash ^= seed.charCodeAt(i);
-      hash = Math.imul(hash, 16777619);
-    }
-    return hash >>> 0; // Convert to unsigned 32-bit
-  }
-
-  next(): number {
-    this.state ^= this.state << 13;
-    this.state ^= this.state >>> 17;
-    this.state ^= this.state << 5;
-    this.state = this.state >>> 0; // Keep as unsigned 32-bit
-    return this.state / 0x100000000; // Return [0, 1)
-  }
-
-  shuffle<T>(array: T[]): T[] {
-    const result = [...array];
-    for (let i = result.length - 1; i > 0; i--) {
-      const j = Math.floor(this.next() * (i + 1));
-      [result[i], result[j]] = [result[j], result[i]];
-    }
-    return result;
-  }
-}
+import { PRNG } from "../_shared/rng";
 
 // Deck building
 function buildDeck(): Card[] {
