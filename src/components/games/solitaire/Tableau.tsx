@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import Card from "./Card";
 import { useSolitaire } from "./provider";
 import type { Card as CardType } from "./types";
@@ -24,6 +25,8 @@ export default function Tableau() {
     moveTableauToFoundation(columnIndex);
   };
 
+  const dragGhostRef = useRef<HTMLElement | null>(null);
+
   const handleCardDragStart = (
     e: React.DragEvent,
     columnIndex: number,
@@ -34,19 +37,50 @@ export default function Tableau() {
 
     if (!card.faceUp) return;
 
-    // Calculate how many cards can be moved (valid sequence from this card to end)
-    const count = tableau.length - cardIndex;
+    // Expand back to the lowest contiguous face-up card so grabbing the
+    // visible top card drags the whole face-up sub-pile, not just the one
+    // card under the cursor. Splitting still works: grabbing a non-top
+    // face-up card drags from there onward (its index is not the bottom of
+    // the face-up run, so this loop is a no-op for that case).
+    let dragIndex = cardIndex;
+    while (dragIndex > 0 && tableau[dragIndex - 1].faceUp) {
+      dragIndex -= 1;
+    }
+    const count = tableau.length - dragIndex;
 
     const dragData = {
       fromColumn: columnIndex,
-      cardIndex,
+      cardIndex: dragIndex,
       count,
-      card,
+      card: tableau[dragIndex],
     };
 
     // Store drag data
     e.dataTransfer.setData("text/plain", "tableau");
     e.dataTransfer.setData("application/json", JSON.stringify(dragData));
+
+    // Custom drag image: clone the whole sub-pile so the user sees a stack
+    // following the cursor, not a single card.
+    if (count > 1) {
+      const cardEl = e.currentTarget as HTMLElement;
+      const columnEl = cardEl.parentElement;
+      if (columnEl) {
+        const ghost = document.createElement("div");
+        ghost.style.position = "fixed";
+        ghost.style.top = "-1000px";
+        ghost.style.left = "-1000px";
+        ghost.style.width = `${cardEl.offsetWidth}px`;
+        ghost.style.pointerEvents = "none";
+        ghost.style.opacity = "0.92";
+        const siblings = Array.from(columnEl.children).slice(dragIndex);
+        for (const node of siblings) {
+          ghost.appendChild(node.cloneNode(true));
+        }
+        document.body.appendChild(ghost);
+        e.dataTransfer.setDragImage(ghost, cardEl.offsetWidth / 2, 20);
+        dragGhostRef.current = ghost;
+      }
+    }
 
     // Update drag state for highlighting
     setDragState({
@@ -57,6 +91,10 @@ export default function Tableau() {
   };
 
   const handleCardDragEnd = () => {
+    if (dragGhostRef.current) {
+      dragGhostRef.current.remove();
+      dragGhostRef.current = null;
+    }
     // Clear drag state when drag ends
     setDragState({
       isDragging: false,
