@@ -1,0 +1,26 @@
+---
+import Container from "@components/Container.astro";
+import ZipGame from "@components/games/linkedin/zip";
+import Nav from "@components/Nav.astro";
+import PageLayout from "@layouts/PageLayout.astro";
+---
+
+<PageLayout
+  title="Zip"
+  description="An infinite, procedurally-generated take on LinkedIn's Zip puzzle. Trace one path through every cell, hitting the numbers in order."
+>
+  <Container>
+    <div class="space-y-2">
+      <Nav
+        breadCrumbsItems={[
+          { href: "/games", label: "Games" },
+          { href: "/games/zip", label: "Zip" },
+        ]}
+      />
+    </div>
+
+    <div class="my-10">
+      <ZipGame client:only="react" />
+    </div>
+  </Container>
+</PageLayout>
