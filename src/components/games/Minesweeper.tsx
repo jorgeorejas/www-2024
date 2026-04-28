@@ -182,6 +182,28 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ className = "" }) => {
     };
   }, [status]);
 
+  // Test-only hook: expose current board so E2E tests can drive deterministic
+  // win/lose flows without relying on chance. Gated on dev mode so it never
+  // ships to production.
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    (window as unknown as { __minesweeper?: unknown }).__minesweeper = {
+      board: board.map((row) =>
+        row.map((cell) => ({
+          mine: cell.mine,
+          revealed: cell.revealed,
+          flagged: cell.flagged,
+          adjacent: cell.adjacent,
+        })),
+      ),
+      status,
+      difficulty,
+    };
+    return () => {
+      delete (window as unknown as { __minesweeper?: unknown }).__minesweeper;
+    };
+  }, [board, status, difficulty]);
+
   const revealAllMines = (b: Cell[][]) => {
     for (const row of b) {
       for (const cell of row) {
@@ -198,10 +220,15 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ className = "" }) => {
     const next = cloneBoard(board);
     let nextStatus: GameStatus = status;
 
-    if (status === "idle") {
+    // Mines are placed lazily on the first reveal, not on the first flag —
+    // otherwise flagging before any reveal would race ahead and leave the
+    // board mineless when the player finally clicks (every cell would then
+    // be adjacent=0 and flood-fill would clear everything).
+    const minesPlaced = board.some((row) => row.some((cell) => cell.mine));
+    if (!minesPlaced) {
       placeMines(next, config.mines, r, c);
-      nextStatus = "playing";
     }
+    if (status === "idle") nextStatus = "playing";
 
     const target = next[r][c];
     if (target.mine) {
@@ -337,6 +364,10 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ className = "" }) => {
       return (
         <button
           key={`${r}-${c}`}
+          data-testid="ms-cell"
+          data-row={r}
+          data-col={c}
+          data-state={cell.flagged ? "flagged" : "hidden"}
           onClick={handleClick}
           onContextMenu={handleContextMenu}
           onMouseDown={handleMouseDown}
@@ -362,6 +393,12 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ className = "" }) => {
     return (
       <div
         key={`${r}-${c}`}
+        data-testid="ms-cell"
+        data-row={r}
+        data-col={c}
+        data-state="revealed"
+        data-mine={cell.mine ? "1" : "0"}
+        data-adjacent={cell.adjacent}
         onMouseDown={handleMouseDown}
         onClick={handleClick}
         onContextMenu={handleContextMenu}
@@ -414,17 +451,27 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ className = "" }) => {
       </div>
 
       <div className="flex items-center justify-between gap-6 w-full max-w-md font-mono text-sm">
-        <div className="px-3 py-1.5 border border-flexoki-base-200 dark:border-flexoki-base-800 tabular-nums text-flexoki-red-600 dark:text-flexoki-red-400">
+        <div
+          data-testid="ms-mines-remaining"
+          data-mines-remaining={minesRemaining}
+          className="px-3 py-1.5 border border-flexoki-base-200 dark:border-flexoki-base-800 tabular-nums text-flexoki-red-600 dark:text-flexoki-red-400"
+        >
           ⚑ {String(minesRemaining).padStart(3, "0")}
         </div>
         <button
           onClick={() => reset()}
           aria-label="Reset game"
+          data-testid="ms-status"
+          data-status={status}
           className={`${pillBase} text-flexoki-base-700 dark:text-flexoki-base-300 hover:text-flexoki-ink dark:hover:text-flexoki-base-100`}
         >
           {statusGlyph} reset
         </button>
-        <div className="px-3 py-1.5 border border-flexoki-base-200 dark:border-flexoki-base-800 tabular-nums text-flexoki-base-700 dark:text-flexoki-base-300">
+        <div
+          data-testid="ms-timer"
+          data-seconds={seconds}
+          className="px-3 py-1.5 border border-flexoki-base-200 dark:border-flexoki-base-800 tabular-nums text-flexoki-base-700 dark:text-flexoki-base-300"
+        >
           ⏱ {String(seconds).padStart(3, "0")}
         </div>
       </div>

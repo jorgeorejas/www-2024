@@ -85,6 +85,11 @@ export default function Card({
   if (!faceUp) {
     return (
       <div
+        data-testid="card"
+        data-card-id={card.id}
+        data-rank={rank}
+        data-suit={suit}
+        data-faceup="false"
         className={clsx(
           cardVariants({ faceDown: true, size, ...props }),
           className,
@@ -101,7 +106,14 @@ export default function Card({
   });
 
   return (
-    <div className={cardClass}>
+    <div
+      data-testid="card"
+      data-card-id={card.id}
+      data-rank={rank}
+      data-suit={suit}
+      data-faceup="true"
+      className={cardClass}
+    >
       <span
         className={clsx(
           "absolute top-2 left-2 flex flex-col",
@@ -120,7 +132,11 @@ export default function Card({
 
 function EmptyCardStack({ suit }: { suit: keyof typeof suits }) {
   return (
-    <div className="w-full aspect-5/7 border border-dashed border-flexoki-base-300 dark:border-flexoki-base-700 rounded-sm flex items-center justify-center select-none">
+    <div
+      data-testid="foundation-empty"
+      data-suit={suit}
+      className="w-full aspect-5/7 border border-dashed border-flexoki-base-300 dark:border-flexoki-base-700 rounded-sm flex items-center justify-center select-none"
+    >
       <span className="text-flexoki-base-400 text-2xl">{suits[suit]}</span>
     </div>
   );

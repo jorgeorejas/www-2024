@@ -1,8 +1,15 @@
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useZip } from "./provider";
 import { Cell } from "./Cell";
-import { cellIndex } from "./engine";
+import { cellIndex, cellRowCol, labelSequence } from "./engine";
 import { PATH_COLOR_VAR } from "./palette";
+
+const ARROW_DELTAS: Record<string, [number, number]> = {
+  ArrowUp: [-1, 0],
+  ArrowDown: [1, 0],
+  ArrowLeft: [0, -1],
+  ArrowRight: [0, 1],
+};
 
 export function Board() {
   const { active, extendPath, truncatePath } = useZip();
@@ -42,6 +49,59 @@ export function Board() {
     ro.observe(grid);
     return () => ro.disconnect();
   }, [active]);
+
+  // Keyboard control: arrow keys extend the path one cell at a time. Empty
+  // path → start at the cell labeled 1, then try to step in the arrow
+  // direction. Stepping back into the previous cell is treated as undo.
+  // Backspace/Delete pops the last step regardless of direction.
+  useEffect(() => {
+    if (!active || active.solvedAt != null) return;
+    const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) return;
+
+      if (e.key === "Backspace" || e.key === "Delete") {
+        if (active.path.length === 0) return;
+        e.preventDefault();
+        truncatePath(active.path.length - 2);
+        return;
+      }
+
+      const delta = ARROW_DELTAS[e.key];
+      if (!delta) return;
+      e.preventDefault();
+      const [dr, dc] = delta;
+      const size = active.puzzle.size;
+
+      if (active.path.length === 0) {
+        const labels = labelSequence(active.puzzle);
+        if (labels.length === 0) return;
+        const startIdx = labels[0];
+        extendPath(startIdx);
+        const [sr, sc] = cellRowCol(startIdx, size);
+        const nr = sr + dr;
+        const nc = sc + dc;
+        if (nr < 0 || nr >= size || nc < 0 || nc >= size) return;
+        extendPath(cellIndex(nr, nc, size));
+        return;
+      }
+
+      const tail = active.path[active.path.length - 1];
+      const [tr, tc] = cellRowCol(tail, size);
+      const nr = tr + dr;
+      const nc = tc + dc;
+      if (nr < 0 || nr >= size || nc < 0 || nc >= size) return;
+      const target_ = cellIndex(nr, nc, size);
+      // Stepping backward (into the previous cell) is an undo.
+      if (active.path.length >= 2 && active.path[active.path.length - 2] === target_) {
+        truncatePath(active.path.length - 2);
+        return;
+      }
+      extendPath(target_);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [active, extendPath, truncatePath]);
 
   const handleClick = useCallback(
     (row: number, col: number) => {

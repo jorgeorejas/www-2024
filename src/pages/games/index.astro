@@ -84,6 +84,8 @@ const staticGames = [
             <li>
               <a
                 href={game.href}
+                data-testid="game-card"
+                data-game={game.href.replace("/games/", "")}
                 class="relative group flex flex-nowrap py-3 px-4 pr-10 border-l border-flexoki-base-200 dark:border-flexoki-base-800 hover:bg-flexoki-base-100 dark:hover:bg-flexoki-base-900 hover:text-flexoki-ink dark:hover:text-flexoki-base-50 transition-colors duration-300 ease-in-out"
               >
                 <div class="flex flex-col gap-2 flex-1">

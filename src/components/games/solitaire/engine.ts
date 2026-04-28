@@ -238,7 +238,7 @@ export function drawFromStock(s: GameState): GameState {
     cards: drawnCards,
   });
 
-  let newState = applyEngineOp(s, ops[0]);
+  const newState = applyEngineOp(s, ops[0]);
   newState.moves += 1;
 
   // Add to history for undo
@@ -398,7 +398,7 @@ export function moveWasteToTableau(s: GameState, to: number): GameState {
     cards: [card],
   });
 
-  let newState = applyEngineOp(s, ops[0]);
+  const newState = applyEngineOp(s, ops[0]);
   newState.moves += 1;
 
   // Add to history for undo
@@ -1009,6 +1009,10 @@ export function undo(s: GameState): GameState {
   // Move history entry to future
   state.history = state.history.slice(0, -1);
   state.future = [...state.future, lastEntry];
+  // Each history entry corresponds to one user-initiated move; undo rolls
+  // it back so the counter has to drop too. Mutators only ever increment
+  // moves by 1 per dispatch.
+  state.moves = Math.max(0, state.moves - 1);
 
   return state;
 }
@@ -1073,6 +1077,8 @@ export function redo(s: GameState): GameState {
   // Move future entry to history
   state.future = state.future.slice(0, -1);
   state.history = [...state.history, nextEntry];
+  // Mirror the increment the original mutator applied.
+  state.moves += 1;
 
   return state;
 }

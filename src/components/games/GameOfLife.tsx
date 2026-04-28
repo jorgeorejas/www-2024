@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from "react";
 
 type GridSize = 16 | 32 | 64 | 128;
 
@@ -68,7 +68,7 @@ const PATTERNS: Record<PatternKey, { label: string; cells: [number, number][] }>
   },
 };
 
-const GameOfLife: React.FC<GameOfLifeProps> = ({ className = '' }) => {
+const GameOfLife: React.FC<GameOfLifeProps> = ({ className = "" }) => {
   const [gridSize, setGridSize] = useState<GridSize>(64);
   const [grid, setGrid] = useState<boolean[][]>(() =>
     Array(64).fill(null).map(() => Array(64).fill(false))
@@ -224,7 +224,11 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ className = '' }) => {
           <span className="w-12 font-mono text-xs">{speed}</span>
         </div>
 
-        <div className="font-mono text-xs tabular-nums text-flexoki-base-600 dark:text-flexoki-base-400">
+        <div
+          data-testid="gol-generation"
+          data-generation={generation}
+          className="font-mono text-xs tabular-nums text-flexoki-base-600 dark:text-flexoki-base-400"
+        >
           gen {generation}
         </div>
       </div>
@@ -234,7 +238,7 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ className = '' }) => {
           onClick={toggleRunning}
           className="px-4 py-2 font-mono text-flexoki-ink dark:text-flexoki-base-50 border border-flexoki-ink dark:border-flexoki-base-100 font-semibold hover:border-flexoki-ink dark:hover:border-flexoki-base-50 transition-colors"
         >
-          {isRunning ? 'Pause' : 'Start'}
+          {isRunning ? "Pause" : "Start"}
         </button>
 
         <button
@@ -284,21 +288,27 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ className = '' }) => {
       </div>
 
       <div
+        data-testid="gol-grid"
+        data-grid-size={gridSize}
         className="grid border border-flexoki-base-300 dark:border-flexoki-base-700"
         style={{
           gridTemplateColumns: `repeat(${gridSize}, ${cellSize}px)`,
-          gap: '1px',
-          padding: '1px'
+          gap: "1px",
+          padding: "1px"
         }}
       >
         {grid.map((row, i) =>
           row.map((cell, j) => (
             <div
               key={`${i}-${j}`}
+              data-testid="gol-cell"
+              data-row={i}
+              data-col={j}
+              data-alive={cell ? "1" : "0"}
               className={`cursor-pointer transition-colors duration-75 ${
                 cell
-                  ? 'bg-flexoki-ink dark:bg-flexoki-base-50'
-                  : 'pattern-dots text-flexoki-base-300 dark:text-flexoki-base-800 hover:text-flexoki-base-500 dark:hover:text-flexoki-base-600'
+                  ? "bg-flexoki-ink dark:bg-flexoki-base-50"
+                  : "pattern-dots text-flexoki-base-300 dark:text-flexoki-base-800 hover:text-flexoki-base-500 dark:hover:text-flexoki-base-600"
               }`}
               style={{
                 width: `${cellSize}px`,

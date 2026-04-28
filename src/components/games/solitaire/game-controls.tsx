@@ -21,22 +21,36 @@ export default function GameControls() {
           Klondike Solitaire
         </h1>
         <div className="flex gap-6 text-sm text-flexoki-base-600 dark:text-flexoki-base-400 font-mono">
-          <span>Score: {stats.score}</span>
-          <span>Moves: {stats.moves}</span>
-          <span>Time: {formatTime(stats.time)}</span>
+          <span data-testid="solitaire-score">Score: {stats.score}</span>
+          <span data-testid="solitaire-moves">Moves: {stats.moves}</span>
+          <span data-testid="solitaire-time">Time: {formatTime(stats.time)}</span>
         </div>
       </div>
 
       <div className="flex gap-2 flex-wrap">
-        <button onClick={() => startNewGame()} className={btn}>
+        <button
+          data-testid="solitaire-new-game"
+          onClick={() => startNewGame()}
+          className={btn}
+        >
           New Game
         </button>
 
-        <button onClick={undo} disabled={!stats.canUndo} className={btn}>
+        <button
+          data-testid="solitaire-undo"
+          onClick={undo}
+          disabled={!stats.canUndo}
+          className={btn}
+        >
           Undo
         </button>
 
-        <button onClick={autoMove} disabled={!canAutoMove} className={btn}>
+        <button
+          data-testid="solitaire-auto-move"
+          onClick={autoMove}
+          disabled={!canAutoMove}
+          className={btn}
+        >
           Auto Move
         </button>
       </div>

@@ -3,9 +3,13 @@ import { Board } from "./Board";
 import { Controls } from "./Controls";
 import { Status } from "./Status";
 import { Rules } from "./Rules";
+import { useWinConfetti } from "../../_shared/confetti";
+import { useRecordSolveOnWin } from "../../_shared/history";
 
 function Inner() {
-  const { hydrated } = useSudoku();
+  const { hydrated, active } = useSudoku();
+  useWinConfetti(active?.solvedAt != null);
+  useRecordSolveOnWin("sudoku", active);
   if (!hydrated) {
     return (
       <div className="text-sm text-flexoki-base-500 dark:text-flexoki-base-500 font-serif text-center py-12">

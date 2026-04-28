@@ -5,7 +5,7 @@ import type { Suit } from "./types";
 export default function Foundations() {
   const { gameState, moveWasteToFoundation, moveTableauToFoundation, isValidDropTarget, setDragState } = useSolitaire();
 
-  const suits: Suit[] = ['H', 'C', 'D', 'S'];
+  const suits: Suit[] = ["H", "C", "D", "S"];
 
   const handleFoundationDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -67,6 +67,9 @@ export default function Foundations() {
           return (
             <div
               key={suit}
+              data-testid="foundation"
+              data-suit={suit}
+              data-count={gameState.foundations[suit].length}
               className={`cursor-pointer transition-all duration-200 ${
                 isValidTarget ? "ring-2 ring-flexoki-blue-600 dark:ring-flexoki-blue-400 ring-offset-2 ring-offset-transparent rounded-sm" : ""
               }`}

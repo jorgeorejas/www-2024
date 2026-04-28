@@ -118,8 +118,13 @@ export default function Hint() {
   };
 
   return (
-    <div className="border border-flexoki-base-200 dark:border-flexoki-base-800 col-span-7">
+    <div
+      data-testid="solitaire-hint"
+      data-hint-kind={hint?.kind ?? ""}
+      className="border border-flexoki-base-200 dark:border-flexoki-base-800 col-span-7"
+    >
       <button
+        data-testid="solitaire-hint-toggle"
         onClick={() => setIsOpen(!isOpen)}
         className="w-full px-4 py-3 text-left flex items-center justify-between hover:text-flexoki-ink dark:hover:text-flexoki-base-100 transition-colors"
       >
@@ -165,6 +170,7 @@ export default function Hint() {
               </div>
               <div className="flex justify-end">
                 <button
+                  data-testid="solitaire-hint-apply"
                   onClick={() => applyHint(hint)}
                   className="px-3 py-1 text-flexoki-ink dark:text-flexoki-base-50 border border-flexoki-ink dark:border-flexoki-base-100 font-medium text-sm hover:border-flexoki-ink dark:hover:border-flexoki-base-50 transition-colors"
                 >

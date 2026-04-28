@@ -1,4 +1,4 @@
-import ical from 'node-ical';
+import ical from "node-ical";
 
 export interface CalendarEvent {
   id: string;
@@ -53,8 +53,8 @@ export function getDateWindow(pastDays: number = 2, futureDays: number = 2): { s
 function getTodayDateString(): string {
   const now = new Date();
   const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 
@@ -63,8 +63,8 @@ function getTodayDateString(): string {
  */
 function getDateString(date: Date): string {
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 
@@ -112,16 +112,16 @@ export function stripHtml(html: string | undefined): string | null {
   if (!html) return null;
 
   // Remove HTML tags
-  const withoutTags = html.replace(/<[^>]*>/g, '');
+  const withoutTags = html.replace(/<[^>]*>/g, "");
 
   // Decode common HTML entities
   const decoded = withoutTags
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, "\"")
     .replace(/&#39;/g, "'")
-    .replace(/&nbsp;/g, ' ');
+    .replace(/&nbsp;/g, " ");
 
   return decoded.trim() || null;
 }
@@ -131,7 +131,7 @@ export function stripHtml(html: string | undefined): string | null {
  */
 function getStringValue(value: string | { val: string; params: Record<string, string> } | undefined): string | undefined {
   if (!value) return undefined;
-  if (typeof value === 'string') return value;
+  if (typeof value === "string") return value;
   return value.val;
 }
 
@@ -156,7 +156,7 @@ export async function fetchCalendarEvents(
 
     if (!response.ok) {
       if (response.status === 404) {
-        return { error: 'Calendar not found' };
+        return { error: "Calendar not found" };
       }
       return { error: `Failed to fetch calendar: ${response.statusText}` };
     }
@@ -174,7 +174,7 @@ export async function fetchCalendarEvents(
 
     for (const event of Object.values(events)) {
       // Only process VEVENT types
-      if (!event || event.type !== 'VEVENT') continue;
+      if (!event || event.type !== "VEVENT") continue;
 
       const vevent = event as any;
 
@@ -190,11 +190,11 @@ export async function fetchCalendarEvents(
               ? new Date(occurrence.getTime() + (new Date(vevent.end).getTime() - new Date(vevent.start).getTime()))
               : occurrence;
 
-            const isAllDay = vevent.datetype === 'date';
+            const isAllDay = vevent.datetype === "date";
 
             calendarEvents.push({
-              id: vevent.uid || '',
-              title: getStringValue(vevent.summary) || 'Untitled Event',
+              id: vevent.uid || "",
+              title: getStringValue(vevent.summary) || "Untitled Event",
               start: eventStart.toISOString(),
               end: eventEnd.toISOString(),
               location: getStringValue(vevent.location) || null,
@@ -202,14 +202,14 @@ export async function fetchCalendarEvents(
               url: extractMeetingUrl(
                 getStringValue(vevent.description),
                 vevent.url,
-                getStringValue((vevent as any)['x-google-conference'])
+                getStringValue((vevent as any)["x-google-conference"])
               ),
               isAllDay,
             });
           }
         } catch (error) {
           // If RRule expansion fails, fall back to treating it as a single event
-          console.error('Failed to expand recurring event:', getStringValue(vevent.summary), error);
+          console.error("Failed to expand recurring event:", getStringValue(vevent.summary), error);
         }
       } else {
         // Non-recurring event - use original logic
@@ -218,11 +218,11 @@ export async function fetchCalendarEvents(
         // Check if event falls within our window
         if (eventStart >= start && eventStart < end) {
           const eventEnd = vevent.end ? new Date(vevent.end) : eventStart;
-          const isAllDay = vevent.datetype === 'date';
+          const isAllDay = vevent.datetype === "date";
 
           calendarEvents.push({
-            id: vevent.uid || '',
-            title: getStringValue(vevent.summary) || 'Untitled Event',
+            id: vevent.uid || "",
+            title: getStringValue(vevent.summary) || "Untitled Event",
             start: eventStart.toISOString(),
             end: eventEnd.toISOString(),
             location: getStringValue(vevent.location) || null,
@@ -230,7 +230,7 @@ export async function fetchCalendarEvents(
             url: extractMeetingUrl(
               getStringValue(vevent.description),
               vevent.url,
-              getStringValue((vevent as any)['x-google-conference'])
+              getStringValue((vevent as any)["x-google-conference"])
             ),
             isAllDay,
           });
@@ -289,11 +289,11 @@ export async function fetchCalendarEvents(
     return { past, today, future };
   } catch (error) {
     if (error instanceof Error) {
-      if (error.name === 'AbortError') {
-        return { error: 'Calendar fetch timed out' };
+      if (error.name === "AbortError") {
+        return { error: "Calendar fetch timed out" };
       }
       return { error: `Failed to parse calendar: ${error.message}` };
     }
-    return { error: 'Unknown error occurred' };
+    return { error: "Unknown error occurred" };
   }
 }

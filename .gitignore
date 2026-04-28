@@ -24,8 +24,11 @@ pnpm-debug.log*
 .vercel/
 .vercel
 
-# Playwright cache
+# Playwright
 .playwright-mcp
+test-results/
+playwright-report/
+playwright/.cache/
 
 # worktrees
 .worktrees/

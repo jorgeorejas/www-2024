@@ -81,7 +81,10 @@ function CellImpl({
           ? "2px solid var(--color-flexoki-red-500, #c03e35)"
           : "none",
         outlineOffset: "-2px",
-        zIndex: conflict ? 1 : 0,
+        // Only promote conflicts to a stacking context. Default cells stay
+        // at z-index auto so that constraint badges (z-index 20) overflowing
+        // into adjacent cells aren't clipped by sibling cells' contexts.
+        zIndex: conflict ? 2 : undefined,
       }}
     >
       <CellGlyph value={value} />
@@ -141,7 +144,7 @@ function ConstraintBadge({ kind, position }: ConstraintBadgeProps) {
         };
   return (
     <span
-      className="absolute z-10 flex items-center justify-center bg-flexoki-paper dark:bg-flexoki-base-950 text-flexoki-base-800 dark:text-flexoki-base-200 font-mono text-xs font-semibold leading-none"
+      className="absolute z-20 flex items-center justify-center bg-flexoki-paper dark:bg-flexoki-base-950 text-flexoki-base-800 dark:text-flexoki-base-200 font-mono text-xs font-semibold leading-none"
       style={{
         ...style,
         width: "16px",
