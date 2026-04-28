@@ -1,0 +1,26 @@
+---
+import Container from "@components/Container.astro";
+import SudokuGame from "@components/games/linkedin/sudoku";
+import Nav from "@components/Nav.astro";
+import PageLayout from "@layouts/PageLayout.astro";
+---
+
+<PageLayout
+  title="Mini Sudoku"
+  description="An infinite, procedurally-generated take on LinkedIn's Mini Sudoku — a 6×6 grid with 2×3 boxes. Daily puzzle plus unlimited random boards."
+>
+  <Container>
+    <div class="space-y-2">
+      <Nav
+        breadCrumbsItems={[
+          { href: "/games", label: "Games" },
+          { href: "/games/sudoku", label: "Mini Sudoku" },
+        ]}
+      />
+    </div>
+
+    <div class="my-10">
+      <SudokuGame client:only="react" />
+    </div>
+  </Container>
+</PageLayout>
