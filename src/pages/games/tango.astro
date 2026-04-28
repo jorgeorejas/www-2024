@@ -1,0 +1,26 @@
+---
+import Container from "@components/Container.astro";
+import TangoGame from "@components/games/linkedin/tango";
+import Nav from "@components/Nav.astro";
+import PageLayout from "@layouts/PageLayout.astro";
+---
+
+<PageLayout
+  title="Tango"
+  description="An infinite, procedurally-generated take on LinkedIn's Tango puzzle. Place suns and moons so every row and column has three of each — no triples, and watch the = / × edge constraints."
+>
+  <Container>
+    <div class="space-y-2">
+      <Nav
+        breadCrumbsItems={[
+          { href: "/games", label: "Games" },
+          { href: "/games/tango", label: "Tango" },
+        ]}
+      />
+    </div>
+
+    <div class="my-10">
+      <TangoGame client:only="react" />
+    </div>
+  </Container>
+</PageLayout>
