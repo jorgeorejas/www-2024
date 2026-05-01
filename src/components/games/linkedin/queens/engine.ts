@@ -5,45 +5,6 @@ import type { CellState, GameState, Puzzle } from "./types";
 // once we enforce one queen per row & column during solving, but the runtime
 // rule still includes it because the player can place queens freely.
 
-// Cells "attacked" by any placed queen: same row, column, region, or
-// diagonally-adjacent corner. Used to draw auto-marks in empty cells so
-// the player can see at a glance which squares can't host a queen.
-export function findAttacked(state: GameState): Set<string> {
-  const { puzzle, cells } = state;
-  const { size, regions } = puzzle;
-  const attacked = new Set<string>();
-
-  for (let r = 0; r < size; r++) {
-    for (let c = 0; c < size; c++) {
-      if (cells[r][c] !== "queen") continue;
-      const region = regions[r][c];
-
-      for (let i = 0; i < size; i++) {
-        if (i !== c) attacked.add(`${r},${i}`);
-        if (i !== r) attacked.add(`${i},${c}`);
-      }
-      for (let rr = 0; rr < size; rr++) {
-        for (let cc = 0; cc < size; cc++) {
-          if (rr === r && cc === c) continue;
-          if (regions[rr][cc] === region) attacked.add(`${rr},${cc}`);
-        }
-      }
-      for (const [dr, dc] of [
-        [-1, -1],
-        [-1, 1],
-        [1, -1],
-        [1, 1],
-      ] as const) {
-        const nr = r + dr;
-        const nc = c + dc;
-        if (nr < 0 || nr >= size || nc < 0 || nc >= size) continue;
-        attacked.add(`${nr},${nc}`);
-      }
-    }
-  }
-  return attacked;
-}
-
 export function findConflicts(state: GameState): Set<string> {
   const { puzzle, cells } = state;
   const queens: Array<{ r: number; c: number; region: number }> = [];

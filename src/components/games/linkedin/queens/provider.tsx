@@ -14,7 +14,6 @@ import type { Difficulty, Mode } from "../../_shared/types";
 import { generatePuzzle } from "./generator";
 import {
   emptyCells,
-  findAttacked,
   findConflicts,
   isSolved,
   nextCellState,
@@ -179,7 +178,6 @@ interface QueensContextValue {
   mode: Mode;
   difficulty: Difficulty;
   conflicts: Set<string>;
-  attacked: Set<string>;
   hydrated: boolean;
   cycleCell: (row: number, col: number) => void;
   markX: (row: number, col: number) => void;
@@ -252,10 +250,6 @@ export function QueensProvider({ children }: { children: ReactNode }) {
     () => (active ? findConflicts(active) : new Set<string>()),
     [active],
   );
-  const attacked = useMemo(
-    () => (active ? findAttacked(active) : new Set<string>()),
-    [active],
-  );
 
   const cycleCell = useCallback((row: number, col: number) => {
     dispatch({ type: "CYCLE_CELL", row, col });
@@ -286,7 +280,6 @@ export function QueensProvider({ children }: { children: ReactNode }) {
     mode: state.mode,
     difficulty: state.difficulty,
     conflicts,
-    attacked,
     hydrated: state.hydrated,
     cycleCell,
     markX,

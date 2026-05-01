@@ -3,7 +3,7 @@ import { useQueens } from "./provider";
 import { Cell } from "./Cell";
 
 export function Board() {
-  const { active, conflicts, attacked, cycleCell, markX } = useQueens();
+  const { active, conflicts, cycleCell, markX } = useQueens();
   const sweepRef = useRef<{ active: boolean; lastKey: string | null; swept: boolean }>(
     { active: false, lastKey: null, swept: false },
   );
@@ -103,7 +103,6 @@ export function Board() {
                 regionId={regionId}
                 size={size}
                 conflict={conflicts.has(`${r},${c}`)}
-                attacked={attacked.has(`${r},${c}`)}
                 southRegion={r < size - 1 ? regions[r + 1][c] : null}
                 eastRegion={c < size - 1 ? regions[r][c + 1] : null}
                 onClick={handleClick}

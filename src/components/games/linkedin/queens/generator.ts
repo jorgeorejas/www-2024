@@ -45,10 +45,13 @@ function inBounds(size: number, r: number, c: number): boolean {
   return r >= 0 && r < size && c >= 0 && c < size;
 }
 
-// 2) Voronoi assignment with PRNG-jittered Manhattan distances. This gives
-// each region a compact shape clustered around its queen — far better starting
-// point for unique-solution puzzles than random tendril growth.
-function voronoiRegions(
+// 2) Multi-source randomized BFS from queen seeds. Each step picks a random
+// frontier cell (unassigned, adjacent to an assigned cell) and assigns it to
+// one of its assigned neighbors' regions. This guarantees every region is
+// orthogonally connected by construction — Manhattan-Voronoi with jitter
+// could leave isolated cells stranded across the bisector between two
+// equidistant queens.
+function growRegions(
   size: number,
   queens: number[],
   prng: PRNG,
@@ -56,21 +59,44 @@ function voronoiRegions(
   const regions: number[][] = Array.from({ length: size }, () =>
     new Array<number>(size).fill(-1),
   );
-  for (let r = 0; r < size; r++) {
-    for (let c = 0; c < size; c++) {
-      let bestId = -1;
-      let bestDist = Infinity;
-      for (let q = 0; q < queens.length; q++) {
-        const qc = queens[q];
-        const dist =
-          Math.abs(r - q) + Math.abs(c - qc) + prng.next() * 0.49;
-        if (dist < bestDist) {
-          bestDist = dist;
-          bestId = q;
-        }
-      }
-      regions[r][c] = bestId;
+  const frontierKeys = new Set<string>();
+  const frontier: Array<[number, number]> = [];
+
+  const addFrontier = (r: number, c: number) => {
+    if (!inBounds(size, r, c)) return;
+    if (regions[r][c] !== -1) return;
+    const k = `${r},${c}`;
+    if (frontierKeys.has(k)) return;
+    frontierKeys.add(k);
+    frontier.push([r, c]);
+  };
+
+  for (let q = 0; q < queens.length; q++) {
+    regions[q][queens[q]] = q;
+    for (const [dr, dc] of NEI) addFrontier(q + dr, queens[q] + dc);
+  }
+
+  while (frontier.length > 0) {
+    const idx = Math.floor(prng.next() * frontier.length);
+    const [r, c] = frontier[idx];
+    // Swap-remove for O(1) deletion.
+    frontier[idx] = frontier[frontier.length - 1];
+    frontier.pop();
+    frontierKeys.delete(`${r},${c}`);
+    if (regions[r][c] !== -1) continue;
+
+    const neighborIds: number[] = [];
+    for (const [dr, dc] of NEI) {
+      const nr = r + dr;
+      const nc = c + dc;
+      if (!inBounds(size, nr, nc)) continue;
+      const id = regions[nr][nc];
+      if (id !== -1) neighborIds.push(id);
     }
+    if (neighborIds.length === 0) continue; // shouldn't happen, but defensive
+    const pick = neighborIds[Math.floor(prng.next() * neighborIds.length)];
+    regions[r][c] = pick;
+    for (const [dr, dc] of NEI) addFrontier(r + dr, c + dc);
   }
   return regions;
 }
@@ -162,6 +188,9 @@ function repairToUnique(
       );
       if (queenRowOfCurrentId === r && queenCol === c) continue;
 
+      // If yanking this cell from currentId would split it, no candidate
+      // reassignment is safe — try the next diff row.
+      if (!regionStaysConnected(work, currentId, r, c)) continue;
       const neighborIds = new Set<number>();
       for (const [dr, dc] of NEI) {
         const nr = r + dr;
@@ -171,17 +200,10 @@ function repairToUnique(
         if (id !== currentId) neighborIds.add(id);
       }
       const candidates = prng.shuffle(Array.from(neighborIds));
-      let applied = false;
-      for (const newId of candidates) {
-        if (!regionStaysConnected(work, currentId, r, c)) continue;
-        work[r][c] = newId;
-        applied = true;
-        break;
-      }
-      if (applied) {
-        mutated = true;
-        break;
-      }
+      if (candidates.length === 0) continue;
+      work[r][c] = candidates[0];
+      mutated = true;
+      break;
     }
     if (!mutated) return null; // no productive reassignment available
   }
@@ -212,7 +234,7 @@ export function generatePuzzle(
     const prng = new PRNG(`${seed}#${attempt}`);
     const queens = placeQueens(size, prng);
     if (!queens) continue;
-    const regions = voronoiRegions(size, queens, prng);
+    const regions = growRegions(size, queens, prng);
     const candidate: Puzzle = { size, regions, seed, difficulty };
     if (hasUniqueSolution(candidate)) {
       return { ...candidate, regions: compactRegionIds(candidate.regions) };

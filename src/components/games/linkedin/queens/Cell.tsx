@@ -8,7 +8,6 @@ interface CellProps {
   state: CellState;
   regionId: number;
   conflict: boolean;
-  attacked: boolean;
   // Region of the southern and eastern neighbors (or null at the bottom/right
   // edge). Used to decide whether the shared edge gets a thick region-divider
   // or a thin in-region line. The cell only renders right + bottom borders;
@@ -31,7 +30,6 @@ function CellImpl({
   state,
   regionId,
   conflict,
-  attacked,
   southRegion,
   eastRegion,
   size,
@@ -41,7 +39,6 @@ function CellImpl({
   disabled,
 }: CellProps) {
   const fill = regionFillClass(regionId);
-  const showAutoMark = state === "empty" && attacked;
 
   // Each shared edge is drawn by exactly one cell — the upper/left neighbor.
   // This avoids the double-drawing that made interior gridlines look thicker
@@ -97,18 +94,12 @@ function CellImpl({
         zIndex: conflict ? 1 : 0,
       }}
     >
-      <CellGlyph state={state} autoMark={showAutoMark} />
+      <CellGlyph state={state} />
     </button>
   );
 }
 
-function CellGlyph({
-  state,
-  autoMark,
-}: {
-  state: CellState;
-  autoMark: boolean;
-}) {
+function CellGlyph({ state }: { state: CellState }) {
   if (state === "queen") {
     return (
       <span className="text-flexoki-ink dark:text-flexoki-base-50 text-2xl leading-none">
@@ -116,7 +107,7 @@ function CellGlyph({
       </span>
     );
   }
-  if (state === "mark" || autoMark) {
+  if (state === "mark") {
     return (
       <span className="text-flexoki-base-800 dark:text-flexoki-base-200 text-lg leading-none font-semibold">
         ×
