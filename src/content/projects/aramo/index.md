@@ -2,6 +2,7 @@
 title: "Aramo"
 description: "Aramo is a platform that allows you to create your own shared trips with your friends."
 date: "09/05/2022"
+hideFromCV: true
 demoURL: "https://aramo.app"
 ---
 

@@ -1,9 +1,6 @@
 ---
-import Container from "@components/Container.astro";
-import Nav from "@components/Nav.astro";
-import WorkTimeline from "@components/WorkTimeline.astro";
-import EducationTimeline from "@components/EducationTimeline.astro";
 import PageLayout from "@layouts/PageLayout.astro";
+import { SITE, SOCIALS } from "@consts";
 import {
   getWorkDateRange,
   processWorkEntry,
@@ -11,98 +8,520 @@ import {
 } from "@lib/utils";
 import { getCollection } from "astro:content";
 
-// Fetch and process work collection
+// Work
 const workCollection = (await getCollection("work")).sort((a, b) => {
-  const aDateRange = getWorkDateRange(a.data.roles);
-  const bDateRange = getWorkDateRange(b.data.roles);
-  return bDateRange.startDate.valueOf() - aDateRange.startDate.valueOf();
+  const aRange = getWorkDateRange(a.data.roles);
+  const bRange = getWorkDateRange(b.data.roles);
+  return bRange.startDate.valueOf() - aRange.startDate.valueOf();
 });
-
-const work = await Promise.all(
-  workCollection.map(async (item) => {
-    const { Content } = await item.render();
-    return { ...item, Content };
-  }),
+const processedWork = workCollection.map((item) =>
+  processWorkEntry({ ...item, body: item.body }),
 );
 
-const processedWork = work.map((item) => processWorkEntry(item));
-
-// Fetch and process education collection
+// Education
 const educationCollection = (await getCollection("education")).sort((a, b) => {
-  const aEndDate = a.data.dateEnd === "Present" ? new Date() : a.data.dateEnd;
-  const bEndDate = b.data.dateEnd === "Present" ? new Date() : b.data.dateEnd;
-  return bEndDate.valueOf() - aEndDate.valueOf();
+  const aEnd = a.data.dateEnd === "Present" ? new Date() : a.data.dateEnd;
+  const bEnd = b.data.dateEnd === "Present" ? new Date() : b.data.dateEnd;
+  return bEnd.valueOf() - aEnd.valueOf();
 });
-
-const education = await Promise.all(
-  educationCollection.map(async (item) => {
-    const { Content } = await item.render();
-    return { ...item, Content };
-  }),
+const processedEducation = educationCollection.map((item) =>
+  processEducationEntry({ ...item, body: item.body }),
 );
 
-const processedEducation = education.map((item) => processEducationEntry(item));
+// Projects (hideFromCV opt-out, draft hides everywhere)
+const projects = (
+  await getCollection(
+    "projects",
+    ({ data }) => !data.draft && !data.hideFromCV,
+  )
+).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+// Helpers
+const fmtMonthYear = (d: Date | string) =>
+  typeof d === "string"
+    ? d
+    : d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+
+const fmtYear = (d: Date | string) =>
+  typeof d === "string" ? d : d.getFullYear().toString();
+
+const linkedin = SOCIALS.find((s) => s.NAME === "linkedin")?.HREF;
+const github = SOCIALS.find((s) => s.NAME === "github")?.HREF;
+const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
 ---
 
 <PageLayout
   title="CV"
-  description="My curriculum vitae - work experience and education timeline"
+  description={`${SITE.NAME} — Curriculum Vitae`}
 >
-  <Container>
-    <div class="space-y-2 print:hidden">
-      <Nav breadCrumbsItems={[{ href: "/cv", label: "CV" }]} />
-    </div>
-    <div class="my-12 space-y-16 print:my-0 print:space-y-8">
-      <!-- Work Experience Section -->
-      <div class="space-y-12 print:space-y-6">
-        <div
-          class="font-semibold font-serif hover:opacity-70 transition-opacity"
-        >
-          Work Experience
-        </div>
-        <WorkTimeline processedWork={processedWork} />
+  <div class="cv-sheet">
+    <div class="cv-header">
+      <div class="cv-header-main">
+        <h1 class="cv-name">{SITE.NAME}</h1>
+        <p class="cv-position">{SITE.POSITION}</p>
       </div>
+      <ul class="cv-contact">
+        <li>Madrid + Asturias, Spain</li>
+        <li>
+          <a href="https://jorgeorejas.com">jorgeorejas.com</a>
+        </li>
+        {
+          linkedin && (
+            <li>
+              <a href={linkedin}>linkedin.com/in/jorgeorejas</a>
+            </li>
+          )
+        }
+        {
+          github && (
+            <li>
+              <a href={github}>github.com/jorgeorejas</a>
+            </li>
+          )
+        }
+        {
+          x && (
+            <li>
+              <a href={x}>@jorejasrojo</a>
+            </li>
+          )
+        }
+      </ul>
+    </div>
 
-      <!-- Education Section -->
-      <div class="space-y-12 print:space-y-6">
-        <div
-          class="font-semibold font-serif hover:opacity-70 transition-opacity"
-        >
-          Education
-        </div>
-        <EducationTimeline processedEducation={processedEducation} />
-      </div>
-    </div>
-  </Container>
+    <section class="cv-section">
+      <h2 class="cv-section-title">Profile</h2>
+      <p class="cv-summary">
+        Developer and entrepreneur from Asturias, Spain. I build at the
+        intersection of growth, AI and product — shipping data-driven
+        experiments, full-stack web features, and tools that turn ideas into
+        scalable products.
+      </p>
+    </section>
+
+    <section class="cv-section">
+      <h2 class="cv-section-title">Experience</h2>
+      {
+        processedWork.map((work) => (
+          <div class="cv-entry">
+            <div class="cv-entry-head">
+              <h3 class="cv-entry-title">{work.name}</h3>
+              <span class="cv-entry-date">
+                {fmtMonthYear(work.startDate)} — {fmtMonthYear(work.endDate)}
+              </span>
+            </div>
+            {work.description && (
+              <p class="cv-entry-context">{work.description}</p>
+            )}
+            <ul class="cv-roles">
+              {work.positions.map((role) => (
+                <li class="cv-role">
+                  <div class="cv-role-head">
+                    <span class="cv-role-title">{role.title}</span>
+                    <span class="cv-role-date">
+                      {fmtMonthYear(role.startDate)} —{" "}
+                      {fmtMonthYear(role.endDate)}
+                    </span>
+                  </div>
+                  {role.description && (
+                    <p class="cv-role-desc">{role.description}</p>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </section>
+
+    <section class="cv-section">
+      <h2 class="cv-section-title">Education</h2>
+      {
+        processedEducation.map((edu) => (
+          <div class="cv-entry">
+            <div class="cv-entry-head">
+              <h3 class="cv-entry-title">{edu.institution}</h3>
+              <span class="cv-entry-date">
+                {fmtYear(edu.startDate)} —{" "}
+                {edu.endDate === "Present" && edu.expectedEnd
+                  ? `${fmtYear(edu.expectedEnd)} (expected)`
+                  : fmtYear(edu.endDate)}
+              </span>
+            </div>
+            <p class="cv-edu-degree">
+              {edu.degree}
+              {edu.field && <span class="cv-edu-field"> · {edu.field}</span>}
+            </p>
+          </div>
+        ))
+      }
+    </section>
+
+    <section class="cv-section">
+      <h2 class="cv-section-title">Selected Projects</h2>
+      <ul class="cv-projects">
+        {
+          projects.map((p) => (
+            <li class="cv-project">
+              <div class="cv-project-head">
+                <span class="cv-project-title">{p.data.title}</span>
+                <span class="cv-project-date">
+                  {p.data.date.getFullYear()}
+                </span>
+              </div>
+              <p class="cv-project-desc">{p.data.description}</p>
+              {(p.data.demoURL || p.data.repoURL) && (
+                <p class="cv-project-links">
+                  {p.data.demoURL && (
+                    <a href={p.data.demoURL}>{p.data.demoURL.replace(/^https?:\/\//, "")}</a>
+                  )}
+                  {p.data.demoURL && p.data.repoURL && <span> · </span>}
+                  {p.data.repoURL && (
+                    <a href={p.data.repoURL}>{p.data.repoURL.replace(/^https?:\/\//, "")}</a>
+                  )}
+                </p>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+  </div>
 </PageLayout>
 
 <style is:global>
+  /* @page margin: 0 so Chrome has no space to inject its header/footer
+     (the "URL — date — page X/Y" line). The CV's own page margins are
+     applied inside .cv-sheet via padding, see the @media print block. */
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  /* Neutralize the global `main { py-32 }` rule for the CV page */
+  body:has(.cv-sheet) main {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* Hide the site Footer (Spotify widget, "Let's Connect", links) on
+     /cv — both screen and print. The Footer renders as a plain <div>
+     inside <main>, so we target main's children that aren't the sheet. */
+  body:has(.cv-sheet) main > *:not(.cv-sheet) {
+    display: none !important;
+  }
+
+  /* Links inside the CV: match the rest of the site —
+     underlined with subtle decoration that darkens on hover. */
+  .cv-sheet a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+    text-decoration-color: rgba(0, 0, 0, 0.2);
+    transition: text-decoration-color 200ms ease;
+  }
+  .cv-sheet a:hover {
+    text-decoration-color: currentColor;
+  }
+  :is(.dark) .cv-sheet a {
+    text-decoration-color: rgba(255, 255, 255, 0.25);
+  }
+
+  /* The A4 sheet — body text is mono to match the rest of the site
+     (the global `body { @apply font-mono }`); headings stay serif. */
+  .cv-sheet {
+    width: 210mm;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 14mm;
+    /* No paper framing on screen — inherits the site background.
+       White background + sheet sizing kick in only on print. */
+    background: transparent;
+    color: inherit;
+    font-size: 9.5pt;
+    line-height: 1.55;
+  }
+
+  /* Header */
+  .cv-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+    padding-top: 8px;
+    padding-bottom: 18px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid;
+    border-bottom-color: rgba(0, 0, 0, 0.15);
+  }
+  :is(.dark) .cv-header {
+    border-bottom-color: rgba(255, 255, 255, 0.2);
+  }
+  .cv-name {
+    font-family: "Instrument Serif", ui-serif, Georgia, serif !important;
+    font-size: 36pt;
+    line-height: 1;
+    margin: 0;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  .cv-position {
+    margin: 8px 0 0;
+    font-size: 10pt;
+  }
+  .cv-contact {
+    list-style: none;
+    margin: 0;
+    padding: 28px 0 0;
+    text-align: right;
+    font-size: 8.5pt;
+    line-height: 1.7;
+  }
+  .cv-contact a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Sections */
+  .cv-section {
+    margin-bottom: 16px;
+    page-break-inside: auto;
+  }
+  .cv-section-title {
+    font-family: "Instrument Serif", ui-serif, Georgia, serif !important;
+    font-size: 14pt;
+    font-weight: 600;
+    margin: 0 0 8px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #cecdc3;
+    letter-spacing: 0.02em;
+    /* Never let a section heading be the last thing on a page —
+       it must stay attached to the first entry that follows. */
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  .cv-summary {
+    margin: 0;
+  }
+
+  /* Entries */
+  .cv-entry {
+    margin-bottom: 12px;
+    page-break-inside: avoid;
+  }
+  .cv-entry:last-child {
+    margin-bottom: 0;
+  }
+  .cv-entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .cv-entry-title {
+    margin: 0;
+    font-size: 11pt;
+    font-weight: 600;
+  }
+  .cv-entry-date {
+    font-family: "Ioskeley Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+    font-size: 8.5pt;
+    color: #575653;
+    white-space: nowrap;
+  }
+  .cv-entry-context {
+    margin: 2px 0 6px;
+    font-size: 9.5pt;
+    color: #575653;
+    font-style: italic;
+  }
+
+  /* Roles */
+  .cv-roles {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-left: 1px solid #cecdc3;
+  }
+  .cv-role {
+    padding: 4px 0 4px 12px;
+    page-break-inside: avoid;
+  }
+  .cv-role:not(:last-child) {
+    margin-bottom: 4px;
+  }
+  .cv-role-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .cv-role-title {
+    font-weight: 500;
+    font-size: 10pt;
+  }
+  .cv-role-date {
+    font-family: "Ioskeley Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+    font-size: 8pt;
+    color: #6f6e69;
+    white-space: nowrap;
+  }
+  .cv-role-desc {
+    margin: 2px 0 0;
+    font-size: 9.5pt;
+    color: #282726;
+  }
+
+  /* Education */
+  .cv-edu-degree {
+    margin: 2px 0 0;
+    font-size: 10pt;
+  }
+  .cv-edu-field {
+    color: #575653;
+  }
+
+  /* Projects */
+  .cv-projects {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .cv-project {
+    margin-bottom: 8px;
+    page-break-inside: avoid;
+  }
+  .cv-project-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .cv-project-title {
+    font-weight: 600;
+    font-size: 10.5pt;
+  }
+  .cv-project-date {
+    font-family: "Ioskeley Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+    font-size: 8.5pt;
+    color: #575653;
+  }
+  .cv-project-desc {
+    margin: 1px 0 0;
+    font-size: 9.5pt;
+  }
+  .cv-project-links {
+    margin: 1px 0 0;
+    font-family: "Ioskeley Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+    font-size: 8.5pt;
+    color: #575653;
+  }
+  .cv-project-links a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: #cecdc3;
+  }
+
+  /* Print rules */
   @media print {
-    /* Hide footer */
-    footer {
-      display: none !important;
+    /* Force light scheme on print */
+    :root {
+      color-scheme: light;
     }
-
-    /* Hide background noise */
-    .fixed.inset-0.pointer-events-none {
-      display: none !important;
-    }
-
-    /* Ensure links are visible with underlines */
-    a {
-      text-decoration: underline;
-      color: inherit;
-    }
-
-    /* Remove hover effects */
-    a:hover {
-      background-color: transparent !important;
-    }
-
-    /* Better spacing for print */
+    html,
     body {
-      background: white;
-      color: black;
+      background: #ffffff !important;
+      color: #100f0f !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    /* Hide everything we don't want on the printed page */
+    nav,
+    .fixed.inset-0.pointer-events-none,
+    a[href="#main-content"] {
+      display: none !important;
+    }
+    /* Apply page margins INSIDE the sheet on print (since @page
+       margin is 0 to suppress the browser's URL/date header).
+       `box-decoration-break: clone` repeats the sheet's padding +
+       background at every page break, so page 2+ also get 14mm of
+       top/bottom breathing room — without it, the inner padding only
+       applies to the first page and subsequent pages look compressed. */
+    .cv-sheet {
+      width: auto;
+      max-width: none;
+      margin: 0;
+      padding: 14mm 14mm;
+      background: #ffffff;
+      color: #100f0f;
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
+    }
+    /* Links: subtle, no color shift */
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .cv-section {
+      page-break-inside: auto;
+    }
+    .cv-entry,
+    .cv-role,
+    .cv-project {
+      page-break-inside: avoid;
+    }
+  }
+
+  /* On screen, muted text uses opacity so it adapts to light & dark. */
+  .cv-position,
+  .cv-contact,
+  .cv-entry-context,
+  .cv-entry-date,
+  .cv-role-date,
+  .cv-project-date,
+  .cv-project-links,
+  .cv-edu-field {
+    color: inherit;
+    opacity: 0.65;
+  }
+  .cv-header {
+    border-bottom-color: currentColor;
+  }
+  .cv-section-title,
+  .cv-roles {
+    border-color: currentColor;
+    opacity: 1;
+  }
+  .cv-section-title {
+    border-bottom-color: color-mix(in srgb, currentColor 30%, transparent);
+  }
+  .cv-roles {
+    border-left-color: color-mix(in srgb, currentColor 25%, transparent);
+  }
+
+  /* On print, restore solid greys against white paper */
+  @media print {
+    .cv-position,
+    .cv-contact,
+    .cv-entry-context,
+    .cv-entry-date,
+    .cv-role-date,
+    .cv-project-date,
+    .cv-project-links,
+    .cv-edu-field {
+      color: #403e3c;
+      opacity: 1;
+    }
+    .cv-header {
+      border-bottom-color: #100f0f;
+    }
+    .cv-section-title {
+      border-bottom-color: #cecdc3;
+    }
+    .cv-roles {
+      border-left-color: #cecdc3;
     }
   }
 </style>
