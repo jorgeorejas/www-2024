@@ -1,0 +1,55 @@
+@font-face {
+  font-family: "Ioskeley Mono";
+  src: url("/fonts/IoskeleyMono/IoskeleyMono-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Ioskeley Mono";
+  src: url("/fonts/IoskeleyMono/IoskeleyMono-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Ioskeley Mono";
+  src: url("/fonts/IoskeleyMono/IoskeleyMono-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Ioskeley Mono";
+  src: url("/fonts/IoskeleyMono/IoskeleyMono-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Ioskeley Mono";
+  src: url("/fonts/IoskeleyMono/IoskeleyMono-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Ioskeley Mono";
+  src: url("/fonts/IoskeleyMono/IoskeleyMono-ExtraBold.woff2") format("woff2");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Ioskeley Mono";
+  src: url("/fonts/IoskeleyMono/IoskeleyMono-Black.woff2") format("woff2");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}

@@ -11,7 +11,7 @@
     Instrument Serif, ui-serif, Georgia, Cambria, "Times New Roman", Times,
     serif;
   --font-mono:
-    Berkeley Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    Ioskeley Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", "Courier New", monospace;
   --font-handwritten:
     Caveat Variable, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
@@ -168,7 +168,7 @@
 }
 
 @font-face {
-  font-family: "Berkeley Mono";
+  font-family: "Ioskeley Mono";
   font-display: swap;
 }
 
