@@ -26,22 +26,28 @@ const { breadCrumbsItems } = Astro.props;
 </div>
 
 <script>
-  // Auto dark mode based on system preference
-  const html = document.documentElement;
-  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  // Dark mode disabled: site is light-only. Code retained for future re-enable.
+  // To restore: remove the early `if (true)` guard below.
+  if (true) {
+    // no-op — force light mode
+  } else {
+    // Auto dark mode based on system preference
+    const html = document.documentElement;
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
-  if (prefersDark) {
-    html.classList.add("dark");
+    if (prefersDark) {
+      html.classList.add("dark");
+    }
+
+    // Listen for system theme changes
+    window
+      .matchMedia("(prefers-color-scheme: dark)")
+      .addEventListener("change", (e) => {
+        if (e.matches) {
+          html.classList.add("dark");
+        } else {
+          html.classList.remove("dark");
+        }
+      });
   }
-
-  // Listen for system theme changes
-  window
-    .matchMedia("(prefers-color-scheme: dark)")
-    .addEventListener("change", (e) => {
-      if (e.matches) {
-        html.classList.add("dark");
-      } else {
-        html.classList.remove("dark");
-      }
-    });
 </script>
