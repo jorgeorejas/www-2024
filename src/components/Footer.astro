@@ -1,66 +1,81 @@
 ---
 import Link from "@components/Link.astro";
 import Container from "@components/Container.astro";
+import Monogram from "@components/Monogram.astro";
 import SpotifyNowPlaying from "@components/SpotifyNowPlaying.astro";
 import { SITE, SOCIALS } from "@consts";
 ---
 
 <Container>
-  <div class="space-y-16 pt-16">
-    <hr class="border-black/15 dark:border-white/20" />
+  <div class="space-y-12 pt-16 pb-8">
+    <div class="rule-double h-0"></div>
 
-    <section class="space-y-4">
-      <SpotifyNowPlaying />
-      <h5 class="font-semibold text-black dark:text-white font-serif">
-        Let's Connect
-      </h5>
-      <article>
-        <p>
-          If you want to get in touch with me about something or just to say hi,
-          reach out on social media or send me an email. You can also use the
-          information from llms.txt and llms-full.txt to connect my information
-          to your AI.
+    <div class="grid gap-12 md:grid-cols-[1fr_auto_1fr] md:items-center">
+      <section class="space-y-3 md:order-1">
+        <p class="eyebrow">Now Playing</p>
+        <SpotifyNowPlaying />
+      </section>
+
+      <div class="flex justify-center md:order-2">
+        <Monogram
+          size={56}
+          class="text-[var(--color-bodega-gold)] dark:text-[var(--color-bodega-gold-dark)]"
+        />
+      </div>
+
+      <section class="space-y-3 md:order-3 md:text-right">
+        <p class="eyebrow">Let's Connect</p>
+        <p class="text-sm leading-relaxed">
+          Reach out on social, send an email, or feed the llms files to your AI.
         </p>
-      </article>
-      <ul class="flex flex-wrap gap-2">
-        {
-          SOCIALS.map((SOCIAL) => (
-            <li class="flex gap-x-2 text-nowrap">
-              <Link
-                href={SOCIAL.HREF}
-                external
-                aria-label={`${SITE.NAME} on ${SOCIAL.NAME}`}
-              >
-                {SOCIAL.NAME}
-              </Link>
-              {"/"}
-            </li>
-          ))
-        }
-        <li class="flex gap-x-2 text-nowrap">
-          <Link href={`mailto:${SITE.EMAIL}`} aria-label={`Email ${SITE.NAME}`}>
-            {SITE.EMAIL}
-          </Link>
-          {"/"}
-        </li>
-        <li class="flex gap-x-2 text-nowrap">
-          <Link
-            href="/llms.txt"
-            aria-label="llms.txt - Basic information for LLMs"
-          >
-            llms.txt
-          </Link>
-          {"/"}
-        </li>
-        <li class="line-clamp-1">
-          <Link
-            href="/llms-full.txt"
-            aria-label="llms-full.txt - Extended information for LLMs"
-          >
-            llms-full.txt
-          </Link>
-        </li>
-      </ul>
-    </section>
+        <ul class="flex flex-wrap gap-x-2 gap-y-1 md:justify-end text-sm">
+          {
+            SOCIALS.map((SOCIAL, i) => (
+              <li class="flex gap-x-2 text-nowrap">
+                <Link
+                  href={SOCIAL.HREF}
+                  external
+                  aria-label={`${SITE.NAME} on ${SOCIAL.NAME}`}
+                >
+                  {SOCIAL.NAME}
+                </Link>
+                {i < SOCIALS.length - 1 && (
+                  <span aria-hidden="true" class="opacity-50">·</span>
+                )}
+              </li>
+            ))
+          }
+        </ul>
+        <ul class="flex flex-wrap gap-x-2 gap-y-1 md:justify-end text-sm">
+          <li class="flex gap-x-2 text-nowrap">
+            <Link href={`mailto:${SITE.EMAIL}`} aria-label={`Email ${SITE.NAME}`}>
+              {SITE.EMAIL}
+            </Link>
+            <span aria-hidden="true" class="opacity-50">·</span>
+          </li>
+          <li class="flex gap-x-2 text-nowrap">
+            <Link
+              href="/llms.txt"
+              aria-label="llms.txt - Basic information for LLMs"
+            >
+              llms.txt
+            </Link>
+            <span aria-hidden="true" class="opacity-50">·</span>
+          </li>
+          <li class="flex gap-x-2 text-nowrap">
+            <Link
+              href="/llms-full.txt"
+              aria-label="llms-full.txt - Extended information for LLMs"
+            >
+              llms-full.txt
+            </Link>
+          </li>
+        </ul>
+      </section>
+    </div>
+
+    <p class="eyebrow text-center opacity-60">
+      {`© ${new Date().getFullYear()} ${SITE.NAME}`} · Vintage {new Date().getFullYear()}
+    </p>
   </div>
 </Container>

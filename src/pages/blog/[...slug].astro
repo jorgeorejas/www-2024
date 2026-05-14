@@ -67,44 +67,53 @@ const breadcrumbSchema = generateBreadcrumbSchema(
   </header>
 
   <Container>
-    <div class="space-y-2">
-      <Nav
-        breadCrumbsItems={[
-          { href: "/blog", label: "Blog" },
-          { href: `/blog/${post.slug}`, label: post.data.title },
-        ]}
-      />
-    </div>
-    <div class="space-y-4 my-10" id="post-header">
-      <div class="flex items-center gap-1.5">
-        <div class="font-base text-sm">
+    <Nav
+      breadCrumbsItems={[
+        { href: "/blog", label: "Blog" },
+        { href: `/blog/${post.slug}`, label: post.data.title },
+      ]}
+    />
+
+    <div
+      class="space-y-6 my-12"
+      id="post-header"
+      style="--section-accent: var(--accent-sienna);"
+    >
+      <div class="section-stripe"></div>
+      <div class="flex flex-wrap items-baseline justify-between gap-3">
+        <span class="eyebrow" style="color: var(--section-accent);">
+          Essay
+        </span>
+        <div class="flex items-baseline gap-2 font-serif italic text-sm text-flexoki-base-600 dark:text-flexoki-base-400">
           <FormattedDate date={post.data.date} />
-        </div>
-        &bull;
-        <div class="font-base text-sm">
-          {readingTime(post.body)}
+          <span aria-hidden="true" class="opacity-50">·</span>
+          <span>{readingTime(post.body)}</span>
         </div>
       </div>
       {
         post.data.titleCorrection ? (
           <Correction
             text={post.data.titleCorrection}
-            textClass="text-2xl -top-6"
+            color="sienna"
+            textClass="text-3xl md:text-4xl -top-7"
           >
-            <div class="text-2xl font-semibold font-serif text-flexoki-ink dark:text-flexoki-base-50">
+            <h1 class="text-3xl md:text-4xl font-semibold font-serif leading-tight text-flexoki-ink dark:text-flexoki-base-50">
               {post.data.title}
-            </div>
+            </h1>
           </Correction>
         ) : (
-          <div class="text-2xl font-semibold font-serif text-flexoki-ink dark:text-flexoki-base-50">
+          <h1 class="text-3xl md:text-4xl font-semibold font-serif leading-tight text-flexoki-ink dark:text-flexoki-base-50">
             {post.data.title}
-          </div>
+          </h1>
         )
       }
 
-      <div class="border-b border-flexoki-base-200 dark:border-flexoki-base-800 pb-4">
+      <p
+        class="vintage pb-6"
+        style="border-bottom: 1px solid var(--color-bodega-rule);"
+      >
         {post.data.description}
-      </div>
+      </p>
     </div>
     <article>
       <Content />

@@ -154,6 +154,30 @@
   --color-flexoki-magenta-850: #4f1b39;
   --color-flexoki-magenta-900: #39172b;
   --color-flexoki-magenta-950: #24131d;
+
+  /* Bodega palette — wine-label inspired accents that harmonize with
+     the warm cream paper (#fbfaf6). Light variants are used on cream;
+     -dark variants are used on the ink-paper of dark mode. */
+  --color-bodega-sienna: #b04a2b;
+  --color-bodega-navy: #1c2e4a;
+  --color-bodega-sage: #6b7a4b;
+  --color-bodega-gold: #b8862f;
+  --color-bodega-bordeaux: #5a1a23;
+  --color-bodega-paper-warm: #f6f1e3;
+  --color-bodega-rule: #c9bfa8;
+
+  --color-bodega-sienna-dark: #d77a5a;
+  --color-bodega-navy-dark: #7a8db3;
+  --color-bodega-sage-dark: #a5b486;
+  --color-bodega-gold-dark: #e3b766;
+  --color-bodega-bordeaux-dark: #c47585;
+  --color-bodega-rule-dark: #3a352b;
+
+  --text-wordmark: clamp(4rem, 14vw, 12rem);
+  --text-vintage: clamp(1.25rem, 2.6vw, 2rem);
+  --leading-wordmark: 0.88;
+  --tracking-eyebrow: 0.22em;
+  --tracking-wordmark: -0.02em;
 }
 
 /* Prevent flash of invisible text (FOIT) */
@@ -258,6 +282,77 @@
 /* Remove default focus outline for mouse users */
 *:focus:not(:focus-visible) {
   outline: none;
+}
+
+/* Bodega editorial utilities ----------------------------------------------
+   A small set of label-inspired typography & rule primitives used across
+   the redesign. Section accents are driven by --section-accent on a
+   wrapper element so cards, links, and dividers can inherit one color. */
+@layer utilities {
+  .eyebrow {
+    @apply font-mono uppercase;
+    font-size: 11px;
+    letter-spacing: var(--tracking-eyebrow);
+    @apply text-flexoki-base-700 dark:text-flexoki-base-300;
+  }
+
+  .wordmark {
+    @apply font-serif;
+    font-weight: 500;
+    font-size: var(--text-wordmark);
+    line-height: var(--leading-wordmark);
+    letter-spacing: var(--tracking-wordmark);
+    font-feature-settings: "liga", "dlig";
+    @apply text-flexoki-ink dark:text-flexoki-base-50;
+  }
+
+  .vintage {
+    @apply font-serif italic;
+    font-size: var(--text-vintage);
+    line-height: 1.15;
+    @apply text-flexoki-base-700 dark:text-flexoki-base-300;
+  }
+
+  .rule-hairline {
+    border-top: 1px solid var(--color-bodega-rule);
+  }
+  .dark .rule-hairline {
+    border-top-color: var(--color-bodega-rule-dark);
+  }
+
+  .rule-double {
+    border-top: 1px solid var(--color-bodega-rule);
+    box-shadow: 0 3px 0 -2px var(--color-bodega-rule);
+  }
+  .dark .rule-double {
+    border-top-color: var(--color-bodega-rule-dark);
+    box-shadow: 0 3px 0 -2px var(--color-bodega-rule-dark);
+  }
+
+  /* Section accent — pages and sections set --section-accent on a wrapper
+     and children pick it up. Falls back to international orange. */
+  .section-stripe {
+    height: 3px;
+    background-color: var(--section-accent, var(--color-international-orange));
+  }
+}
+
+/* Bodega palette aliases that resolve to the dark variant in dark mode.
+   These give us tokens like `text-[var(--accent-sienna)]` that work in
+   both schemes without per-call dark: overrides. */
+:root {
+  --accent-sienna: var(--color-bodega-sienna);
+  --accent-navy: var(--color-bodega-navy);
+  --accent-sage: var(--color-bodega-sage);
+  --accent-gold: var(--color-bodega-gold);
+  --accent-bordeaux: var(--color-bodega-bordeaux);
+}
+:root.dark {
+  --accent-sienna: var(--color-bodega-sienna-dark);
+  --accent-navy: var(--color-bodega-navy-dark);
+  --accent-sage: var(--color-bodega-sage-dark);
+  --accent-gold: var(--color-bodega-gold-dark);
+  --accent-bordeaux: var(--color-bodega-bordeaux-dark);
 }
 
 @utility pattern-dots {

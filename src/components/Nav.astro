@@ -1,6 +1,8 @@
 ---
-import { SITE } from "@consts";
 import Breadcrumbs from "./Breadcrumbs.astro";
+import Monogram from "./Monogram.astro";
+import { SITE } from "@consts";
+
 type Props = {
   breadCrumbsItems?: {
     href: string;
@@ -9,24 +11,53 @@ type Props = {
 };
 
 const { breadCrumbsItems } = Astro.props;
+
+const links = [
+  { href: "/blog", label: "Writing" },
+  { href: "/projects", label: "Projects" },
+  { href: "/work", label: "Work" },
+  { href: "/games", label: "Games" },
+  { href: "/cv", label: "CV" },
+];
 ---
 
-<div
-  class="flex md:flex-row flex-col gap-2 md:gap-0 justify-between items-center"
->
-  <div class="space-y-2 w-full md:w-auto">
-    <a href="/" class="space-y-2">
-      <p class="text-3xl font-semibold font-serif text-flexoki-ink dark:text-flexoki-base-50">
-        {SITE.NAME}
-      </p>
-      <p class="w-full font-medium">{SITE.POSITION}</p>
-    </a>
-    {breadCrumbsItems && <Breadcrumbs items={breadCrumbsItems} />}
-  </div>
+<div class="flex items-center justify-between gap-4">
+  <a
+    href="/"
+    class="inline-flex items-center gap-3 text-flexoki-ink dark:text-flexoki-base-50 transition-opacity hover:opacity-70"
+    aria-label={`${SITE.NAME} — home`}
+  >
+    <Monogram size={28} class="text-[var(--color-bodega-gold)] dark:text-[var(--color-bodega-gold-dark)]" />
+    <span class="eyebrow hidden sm:inline">{SITE.NAME}</span>
+  </a>
+
+  <nav aria-label="Primary" class="hidden md:block">
+    <ul class="flex items-center gap-6">
+      {
+        links.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class="eyebrow text-flexoki-base-700 dark:text-flexoki-base-300 hover:text-flexoki-ink dark:hover:text-flexoki-base-50 transition-colors"
+            >
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
 </div>
 
+{
+  breadCrumbsItems && (
+    <div class="mt-3">
+      <Breadcrumbs items={breadCrumbsItems} />
+    </div>
+  )
+}
+
 <script>
-  // Auto dark mode based on system preference
   const html = document.documentElement;
   const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
@@ -34,7 +65,6 @@ const { breadCrumbsItems } = Astro.props;
     html.classList.add("dark");
   }
 
-  // Listen for system theme changes
   window
     .matchMedia("(prefers-color-scheme: dark)")
     .addEventListener("change", (e) => {

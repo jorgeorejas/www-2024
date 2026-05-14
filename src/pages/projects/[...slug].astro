@@ -46,52 +46,59 @@ const breadcrumbSchema = generateBreadcrumbSchema(
   structuredData={[projectSchema, breadcrumbSchema]}
 >
   <Container>
-    <div class="space-y-2">
-      <Nav
-        breadCrumbsItems={[
-          { href: "/projects", label: "Projects" },
-          { href: `/projects/${project.slug}`, label: project.data.title },
-        ]}
-      />
-    </div>
-    <div class="space-y-4 my-10">
-      <div class="flex items-center gap-1.5">
-        <div class="font-base text-sm">
+    <Nav
+      breadCrumbsItems={[
+        { href: "/projects", label: "Projects" },
+        { href: `/projects/${project.slug}`, label: project.data.title },
+      ]}
+    />
+
+    <div
+      class="space-y-6 my-12"
+      style="--section-accent: var(--accent-sage);"
+    >
+      <div class="section-stripe"></div>
+      <div class="flex flex-wrap items-baseline justify-between gap-3">
+        <span class="eyebrow" style="color: var(--section-accent);">
+          Project
+        </span>
+        <div class="flex items-baseline gap-2 font-serif italic text-sm text-flexoki-base-600 dark:text-flexoki-base-400">
           <FormattedDate date={project.data.date} />
-        </div>
-        &bull;
-        <div class="font-base text-sm">
-          {readingTime(project.body)}
+          <span aria-hidden="true" class="opacity-50">·</span>
+          <span>{readingTime(project.body)}</span>
         </div>
       </div>
       {
         project.data.titleCorrection ? (
           <Correction
             text={project.data.titleCorrection}
-            textClass="text-2xl -top-6"
+            color="sage"
+            textClass="text-3xl md:text-4xl -top-7"
           >
-            <div class="text-2xl font-semibold font-serif text-flexoki-ink dark:text-flexoki-base-50">
+            <h1 class="text-3xl md:text-4xl font-semibold font-serif leading-tight text-flexoki-ink dark:text-flexoki-base-50">
               {project.data.title}
-            </div>
+            </h1>
           </Correction>
         ) : (
-          <div class="text-2xl font-semibold font-serif text-flexoki-ink dark:text-flexoki-base-50">
+          <h1 class="text-3xl md:text-4xl font-semibold font-serif leading-tight text-flexoki-ink dark:text-flexoki-base-50">
             {project.data.title}
-          </div>
+          </h1>
         )
       }
       {
         (project.data.demoURL || project.data.repoURL) && (
-          <nav class=" flex gap-1">
+          <nav class="flex gap-2 text-sm">
             {project.data.demoURL && (
               <Link href={project.data.demoURL} external>
-                visit
+                Visit
               </Link>
             )}
-            {project.data.demoURL && project.data.repoURL && <span>/</span>}
+            {project.data.demoURL && project.data.repoURL && (
+              <span aria-hidden="true" class="opacity-50">·</span>
+            )}
             {project.data.repoURL && (
               <Link href={project.data.repoURL} external>
-                repo
+                Source
               </Link>
             )}
           </nav>

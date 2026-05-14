@@ -1,15 +1,18 @@
 ---
-import AnimatedLink from "@components/AnimatedLink.astro";
+import AppellationBand from "@components/AppellationBand.astro";
 import ArrowCard from "@components/ArrowCard.astro";
 import Container from "@components/Container.astro";
 import ContentBlock from "@components/ContentBlock.astro";
+import Monogram from "@components/Monogram.astro";
 import Nav from "@components/Nav.astro";
 import WorkTimeline from "@components/WorkTimeline.astro";
+import { AnimatedSignature } from "@components/AnimatedSignature";
 import { HOME, SITE } from "@consts";
 import PageLayout from "@layouts/PageLayout.astro";
 import { getWorkDateRange, processWorkEntry } from "@lib/utils";
 import { generatePersonSchema } from "@lib/seo-utils";
 import { getCollection } from "astro:content";
+
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 
@@ -25,27 +28,6 @@ const projects = (await getCollection("projects"))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, SITE.NUM_PROJECTS_ON_HOMEPAGE);
 
-const games = [
-  {
-    title: "Klondike Solitaire",
-    description:
-      "Classic Klondike Solitaire with Easy (1 card) and Hard (3 cards) difficulty modes.",
-    href: "/games/solitaire",
-  },
-  {
-    title: "Conway's Game of Life",
-    description:
-      "A mesmerizing cellular automaton where simple rules create complex, beautiful patterns.",
-    href: "/games/game-of-life",
-  },
-  {
-    title: "Minesweeper",
-    description:
-      "The classic logic puzzle. Reveal every safe square without detonating a mine.",
-    href: "/games/minesweeper",
-  },
-].slice(0, SITE.NUM_GAMES_ON_HOMEPAGE);
-
 const allwork = (await getCollection("work"))
   .sort((a, b) => {
     const aDateRange = getWorkDateRange(a.data.roles);
@@ -54,10 +36,8 @@ const allwork = (await getCollection("work"))
   })
   .slice(0, SITE.NUM_WORKS_ON_HOMEPAGE);
 
-// Process work entries for timeline
 const processedWork = allwork.map((item) => processWorkEntry(item));
 
-// Generate Person schema for SEO
 const personSchema = generatePersonSchema(Astro.site!.toString());
 ---
 
@@ -69,100 +49,108 @@ const personSchema = generatePersonSchema(Astro.site!.toString());
 >
   <Container>
     <Nav />
-    <div class="space-y-20">
-      <section>
-        <ContentBlock slug="bio" class="space-y-4" />
+
+    {/* Hero — wine-label wordmark + animated signature flourish */}
+    <section class="pt-20 md:pt-28 pb-12 relative" aria-label="Introduction">
+      <div class="flex flex-col gap-8">
+        <div class="flex items-start justify-between gap-6">
+          <p class="eyebrow">Madrid · Asturias · Vintage MMXXVI</p>
+          <div class="hidden sm:block opacity-70">
+            <Monogram
+              size={56}
+              class="text-[var(--color-bodega-gold)] dark:text-[var(--color-bodega-gold-dark)]"
+            />
+          </div>
+        </div>
+
+        <h1 class="wordmark break-words">{SITE.NAME}</h1>
+
+        <div class="flex flex-col gap-6">
+          <p class="vintage">{SITE.POSITION}</p>
+          <div
+            class="max-w-md text-[var(--color-bodega-bordeaux)] dark:text-[var(--color-bodega-bordeaux-dark)]"
+            aria-label="Animated signature"
+          >
+            <AnimatedSignature client:visible className="h-12 md:h-16 w-auto" />
+          </div>
+        </div>
+      </div>
+      <div class="rule-hairline h-0 mt-10"></div>
+    </section>
+
+    <div class="space-y-20 pb-16">
+      {/* Bio — back-label treatment */}
+      <section
+        class="grid gap-6 md:grid-cols-[160px_1fr]"
+        aria-label="About"
+      >
+        <p class="eyebrow md:pt-1">Tasting Notes</p>
+        <div class="bio-prose space-y-4">
+          <ContentBlock slug="bio" class="space-y-4" />
+        </div>
       </section>
 
-      <section class="space-y-8">
-        <div class="flex flex-wrap gap-y-2 items-center justify-between">
-          <h2 class="text-2xl font-semibold text-flexoki-ink dark:text-flexoki-base-50 font-serif">
-            Latest posts
-          </h2>
-          <AnimatedLink href="/blog"> See all posts </AnimatedLink>
-        </div>
-        <ul class="flex flex-col gap-4">
+      {/* Writing — sienna */}
+      <section class="space-y-6" aria-label="Latest writing">
+        <AppellationBand
+          variant="sienna"
+          eyebrow="Writing"
+          subtitle="Notes, essays, fragments."
+          href="/blog"
+          hrefLabel="All posts"
+        />
+        <ul class="flex flex-col gap-1">
           {
             blog.map((post) => (
               <li>
-                <ArrowCard entry={post} dateFormat="day" />
+                <ArrowCard entry={post} dateFormat="day" variant="sienna" />
               </li>
             ))
           }
         </ul>
       </section>
 
-      <section class="space-y-8">
-        <div class="flex flex-wrap gap-y-2 items-center justify-between">
-          <h2 class="text-2xl font-semibold text-flexoki-ink font-serif dark:text-flexoki-base-50">
-            Recent projects
-          </h2>
-          <AnimatedLink href="/projects"> See all projects </AnimatedLink>
-        </div>
-        <ul class="flex flex-col gap-4">
+      {/* Projects — sage */}
+      <section class="space-y-6" aria-label="Recent projects">
+        <AppellationBand
+          variant="sage"
+          eyebrow="Projects"
+          subtitle="Selected work I've shipped."
+          href="/projects"
+          hrefLabel="All projects"
+        />
+        <ul class="flex flex-col gap-1">
           {
             projects.map((project) => (
               <li>
-                <ArrowCard entry={project} />
+                <ArrowCard entry={project} variant="sage" />
               </li>
             ))
           }
         </ul>
       </section>
 
-      {/* TODO: re-enable Games section on homepage */}
-      {false && (
-        <section class="space-y-8">
-          <div class="flex flex-wrap gap-y-2 items-center justify-between">
-            <h2 class="text-2xl font-semibold text-flexoki-ink font-serif dark:text-flexoki-base-50">
-              Games
-            </h2>
-            <AnimatedLink href="/games"> See all games </AnimatedLink>
-          </div>
-          <ul class="flex flex-col gap-4">
-            {games.map((game) => (
-              <li>
-                <a
-                  href={game.href}
-                  class="relative group flex flex-nowrap py-3 px-4 pr-10 border-l border-flexoki-base-200 dark:border-flexoki-base-800 hover:bg-flexoki-base-100 dark:hover:bg-flexoki-base-900 hover:text-flexoki-ink dark:hover:text-flexoki-base-50 transition-colors duration-300 ease-in-out"
-                >
-                  <div class="flex flex-col gap-1 flex-1">
-                    <div class="font-semibold font-serif">{game.title}</div>
-                    <div class="text-sm">{game.description}</div>
-                  </div>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    class="absolute top-1/2 right-2 -translate-y-1/2 size-5 stroke-2 fill-none stroke-current"
-                  >
-                    <line
-                      x1="5"
-                      y1="12"
-                      x2="19"
-                      y2="12"
-                      class="translate-x-3 group-hover:translate-x-0 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out"
-                    />
-                    <polyline
-                      points="12 5 19 12 12 19"
-                      class="-translate-x-1 group-hover:translate-x-0 transition-transform duration-300 ease-in-out"
-                    />
-                  </svg>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      <section class="space-y-8">
-        <div class="flex flex-wrap gap-y-2 items-center justify-between">
-          <h2 class="text-2xl font-semibold text-flexoki-ink font-serif dark:text-flexoki-base-50">
-            Work Experience
-          </h2>
-          <AnimatedLink href="/work"> See all work </AnimatedLink>
-        </div>
+      {/* Work — bordeaux */}
+      <section class="space-y-6" aria-label="Work experience">
+        <AppellationBand
+          variant="bordeaux"
+          eyebrow="Experience"
+          subtitle="Where I've worked."
+          href="/work"
+          hrefLabel="Full history"
+        />
         <WorkTimeline processedWork={processedWork} />
       </section>
     </div>
   </Container>
 </PageLayout>
+
+<style>
+  /* Subtle Pomal-style warmth on the bio's opening line:
+     the first line of the first paragraph picks up the serif. */
+  .bio-prose :global(article > p:first-child::first-line) {
+    font-family: "Instrument Serif", ui-serif, Georgia, serif;
+    font-size: 1.35rem;
+    line-height: 1.1;
+  }
+</style>

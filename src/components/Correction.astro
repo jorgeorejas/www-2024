@@ -2,7 +2,17 @@
 import { cn } from "@lib/utils";
 
 type Props = {
-  color?: "blue" | "red" | "green" | "black" | "orange";
+  color?:
+    | "blue"
+    | "red"
+    | "green"
+    | "black"
+    | "orange"
+    | "sienna"
+    | "navy"
+    | "sage"
+    | "gold"
+    | "bordeaux";
   rotate?: boolean;
   text: string;
   textClass?: string;
@@ -10,12 +20,38 @@ type Props = {
 };
 
 const {
-  color = "blue",
+  color = "sienna",
   rotate = false,
   text,
   textClass,
   class: correctionClass = "",
 } = Astro.props;
+
+const colorClass = {
+  orange: "text-international-orange",
+  red: "text-flexoki-red-600",
+  green: "text-flexoki-green-600",
+  blue: "text-flexoki-blue-600",
+  black: "text-flexoki-ink dark:text-flexoki-base-50",
+  sienna: "text-[var(--accent-sienna)]",
+  navy: "text-[var(--accent-navy)]",
+  sage: "text-[var(--accent-sage)]",
+  gold: "text-[var(--accent-gold)]",
+  bordeaux: "text-[var(--accent-bordeaux)]",
+}[color];
+
+const decorationClass = {
+  orange: "decoration-international-orange",
+  red: "decoration-flexoki-red-600",
+  green: "decoration-flexoki-green-600",
+  blue: "decoration-flexoki-blue-600",
+  black: "decoration-flexoki-ink",
+  sienna: "decoration-[var(--accent-sienna)]",
+  navy: "decoration-[var(--accent-navy)]",
+  sage: "decoration-[var(--accent-sage)]",
+  gold: "decoration-[var(--accent-gold)]",
+  bordeaux: "decoration-[var(--accent-bordeaux)]",
+}[color];
 ---
 
 <span class={cn("flex flex-col relative", correctionClass)}>
@@ -23,31 +59,14 @@ const {
     class={cn(
       "font-handwritten font-bold relative inline-block",
       "absolute -top-4 whitespace-nowrap",
-      {
-        "-rotate-6": rotate,
-      },
-      {
-        "text-international-orange": color === "orange",
-        "text-flexoki-red-600": color === "red",
-        "text-flexoki-green-600": color === "green",
-        "text-flexoki-blue-600": color === "blue",
-      },
+      { "-rotate-6": rotate },
+      colorClass,
       textClass,
     )}
   >
     {text}
-    <span
-      class="absolute left-0 bottom-1 w-full h-[1px] bg-blue-800 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-in-out"
-    ></span>
   </span>
-  <span
-    class={cn("line-through", {
-      "decoration-international-orange": color === "orange",
-      "decoration-flexoki-red-600": color === "red",
-      "decoration-flexoki-green-600": color === "green",
-      "decoration-flexoki-blue-600": color === "blue",
-    })}
-  >
+  <span class={cn("line-through", decorationClass)}>
     <slot />
   </span>
 </span>

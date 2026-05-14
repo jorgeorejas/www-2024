@@ -1,0 +1,55 @@
+---
+type Variant = "sienna" | "navy" | "sage" | "gold" | "bordeaux";
+
+type Props = {
+  variant?: Variant;
+  eyebrow: string;
+  subtitle?: string;
+  href?: string;
+  hrefLabel?: string;
+  class?: string;
+};
+
+const {
+  variant = "sienna",
+  eyebrow,
+  subtitle,
+  href,
+  hrefLabel = "See all",
+  class: className = "",
+} = Astro.props;
+
+const accentVar = {
+  sienna: "var(--accent-sienna)",
+  navy: "var(--accent-navy)",
+  sage: "var(--accent-sage)",
+  gold: "var(--accent-gold)",
+  bordeaux: "var(--accent-bordeaux)",
+}[variant];
+---
+
+<header
+  class:list={["space-y-3", className]}
+  style={`--section-accent: ${accentVar};`}
+  data-section-variant={variant}
+>
+  <div class="section-stripe"></div>
+  <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+    <span class="eyebrow" style={`color: var(--section-accent);`}>
+      {eyebrow}
+    </span>
+    {
+      href && (
+        <a
+          href={href}
+          class="eyebrow group inline-flex items-center gap-1.5 transition-opacity hover:opacity-70"
+          style="color: var(--section-accent);"
+        >
+          {hrefLabel}
+          <span aria-hidden="true" class="transition-transform duration-300 ease-out group-hover:translate-x-1">→</span>
+        </a>
+      )
+    }
+  </div>
+  {subtitle && <p class="vintage">{subtitle}</p>}
+</header>

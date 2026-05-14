@@ -1,4 +1,5 @@
 ---
+import AppellationBand from "@components/AppellationBand.astro";
 import Container from "@components/Container.astro";
 import Nav from "@components/Nav.astro";
 import { GAMES } from "@consts";
@@ -66,19 +67,22 @@ const staticGames = [
 
 <PageLayout title={GAMES.TITLE} description={GAMES.DESCRIPTION}>
   <Container>
-    <div class="space-y-2">
-      <Nav breadCrumbsItems={[{ href: "/games", label: "Games" }]} />
-    </div>
-    <div class="space-y-10 my-10">
-      <div class="space-y-4">
-        <div class="font-semibold text-flexoki-ink dark:text-flexoki-base-50 font-serif">
-          Games
-        </div>
-        <p class="text-sm text-flexoki-base-800 dark:text-flexoki-base-300 max-w-md">
-          Simple, ad-free games made because grandma was tired of all the games having ads. Just pure fun, no interruptions.
-        </p>
-      </div>
-      <ul class="flex flex-col gap-4">
+    <Nav breadCrumbsItems={[{ href: "/games", label: "Games" }]} />
+
+    <div
+      class="my-12 space-y-10"
+      style="--section-accent: var(--accent-gold);"
+    >
+      <AppellationBand
+        variant="gold"
+        eyebrow="Games"
+        subtitle="Simple, ad-free games made because grandma was tired of all the games having ads."
+      />
+      <h1 class="wordmark" style="font-size: clamp(3rem, 9vw, 7rem);">
+        Games
+      </h1>
+
+      <ul class="flex flex-col gap-1">
         {
           staticGames.map((game) => (
             <li>
@@ -86,24 +90,37 @@ const staticGames = [
                 href={game.href}
                 data-testid="game-card"
                 data-game={game.href.replace("/games/", "")}
-                class="relative group flex flex-nowrap py-3 px-4 pr-10 border-l border-flexoki-base-200 dark:border-flexoki-base-800 hover:bg-flexoki-base-100 dark:hover:bg-flexoki-base-900 hover:text-flexoki-ink dark:hover:text-flexoki-base-50 transition-colors duration-300 ease-in-out"
+                class="relative group block pt-3 pb-4 px-4 pr-12 transition-colors duration-300 ease-in-out hover:bg-[var(--color-bodega-paper-warm)] dark:hover:bg-flexoki-base-900"
               >
-                <div class="flex flex-col gap-2 flex-1">
-                  <div class="flex md:gap-2 md:items-center flex-col md:flex-row">
-                    <div class="font-semibold font-serif">{game.title}</div>
-                    <div class="text-sm text-flexoki-base-500 dark:text-flexoki-base-500">
-                      <span class="hidden md:inline"> - </span>
-                      {game.difficulty} • {game.category}
-                    </div>
+                <span
+                  class="absolute left-0 top-0 h-[3px] w-full"
+                  style="background-color: var(--section-accent);"
+                  aria-hidden="true"
+                />
+                <div class="flex flex-col gap-2">
+                  <div class="flex items-baseline justify-between gap-4">
+                    <span class="eyebrow" style="color: var(--section-accent);">
+                      {game.category}
+                    </span>
+                    <span class="font-serif italic text-sm text-flexoki-base-600 dark:text-flexoki-base-400">
+                      {game.difficulty}
+                    </span>
                   </div>
-                  <div class="text-sm">
+                  <div class="font-semibold font-serif text-lg leading-snug relative inline-block">
+                    {game.title}
+                    <span
+                      class="absolute left-0 -bottom-0.5 w-full h-[1px] scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-in-out"
+                      style="background-color: var(--section-accent);"
+                    />
+                  </div>
+                  <p class="text-sm text-flexoki-base-700 dark:text-flexoki-base-300 leading-relaxed">
                     {game.description}
-                  </div>
+                  </p>
                 </div>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
-                  class="absolute top-1/2 right-2 -translate-y-1/2 size-5 stroke-2 fill-none stroke-current"
+                  class="absolute top-1/2 right-3 -translate-y-1/2 size-5 stroke-2 fill-none stroke-current"
                 >
                   <line
                     x1="5"
@@ -111,11 +128,11 @@ const staticGames = [
                     x2="19"
                     y2="12"
                     class="translate-x-3 group-hover:translate-x-0 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out"
-                  ></line>
+                  />
                   <polyline
                     points="12 5 19 12 12 19"
                     class="-translate-x-1 group-hover:translate-x-0 transition-transform duration-300 ease-in-out"
-                  ></polyline>
+                  />
                 </svg>
               </a>
             </li>

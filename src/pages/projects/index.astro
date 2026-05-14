@@ -1,4 +1,5 @@
 ---
+import AppellationBand from "@components/AppellationBand.astro";
 import ArrowCard from "@components/ArrowCard.astro";
 import Container from "@components/Container.astro";
 import Nav from "@components/Nav.astro";
@@ -13,18 +14,26 @@ const projects = (await getCollection("projects"))
 
 <PageLayout title={PROJECTS.TITLE} description={PROJECTS.DESCRIPTION}>
   <Container>
-    <div class="space-y-2">
-      <Nav breadCrumbsItems={[{ href: "/projects", label: "Projects" }]} />
-    </div>
-    <div class="space-y-12 my-12">
-      <h1 class="text-3xl font-semibold text-flexoki-ink dark:text-flexoki-base-50 font-serif">
+    <Nav breadCrumbsItems={[{ href: "/projects", label: "Projects" }]} />
+
+    <div
+      class="my-12 space-y-12"
+      style="--section-accent: var(--accent-sage);"
+    >
+      <AppellationBand
+        variant="sage"
+        eyebrow="Projects"
+        subtitle="Selected work, side experiments, things I've shipped."
+      />
+      <h1 class="wordmark" style="font-size: clamp(3rem, 9vw, 7rem);">
         Projects
       </h1>
-      <ul class="flex flex-col gap-4">
+
+      <ul class="flex flex-col gap-1">
         {
           projects.map((project) => (
             <li>
-              <ArrowCard entry={project} />
+              <ArrowCard entry={project} variant="sage" />
             </li>
           ))
         }

@@ -4,43 +4,93 @@ import FormattedDate from "./FormattedDate.astro";
 import Correction from "./Correction.astro";
 import AnimatedArrow from "./AnimatedArrow.astro";
 
+type Variant = "sienna" | "navy" | "sage" | "gold" | "bordeaux";
+
 type Props = {
   entry: CollectionEntry<"blog"> | CollectionEntry<"projects">;
   dateFormat?: "short" | "day" | "month";
+  variant?: Variant;
 };
 
-const { entry, dateFormat } = Astro.props;
+const { entry, dateFormat, variant = "sienna" } = Astro.props;
+
+const accentVar = {
+  sienna: "var(--accent-sienna)",
+  navy: "var(--accent-navy)",
+  sage: "var(--accent-sage)",
+  gold: "var(--accent-gold)",
+  bordeaux: "var(--accent-bordeaux)",
+}[variant];
+
+const correctionColor = {
+  sienna: "sienna",
+  navy: "navy",
+  sage: "sage",
+  gold: "gold",
+  bordeaux: "bordeaux",
+}[variant] as
+  | "sienna"
+  | "navy"
+  | "sage"
+  | "gold"
+  | "bordeaux";
+
+const collectionLabel = entry.collection === "blog" ? "Essay" : "Project";
+const year = entry.data.date.getFullYear();
 ---
 
 <a
   href={`/${entry.collection}/${entry.slug}`}
-  class="relative group flex flex-nowrap py-3 px-4 pr-10 border-l border-flexoki-base-200 dark:border-flexoki-base-800 hover:bg-flexoki-base-100 dark:hover:bg-flexoki-base-900 hover:text-flexoki-ink dark:hover:text-flexoki-base-50 transition-colors duration-300 ease-in-out"
+  class="relative group block pt-3 pb-4 px-4 pr-12 transition-colors duration-300 ease-in-out hover:bg-[var(--color-bodega-paper-warm)] dark:hover:bg-flexoki-base-900"
+  style={`--section-accent: ${accentVar};`}
 >
-  <div class="flex flex-col gap-2 flex-1">
-    <div class="flex md:gap-2 md:items-center flex-col md:flex-row">
+  <span
+    class="absolute left-0 top-0 h-[3px] w-full"
+    style="background-color: var(--section-accent);"
+    aria-hidden="true"
+  ></span>
+
+  <div class="flex flex-col gap-2">
+    <div class="flex items-baseline justify-between gap-4">
+      <span class="eyebrow" style="color: var(--section-accent);">
+        {collectionLabel}
+      </span>
+      <span class="font-serif italic text-sm text-flexoki-base-600 dark:text-flexoki-base-400">
+        {year}
+      </span>
+    </div>
+
+    <div class="flex md:gap-2 md:items-baseline flex-col md:flex-row">
       {
         entry.data.titleCorrection ? (
-          <div class="font-semibold font-serif">
-            <Correction text={entry.data.titleCorrection} rotate>
+          <div class="font-semibold font-serif text-lg leading-snug">
+            <Correction
+              text={entry.data.titleCorrection}
+              color={correctionColor}
+              rotate
+            >
               {entry.data.title}
             </Correction>
           </div>
         ) : (
-          <div class="font-semibold font-serif relative inline-block">
+          <div class="font-semibold font-serif text-lg leading-snug relative inline-block">
             {entry.data.title}
-            <span class="absolute left-0 bottom-0 w-full h-[1px] bg-blue-800 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-in-out" />
+            <span
+              class="absolute left-0 -bottom-0.5 w-full h-[1px] scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-in-out"
+              style="background-color: var(--section-accent);"
+            />
           </div>
         )
       }
-      <div class="text-sm text-flexoki-base-500 dark:text-flexoki-base-500">
-        <span class="hidden md:inline"> - </span>
+      <div class="text-xs text-flexoki-base-500 dark:text-flexoki-base-500">
+        <span class="hidden md:inline opacity-50">·</span>
         <FormattedDate date={entry.data.date} detail={dateFormat} />
       </div>
     </div>
 
-    <div class="text-sm">
+    <p class="text-sm text-flexoki-base-700 dark:text-flexoki-base-300 leading-relaxed">
       {entry.data.description}
-    </div>
+    </p>
   </div>
   <AnimatedArrow />
 </a>

@@ -21,21 +21,21 @@ const { startDate, endDate } = getWorkDateRange(entry.data.roles);
 ---
 
 <li class="work-entry">
-  <div class="flex md:gap-2 md:items-center flex-col md:flex-row">
+  <div class="flex md:gap-3 md:items-baseline flex-col md:flex-row">
     {
       linkToDetail ? (
         <a
           href={`/work/${entry.slug}`}
-          class="font-semibold font-serif hover:opacity-70 transition-opacity"
+          class="font-semibold font-serif text-lg hover:opacity-70 transition-opacity"
         >
           {entry.data.company}
         </a>
       ) : (
-        <div class="font-semibold font-serif">{entry.data.company}</div>
+        <div class="font-semibold font-serif text-lg">{entry.data.company}</div>
       )
     }
-    <div class="text-sm text-black/50 dark:text-white/50">
-      <span class="hidden md:inline"> - </span>
+    <div class="font-serif italic text-sm text-flexoki-base-600 dark:text-flexoki-base-400">
+      <span class="hidden md:inline opacity-50">·</span>
       {dateRange(startDate, endDate)}
     </div>
   </div>
