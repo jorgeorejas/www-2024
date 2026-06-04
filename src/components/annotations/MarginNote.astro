@@ -1,0 +1,48 @@
+---
+import { cn } from "@lib/utils";
+import { MARGIN_NOTE_COLOR_CLASS, type AnnotationColor } from "./types";
+
+/**
+ * Handwritten Caveat aside, like the blue margin notes on the Attio GTM Atlas
+ * page (e.g. "One-off prompts don't compound").
+ *
+ * Place it right after the paragraph it comments on. On wide screens it floats
+ * into the side gutter; on narrow screens it reflows as a centered block below.
+ *
+ * Usage (MDX): <MarginNote text="One-off prompts don't compound" />
+ *   or with markup:  <MarginNote>I needed this <em>yesterday</em></MarginNote>
+ */
+type Props = {
+  text?: string;
+  color?: AnnotationColor;
+  rotate?: boolean;
+  side?: "right" | "left";
+  class?: string;
+};
+
+const {
+  text,
+  color = "blue",
+  rotate = true,
+  side = "right",
+  class: className,
+} = Astro.props;
+
+---
+
+<aside
+  class={cn(
+    "not-prose font-handwritten font-bold text-xl leading-tight",
+    MARGIN_NOTE_COLOR_CLASS[color],
+    // Base / narrow screens: centered block beneath the paragraph.
+    "my-3 text-center",
+    // Wide screens: pull into the side gutter so body text flows alongside.
+    side === "right"
+      ? "xl:float-right xl:clear-right xl:my-0 xl:ml-6 xl:-mr-52 xl:w-44 xl:text-left"
+      : "xl:float-left xl:clear-left xl:my-0 xl:mr-6 xl:-ml-52 xl:w-44 xl:text-right",
+    rotate && (side === "right" ? "-rotate-3" : "rotate-3"),
+    className,
+  )}
+>
+  {text ? text : <slot />}
+</aside>

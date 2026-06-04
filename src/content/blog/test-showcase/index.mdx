@@ -5,6 +5,11 @@ date: 2099-12-31
 draft: false
 ---
 
+import Circle from "@components/annotations/Circle.astro";
+import Underline from "@components/annotations/Underline.astro";
+import Bracket from "@components/annotations/Bracket.astro";
+import MarginNote from "@components/annotations/MarginNote.astro";
+
 # Style Showcase
 
 This page showcases all the available markdown styles and components currently supported.
@@ -186,6 +191,28 @@ This demonstrates:
 ## Special Characters
 
 Testing special characters: & < > " ' @ # $ % ^ * ( ) - _ = + [ ] { } | \ / ? . , ; :
+
+## Handwritten Quirks
+
+Hand-drawn annotations (rough-notation) that draw themselves as they scroll into view. Authorable as markdown directives or as MDX components.
+
+### Markdown directives
+
+When you're early, this is your :circle[ECP]. The whole idea of ECP before ICP is that you have to win early to earn the right to go upmarket. So focus on what's :underline[immediately obtainable]: sub-segments of the market with burning pain points.
+
+::margin-note[The ones thinking "I needed this yesterday, where were you?"]
+
+You can recolor them too: :circle[GTM brain]{color=red} and :underline[context engineering]{color=green}.
+
+### MDX components
+
+The real unlock is <Underline>context engineering</Underline>: you upload your base information once, and it stays as a <Circle>persistent</Circle> window of context for everything that comes after.
+
+<MarginNote text="One-off prompts don't compound" />
+
+<Bracket>
+A team still prompting is running a chatbot. A team doing context engineering is running a brain. The hand-drawn bracket wraps this entire paragraph, even when it spans multiple lines, just like the Attio GTM Atlas page.
+</Bracket>
 
 ## End Note
 

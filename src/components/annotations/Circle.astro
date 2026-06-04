@@ -1,0 +1,34 @@
+---
+import Annotation from "./Annotation.astro";
+import type { AnnotationColor } from "./types";
+
+/**
+ * Hand-drawn ellipse around inline text, like the circled "ECP" / "GTM brain"
+ * on the Attio GTM Atlas page.
+ *
+ * Usage: <Circle>ECP</Circle> or <Circle color="red" padding={6}>text</Circle>
+ */
+type Props = {
+  color?: AnnotationColor;
+  strokeWidth?: number;
+  padding?: number | number[];
+  iterations?: number;
+  duration?: number;
+  class?: string;
+};
+
+const { color, strokeWidth, padding = 4, iterations, duration, class: className } =
+  Astro.props;
+---
+
+<Annotation
+  type="circle"
+  color={color}
+  strokeWidth={strokeWidth}
+  padding={padding}
+  iterations={iterations}
+  duration={duration}
+  class={className}
+>
+  <slot />
+</Annotation>

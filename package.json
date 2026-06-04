@@ -50,6 +50,8 @@
     "node-ical": "^0.25.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "remark-directive": "^4.0.0",
+    "rough-notation": "^0.5.1",
     "satori": "^0.11.1",
     "sharp": "^0.33.3",
     "tailwind-merge": "^2.2.2",

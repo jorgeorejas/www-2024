@@ -1,0 +1,44 @@
+---
+import Annotation from "./Annotation.astro";
+import type { AnnotationColor } from "./types";
+
+/**
+ * Sketchy hand-drawn underline beneath inline text, like the underlined
+ * "immediately obtainable" / "context engineering" on the Attio GTM Atlas page.
+ *
+ * Usage: <Underline>immediately obtainable</Underline>
+ */
+type Props = {
+  color?: AnnotationColor;
+  strokeWidth?: number;
+  padding?: number | number[];
+  iterations?: number;
+  duration?: number;
+  /** Allow the underline to wrap across multiple lines (default true). */
+  multiline?: boolean;
+  class?: string;
+};
+
+const {
+  color,
+  strokeWidth,
+  padding,
+  iterations,
+  duration,
+  multiline = true,
+  class: className,
+} = Astro.props;
+---
+
+<Annotation
+  type="underline"
+  color={color}
+  strokeWidth={strokeWidth}
+  padding={padding}
+  iterations={iterations}
+  duration={duration}
+  multiline={multiline}
+  class={className}
+>
+  <slot />
+</Annotation>
