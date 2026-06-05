@@ -1,0 +1,93 @@
+---
+import { cn } from "@lib/utils";
+import {
+  ANNOTATION_COLORS,
+  type AnnotationColor,
+  type AnnotationType,
+  type BracketSide,
+} from "./types";
+
+/**
+ * Base wrapper for hand-drawn rough-notation annotations.
+ *
+ * Renders a plain element carrying `data-rn*` attributes; the actual sketchy
+ * stroke is drawn client-side by `src/scripts/rough-annotations.ts` (loaded
+ * once globally from PageLayout). Prefer the named wrappers (Circle, Underline,
+ * Bracket) over using this directly.
+ */
+
+type Props = {
+  type: AnnotationType;
+  color?: AnnotationColor;
+  /** Render as a block wrapper (`<div>`) instead of inline (`<span>`). */
+  block?: boolean;
+  strokeWidth?: number;
+  padding?: number | number[];
+  iterations?: number;
+  /** Animation duration in ms. */
+  duration?: number;
+  /** Allow the annotation to wrap across multiple lines. */
+  multiline?: boolean;
+  /** Bracket side(s) — only used when `type="bracket"`. */
+  brackets?: BracketSide | BracketSide[];
+  class?: string;
+};
+
+const {
+  type,
+  color = "blue",
+  block = false,
+  strokeWidth,
+  padding,
+  iterations,
+  duration,
+  multiline,
+  brackets,
+  class: className,
+} = Astro.props;
+
+const { light, dark } = ANNOTATION_COLORS[color];
+
+const paddingAttr =
+  padding === undefined
+    ? undefined
+    : Array.isArray(padding)
+      ? padding.join(",")
+      : String(padding);
+
+const bracketsAttr = Array.isArray(brackets) ? brackets.join(",") : brackets;
+---
+
+{
+  block ? (
+    <div
+      class={cn("relative", className)}
+      data-rn={type}
+      data-rn-color-light={light}
+      data-rn-color-dark={dark}
+      data-rn-stroke={strokeWidth?.toString()}
+      data-rn-padding={paddingAttr}
+      data-rn-iterations={iterations?.toString()}
+      data-rn-duration={duration?.toString()}
+      data-rn-multiline={multiline ? "true" : undefined}
+      data-rn-brackets={bracketsAttr}
+    >
+      <slot />
+    </div>
+  ) : (
+    <span
+      class={cn("relative", className)}
+      data-rn={type}
+      data-rn-color-light={light}
+      data-rn-color-dark={dark}
+      data-rn-stroke={strokeWidth?.toString()}
+      data-rn-padding={paddingAttr}
+      data-rn-iterations={iterations?.toString()}
+      data-rn-duration={duration?.toString()}
+      data-rn-multiline={multiline ? "true" : undefined}
+      data-rn-brackets={bracketsAttr}
+    >
+      <slot />
+    </span>
+  )
+}

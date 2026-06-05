@@ -1,0 +1,49 @@
+---
+import Annotation from "./Annotation.astro";
+import type { AnnotationColor, BracketSide } from "./types";
+
+/**
+ * Hand-drawn bracket wrapping a whole block (e.g. a paragraph), like the big
+ * blue brackets around a paragraph on the Attio GTM Atlas page.
+ *
+ * Wraps block content, so place a paragraph (or several) inside:
+ *   <Bracket>
+ *   Your paragraph text...
+ *   </Bracket>
+ */
+type Props = {
+  color?: AnnotationColor;
+  strokeWidth?: number;
+  padding?: number | number[];
+  iterations?: number;
+  duration?: number;
+  /** Which sides to draw (default left + right). */
+  brackets?: BracketSide | BracketSide[];
+  class?: string;
+};
+
+const {
+  color,
+  strokeWidth,
+  padding = 8,
+  iterations,
+  duration,
+  brackets = ["left", "right"],
+  class: className,
+} = Astro.props;
+---
+
+<Annotation
+  type="bracket"
+  color={color}
+  block
+  strokeWidth={strokeWidth}
+  padding={padding}
+  iterations={iterations}
+  duration={duration}
+  multiline={true}
+  brackets={brackets}
+  class={className}
+>
+  <slot />
+</Annotation>
