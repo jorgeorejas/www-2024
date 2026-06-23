@@ -10,7 +10,7 @@ import {
   generateBlogPostingSchema,
   generateBreadcrumbSchema,
 } from "@lib/seo-utils";
-import { type CollectionEntry, getCollection } from "astro:content";
+import { type CollectionEntry, getCollection, render } from "astro:content";
 import { SITE } from "@consts";
 
 export const prerender = true;
@@ -23,14 +23,14 @@ export async function getStaticPaths() {
         b.data.date.valueOf() - a.data.date.valueOf(),
     );
   return posts.map((post: CollectionEntry<"blog">) => ({
-    params: { slug: post.slug },
+    params: { slug: post.id },
     props: post,
   }));
 }
 type Props = CollectionEntry<"blog">;
 
 const post = Astro.props;
-const { Content } = await post.render();
+const { Content } = await render(post);
 
 // Generate structured data for SEO
 const blogPostingSchema = generateBlogPostingSchema(
@@ -41,7 +41,7 @@ const breadcrumbSchema = generateBreadcrumbSchema(
   [
     { href: "/", label: "Home" },
     { href: "/blog", label: "Blog" },
-    { href: `/blog/${post.slug}`, label: post.data.title },
+    { href: `/blog/${post.id}`, label: post.data.title },
   ],
   Astro.site!.toString(),
 );
@@ -50,7 +50,7 @@ const breadcrumbSchema = generateBreadcrumbSchema(
 <PageLayout
   title={post.data.title}
   description={post.data.description}
-  ogImage={`/og/${post.slug}.png`}
+  ogImage={`/og/${post.id}.png`}
   type="article"
   publishedTime={post.data.date}
   structuredData={[blogPostingSchema, breadcrumbSchema]}
@@ -71,7 +71,7 @@ const breadcrumbSchema = generateBreadcrumbSchema(
       <Nav
         breadCrumbsItems={[
           { href: "/blog", label: "Blog" },
-          { href: `/blog/${post.slug}`, label: post.data.title },
+          { href: `/blog/${post.id}`, label: post.data.title },
         ]}
       />
     </div>

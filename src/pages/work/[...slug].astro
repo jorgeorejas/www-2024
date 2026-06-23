@@ -4,7 +4,7 @@ import Nav from "@components/Nav.astro";
 import WorkEntry from "@components/WorkEntry.astro";
 import PageLayout from "@layouts/PageLayout.astro";
 import { dateRange, getWorkDateRange } from "@lib/utils";
-import { type CollectionEntry, getCollection } from "astro:content";
+import { type CollectionEntry, getCollection, render } from "astro:content";
 
 export const prerender = true;
 
@@ -17,14 +17,14 @@ export async function getStaticPaths() {
     },
   );
   return workEntries.map((work: CollectionEntry<"work">) => ({
-    params: { slug: work.slug },
+    params: { slug: work.id },
     props: work,
   }));
 }
 type Props = CollectionEntry<"work">;
 
 const work = Astro.props;
-const { Content } = await work.render();
+const { Content } = await render(work);
 
 // Derive the overall date range from roles
 const { startDate, endDate } = getWorkDateRange(work.data.roles);
@@ -39,7 +39,7 @@ const { startDate, endDate } = getWorkDateRange(work.data.roles);
       <Nav
         breadCrumbsItems={[
           { href: "/work", label: "Work" },
-          { href: `/work/${work.slug}`, label: work.data.company },
+          { href: `/work/${work.id}`, label: work.data.company },
         ]}
       />
     </div>

@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a personal website built with Astro 5, deployed on Vercel. The site features a blog, projects showcase, work experience timeline, dynamic OG image generation, and Spotify integration showing currently playing music.
+This is a personal website built with Astro 7, deployed on Vercel. The site features a blog, projects showcase, work experience timeline, dynamic OG image generation, and Spotify integration showing currently playing music.
 
-**Stack**: Astro 5 (SSR mode), TypeScript, React, Tailwind CSS 4, MDX
+**Stack**: Astro 7 (SSR mode), TypeScript, React, Tailwind CSS 4, MDX
 
 ## Development Commands
 
@@ -51,7 +51,7 @@ Content is managed through Astro's content collections in `src/content/`:
 - **projects**: Project showcase items with optional demo/repo URLs
 - **blocks**: Reusable markdown blocks (bios, mottos, etc.)
 
-All content schemas are defined in `src/content/config.ts`. Use Zod schemas when modifying collection structures.
+All content schemas are defined in `src/content.config.ts`. Collections use the Content Layer API with the `glob()` loader (Astro 6+), and entries are addressed by `id` (not the legacy `slug`). Use Zod schemas when modifying collection structures.
 
 ### Custom Markdown Correction Syntax
 The site implements a unique inline correction feature for showing typos and corrections:
@@ -142,8 +142,8 @@ API routes go in `src/pages/api/` and must return a `Response` object. The site 
 
 ## Important Notes
 
-- **Node Version**: Requires Node >= 20 and < 23 (specified in `package.json` engines)
-- **Custom Remark Plugin**: The `remarkCorrection` plugin is registered in both `markdown` and `mdx` sections of `astro.config.mjs`
+- **Node Version**: Requires Node >= 22.12.0 (Astro 7 requirement, specified in `package.json` engines)
+- **Custom Remark Plugin**: The `remarkCorrection` plugin is registered in both `markdown` and `mdx` sections of `astro.config.mjs`. Astro 7 defaults Markdown to the native Sätteri pipeline, so the `markdown` section opts back into the remark/rehype processor via `unified()` from `@astrojs/markdown-remark` to keep the correction plugin working.
 - **Vercel Configuration**: The site uses Vercel Web Analytics, enabled in the adapter config
 - **ngrok Configuration**: Vite server is configured to allow ngrok domains for local testing with Spotify OAuth callbacks
 - **Git Worktrees**: The project uses git worktrees (see `worktree/` directory) - avoid touching these

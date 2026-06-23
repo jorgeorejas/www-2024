@@ -6,7 +6,7 @@ import { PNG } from "./createImage";
 export const getStaticPaths = async () => {
   const blogEntries = await getCollection("blog");
   return blogEntries.map((entry) => ({
-    params: { slug: entry.slug },
+    params: { slug: entry.id },
   }));
 };
 

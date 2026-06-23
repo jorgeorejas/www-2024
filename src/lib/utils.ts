@@ -13,7 +13,7 @@ export function formatDate(date: Date) {
   }).format(date);
 }
 
-export function readingTime(html: string) {
+export function readingTime(html: string = "") {
   const textOnly = html.replace(/<[^>]+>/g, "");
   const wordCount = textOnly.split(/\s+/).length;
   const readingTimeMinutes = (wordCount / 200 + 1).toFixed();
@@ -79,7 +79,7 @@ export function getWorkDateRange(
 }
 
 export function processWorkEntry(workEntry: {
-  slug: string;
+  id: string;
   data: {
     company: string;
     roles: Array<{
@@ -89,14 +89,14 @@ export function processWorkEntry(workEntry: {
       description?: string;
     }>;
   };
-  body: string;
+  body?: string;
 }) {
   const { startDate, endDate } = getWorkDateRange(workEntry.data.roles);
 
   return {
-    slug: workEntry.slug,
+    slug: workEntry.id,
     name: workEntry.data.company,
-    description: workEntry.body.trim(),
+    description: (workEntry.body ?? "").trim(),
     startDate,
     endDate,
     positions: workEntry.data.roles
@@ -122,7 +122,7 @@ export function formatWorkDate(date: Date | string): string {
 }
 
 export function processEducationEntry(educationEntry: {
-  slug: string;
+  id: string;
   data: {
     institution: string;
     degree: string;
@@ -132,15 +132,15 @@ export function processEducationEntry(educationEntry: {
     dateEnd: Date | string;
     expectedEnd?: Date;
   };
-  body: string;
+  body?: string;
 }) {
   return {
-    slug: educationEntry.slug,
+    slug: educationEntry.id,
     institution: educationEntry.data.institution,
     degree: educationEntry.data.degree,
     field: educationEntry.data.field,
     grade: educationEntry.data.grade,
-    description: educationEntry.body.trim(),
+    description: (educationEntry.body ?? "").trim(),
     startDate: educationEntry.data.dateStart,
     endDate: educationEntry.data.dateEnd,
     expectedEnd: educationEntry.data.expectedEnd,

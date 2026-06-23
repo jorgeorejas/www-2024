@@ -7,7 +7,7 @@ import Nav from "@components/Nav.astro";
 import PageLayout from "@layouts/PageLayout.astro";
 import { readingTime } from "@lib/utils";
 import { generateProjectSchema, generateBreadcrumbSchema } from "@lib/seo-utils";
-import { type CollectionEntry, getCollection } from "astro:content";
+import { type CollectionEntry, getCollection, render } from "astro:content";
 
 export const prerender = true;
 
@@ -19,14 +19,14 @@ export async function getStaticPaths() {
         b.data.date.valueOf() - a.data.date.valueOf(),
     );
   return projects.map((project: CollectionEntry<"projects">) => ({
-    params: { slug: project.slug },
+    params: { slug: project.id },
     props: project,
   }));
 }
 type Props = CollectionEntry<"projects">;
 
 const project = Astro.props;
-const { Content } = await project.render();
+const { Content } = await render(project);
 
 // Generate structured data for SEO
 const projectSchema = generateProjectSchema(project, Astro.site!.toString());
@@ -34,7 +34,7 @@ const breadcrumbSchema = generateBreadcrumbSchema(
   [
     { href: "/", label: "Home" },
     { href: "/projects", label: "Projects" },
-    { href: `/projects/${project.slug}`, label: project.data.title },
+    { href: `/projects/${project.id}`, label: project.data.title },
   ],
   Astro.site!.toString()
 );
@@ -50,7 +50,7 @@ const breadcrumbSchema = generateBreadcrumbSchema(
       <Nav
         breadCrumbsItems={[
           { href: "/projects", label: "Projects" },
-          { href: `/projects/${project.slug}`, label: project.data.title },
+          { href: `/projects/${project.id}`, label: project.data.title },
         ]}
       />
     </div>
