@@ -8,7 +8,7 @@ export const GET: APIRoute = async () => {
     let bioContent = "Bio content not available";
     if (bioEntry) {
       // Process the bio content to handle JavaScript expressions
-      let rawBio = bioEntry.body.replace(/^---[\s\S]*?---/, "").trim();
+      let rawBio = (bioEntry.body ?? "").replace(/^---[\s\S]*?---/, "").trim();
       // Handle the age calculation
       rawBio = rawBio.replace(
         /\{new Date\(\)\.getFullYear\(\) - new Date\("2003-03-08"\)\.getFullYear\(\)\}/g,
@@ -37,20 +37,20 @@ Below you'll find links to the main content sections and resources of this site,
 
     // Blog links
     for (const post of blogPosts.filter((p) => !p.data.draft)) {
-      content += `- [${post.data.title}](https://jorgeorejas.com/blog/${post.slug}): ${post.data.description}\n`;
+      content += `- [${post.data.title}](https://jorgeorejas.com/blog/${post.id}): ${post.data.description}\n`;
     }
     content += `- [All Blog Posts](https://jorgeorejas.com/blog): List of all blog articles\n`;
     content += `- [RSS Feed](https://jorgeorejas.com/rss.xml): Machine-readable feed of blog posts\n`;
 
     content += `\n## Projects\n`;
     for (const project of projects.filter((p) => !p.data.draft)) {
-      content += `- [${project.data.title}](https://jorgeorejas.com/projects/${project.slug}): ${project.data.description}\n`;
+      content += `- [${project.data.title}](https://jorgeorejas.com/projects/${project.id}): ${project.data.description}\n`;
     }
     content += `- [All Projects](https://jorgeorejas.com/projects): Portfolio of personal and professional projects\n`;
 
     content += `\n## Work\n`;
     for (const job of work) {
-      content += `- [${job.data.roles[job.data.roles.length - 1].title} at ${job.data.company}](https://jorgeorejas.com/work): ${job.body.trim().split("\n")[0] || "Work experience entry"}\n`;
+      content += `- [${job.data.roles[job.data.roles.length - 1].title} at ${job.data.company}](https://jorgeorejas.com/work): ${(job.body ?? "").trim().split("\n")[0] || "Work experience entry"}\n`;
     }
     content += `- [Work Experience](https://jorgeorejas.com/work): Professional history and roles\n`;
 

@@ -7,6 +7,7 @@ import { defineConfig } from "astro/config";
 import vercel from "@astrojs/vercel";
 
 import pageInsight from "astro-page-insight";
+import { unified } from "@astrojs/markdown-remark";
 import { remarkCorrection } from "./src/lib/remark-correction.mjs";
 
 import tailwindcss from "@tailwindcss/vite";
@@ -23,8 +24,13 @@ export default defineConfig({
     pageInsight(),
   ],
   markdown: {
-    remarkPlugins: [remarkCorrection],
+    // Astro 7 defaults Markdown to the native Sätteri pipeline. Opt back into
+    // the remark/rehype processor so the custom correction plugin keeps working.
+    processor: unified({ remarkPlugins: [remarkCorrection] }),
   },
+  // Astro 7 changed the default to "jsx" (whitespace stripped using JSX rules).
+  // Keep the previous behavior to avoid regressions in inline-element spacing.
+  compressHTML: true,
   output: "server",
   adapter: vercel({
     webAnalytics: { enabled: true },

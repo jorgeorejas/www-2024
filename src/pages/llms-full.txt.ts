@@ -3,7 +3,7 @@ import { getCollection, getEntry } from "astro:content";
 import { getWorkDateRange } from "@lib/utils";
 
 // Helper function to process content and resolve JavaScript expressions and components
-async function processContent(content: string): Promise<string> {
+async function processContent(content: string = ""): Promise<string> {
   let processed = content
     .replace(/^---[\s\S]*?---/, "") // Remove frontmatter
     .trim();
@@ -25,7 +25,7 @@ async function processContent(content: string): Promise<string> {
         const slug = slugMatch[1];
         const blockEntry = await getEntry("blocks", slug);
         if (blockEntry) {
-          let blockContent = blockEntry.body
+          let blockContent = (blockEntry.body ?? "")
             .replace(/^---[\s\S]*?---/, "")
             .trim();
           // Process any JavaScript expressions in the block content too
@@ -100,7 +100,7 @@ ${bioContent}
         content += `**Title Correction:** ${post.data.titleCorrection}\n`;
       }
       content += `**Draft Status:** ${post.data.draft ? "Draft" : "Published"}\n`;
-      content += `**Slug:** ${post.slug}\n\n`;
+      content += `**Slug:** ${post.id}\n\n`;
 
       // Process the complete content with proper component and image handling
       const processedContent = await processContent(post.body);
@@ -123,7 +123,7 @@ ${bioContent}
         content += `**Repository URL:** ${project.data.repoURL}\n`;
       }
       content += `**Draft Status:** ${project.data.draft ? "Draft" : "Published"}\n`;
-      content += `**Slug:** ${project.slug}\n\n`;
+      content += `**Slug:** ${project.id}\n\n`;
 
       // Process the complete content with proper component and image handling
       const processedContent = await processContent(project.body);
@@ -143,7 +143,7 @@ ${bioContent}
         content += endDate.toLocaleDateString();
       }
       content += "\n";
-      content += `**Slug:** ${job.slug}\n\n`;
+      content += `**Slug:** ${job.id}\n\n`;
 
       // Process the complete content with proper component and image handling
       const processedContent = await processContent(job.body);

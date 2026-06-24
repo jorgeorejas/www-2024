@@ -6,7 +6,7 @@ import WorkTimeline from "@components/WorkTimeline.astro";
 import { WORK } from "@consts";
 import PageLayout from "@layouts/PageLayout.astro";
 import { getWorkDateRange, processWorkEntry } from "@lib/utils";
-import { getCollection } from "astro:content";
+import { getCollection, render } from "astro:content";
 
 const collection = (await getCollection("work")).sort((a, b) => {
   const aDateRange = getWorkDateRange(a.data.roles);
@@ -16,7 +16,7 @@ const collection = (await getCollection("work")).sort((a, b) => {
 
 const work = await Promise.all(
   collection.map(async (item) => {
-    const { Content } = await item.render();
+    const { Content } = await render(item);
     return { ...item, Content };
   }),
 );

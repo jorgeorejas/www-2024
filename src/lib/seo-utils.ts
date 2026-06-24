@@ -33,8 +33,8 @@ export function generateBlogPostingSchema(
   post: CollectionEntry<"blog">,
   baseUrl: string,
 ): BlogPostingSchema {
-  const postUrl = `${baseUrl}blog/${post.slug}`;
-  const ogImageUrl = `${baseUrl}og/blog/${post.slug}.png`;
+  const postUrl = `${baseUrl}blog/${post.id}`;
+  const ogImageUrl = `${baseUrl}og/blog/${post.id}.png`;
 
   return {
     "@context": "https://schema.org",
@@ -79,8 +79,8 @@ export function generateProjectSchema(
   project: CollectionEntry<"projects">,
   baseUrl: string,
 ): Record<string, unknown> {
-  const projectUrl = `${baseUrl}projects/${project.slug}`;
-  const ogImageUrl = `${baseUrl}og/projects/${project.slug}.png`;
+  const projectUrl = `${baseUrl}projects/${project.id}`;
+  const ogImageUrl = `${baseUrl}og/projects/${project.id}.png`;
 
   return {
     "@context": "https://schema.org",
