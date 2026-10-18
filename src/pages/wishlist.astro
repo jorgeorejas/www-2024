@@ -4,11 +4,24 @@ import Container from "@components/Container.astro";
 import Nav from "@components/Nav.astro";
 import { WISHLIST } from "@consts";
 import PageLayout from "@layouts/PageLayout.astro";
-import { getCollection } from "astro:content";
+import { getLiveCollection } from "astro:content";
 
-export const prerender = true;
+// Read live from Notion; the CDN serves a cached copy and refreshes it in the
+// background at most every 10 minutes (Notion allows ~3 req/s)
+const { entries: liveEntries = [], error } = await getLiveCollection("wishlist");
 
-const items = (await getCollection("wishlist")).sort(
+if (error) {
+  console.error("[wishlist] Notion load failed:", error);
+  // Never cache the failure; the CDN keeps serving the last good copy meanwhile
+  Astro.response.headers.set("Cache-Control", "no-store");
+} else {
+  Astro.response.headers.set(
+    "Cache-Control",
+    "public, max-age=0, s-maxage=600, stale-while-revalidate=86400",
+  );
+}
+
+const items = liveEntries.sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
 );
 
@@ -135,7 +148,11 @@ const underline =
       }
 
       {
-        entries.length === 0 ? (
+        error ? (
+          <p class="text-flexoki-base-500">
+            The list couldn't be loaded right now. Try again in a minute.
+          </p>
+        ) : entries.length === 0 ? (
           <p class="text-flexoki-base-500">Nothing here yet.</p>
         ) : (
           <div class="space-y-6">

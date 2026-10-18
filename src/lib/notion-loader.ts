@@ -1,4 +1,4 @@
-import type { Loader } from "astro/loaders";
+import type { LiveLoader } from "astro/loaders";
 
 const NOTION_API = "https://api.notion.com/v1";
 const NOTION_VERSION = "2022-06-28";
@@ -173,65 +173,99 @@ function mapPage(page: NotionPage, currency: string | undefined) {
   };
 }
 
+export type NotionItem = ReturnType<typeof mapPage>;
+
+async function fetchCurrency(token: string, databaseId: string) {
+  const database = await notionRequest<NotionDatabase>(
+    token,
+    `/databases/${databaseId}`,
+  );
+  const priceProp =
+    Object.entries(database.properties).find(
+      ([name, p]) => p.type === "number" && PRICE_NUMBER.test(name),
+    ) ?? Object.entries(database.properties).find(([, p]) => p.type === "number");
+  return priceProp?.[1].number ? CURRENCIES[priceProp[1].number.format] : undefined;
+}
+
+async function fetchPages(token: string, databaseId: string) {
+  const pages: NotionPage[] = [];
+  let cursor: string | undefined;
+  do {
+    const res = await notionRequest<{
+      results: NotionPage[];
+      has_more: boolean;
+      next_cursor: string | null;
+    }>(token, `/databases/${databaseId}/query`, {
+      method: "POST",
+      body: JSON.stringify({ start_cursor: cursor, page_size: 100 }),
+    });
+    pages.push(...res.results);
+    cursor = res.has_more ? (res.next_cursor ?? undefined) : undefined;
+  } while (cursor);
+  return pages;
+}
+
 /**
- * Astro content-layer loader for a Notion database. Runs at build time
- * (and on `astro sync`), so new rows show up on the next deploy.
- * If the env vars are missing it logs a warning and yields an empty collection
- * instead of failing the build.
+ * Astro live loader for a Notion database: rows are fetched on request, so
+ * edits in Notion show up without a rebuild. Callers should cache the
+ * response (the Notion API allows ~3 req/s).
  */
-export function notionLoader(options: {
+export function notionLiveLoader(options: {
   token: string | undefined;
   databaseId: string | undefined;
-}): Loader {
+}): LiveLoader<NotionItem, { id: string }> {
+  const config = () => {
+    const { token, databaseId } = options;
+    if (!token || !databaseId) {
+      throw new Error("NOTION_TOKEN or NOTION_WISHLIST_DATABASE_ID missing");
+    }
+    return { token, databaseId };
+  };
+
   return {
-    name: "notion-loader",
-    load: async ({ store, logger, parseData, generateDigest }) => {
-      const { token, databaseId } = options;
-      if (!token || !databaseId) {
-        logger.warn("NOTION_TOKEN or NOTION_WISHLIST_DATABASE_ID missing, skipping");
-        store.clear();
-        return;
+    name: "notion-live-loader",
+    loadCollection: async () => {
+      try {
+        const { token, databaseId } = config();
+        const [currency, pages] = await Promise.all([
+          fetchCurrency(token, databaseId),
+          fetchPages(token, databaseId),
+        ]);
+        const entries = pages
+          .map((page) => ({ id: page.id, data: mapPage(page, currency) }))
+          .filter((entry) => !entry.data.hidden);
+        const lastModified = pages.reduce(
+          (latest, page) => Math.max(latest, Date.parse(page.last_edited_time)),
+          0,
+        );
+        return {
+          entries,
+          cacheHint: {
+            tags: ["wishlist"],
+            lastModified: lastModified ? new Date(lastModified) : undefined,
+          },
+        };
+      } catch (error) {
+        return { error: error instanceof Error ? error : new Error(String(error)) };
       }
-
-      const database = await notionRequest<NotionDatabase>(
-        token,
-        `/databases/${databaseId}`,
-      );
-      const priceProp =
-        Object.entries(database.properties).find(
-          ([name, p]) => p.type === "number" && PRICE_NUMBER.test(name),
-        ) ?? Object.entries(database.properties).find(([, p]) => p.type === "number");
-      const currency = priceProp?.[1].number
-        ? CURRENCIES[priceProp[1].number.format]
-        : undefined;
-
-      const pages: NotionPage[] = [];
-      let cursor: string | undefined;
-      do {
-        const res = await notionRequest<{
-          results: NotionPage[];
-          has_more: boolean;
-          next_cursor: string | null;
-        }>(token, `/databases/${databaseId}/query`, {
-          method: "POST",
-          body: JSON.stringify({ start_cursor: cursor, page_size: 100 }),
-        });
-        pages.push(...res.results);
-        cursor = res.has_more ? (res.next_cursor ?? undefined) : undefined;
-      } while (cursor);
-
-      store.clear();
-      for (const page of pages) {
-        const raw = mapPage(page, currency);
-        if (raw.hidden) continue;
-        const data = await parseData({ id: page.id, data: raw });
-        store.set({
+    },
+    loadEntry: async ({ filter }) => {
+      try {
+        const { token, databaseId } = config();
+        const [currency, page] = await Promise.all([
+          fetchCurrency(token, databaseId),
+          notionRequest<NotionPage>(token, `/pages/${filter.id}`),
+        ]);
+        const data = mapPage(page, currency);
+        if (data.hidden) return undefined;
+        return {
           id: page.id,
           data,
-          digest: generateDigest(page.last_edited_time + page.id),
-        });
+          cacheHint: { tags: ["wishlist", `wishlist:${page.id}`] },
+        };
+      } catch (error) {
+        return { error: error instanceof Error ? error : new Error(String(error)) };
       }
-      logger.info(`Loaded ${store.keys().length} entries from Notion`);
     },
   };
 }
