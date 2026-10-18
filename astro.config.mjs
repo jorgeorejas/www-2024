@@ -16,9 +16,8 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   site: "https://jorgeorejas.com",
   integrations: [
-    mdx({
-      remarkPlugins: [remarkCorrection],
-    }),
+    // MDX inherits remark plugins from markdown.processor below.
+    mdx(),
     // /wishlist is unlisted: reachable by URL only
     sitemap({ filter: (page) => !page.includes("/wishlist") }),
     react(),

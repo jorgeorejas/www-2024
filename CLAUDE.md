@@ -142,8 +142,8 @@ API routes go in `src/pages/api/` and must return a `Response` object. The site 
 
 ## Important Notes
 
-- **Node Version**: Requires Node >= 22.12.0 (Astro 7 requirement, specified in `package.json` engines)
-- **Custom Remark Plugin**: The `remarkCorrection` plugin is registered in both `markdown` and `mdx` sections of `astro.config.mjs`. Astro 7 defaults Markdown to the native Sätteri pipeline, so the `markdown` section opts back into the remark/rehype processor via `unified()` from `@astrojs/markdown-remark` to keep the correction plugin working.
+- **Node Version**: Requires Node >= 22.22.0 (Astro 7 requirement, specified in `package.json` engines)
+- **Custom Remark Plugin**: The `remarkCorrection` plugin is registered once, in `markdown.processor` in `astro.config.mjs`; MDX (`@astrojs/mdx` 8+) inherits it from there. Astro 7 defaults Markdown to the native Sätteri pipeline, so the config opts back into the remark/rehype processor via `unified()` from `@astrojs/markdown-remark` to keep the correction plugin working.
 - **Vercel Configuration**: The site uses Vercel Web Analytics, enabled in the adapter config
 - **ngrok Configuration**: Vite server is configured to allow ngrok domains for local testing with Spotify OAuth callbacks
 - **Git Worktrees**: The project uses git worktrees (see `worktree/` directory) - avoid touching these
