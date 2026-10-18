@@ -113,8 +113,24 @@ const isDev = import.meta.env.DEV;
   const progress = document.getElementById("spotify-progress");
   const progressFill = document.getElementById("spotify-progress-fill");
 
+  const es = document.documentElement.lang === "es";
+  const rtf = new Intl.RelativeTimeFormat("es", { numeric: "auto" });
+
   function formatRelative(iso: string): string {
     const then = new Date(iso).getTime();
+    if (es) {
+      if (Number.isNaN(then)) return "hace poco";
+      const sec = Math.round((then - Date.now()) / 1000);
+      const steps: [Intl.RelativeTimeFormatUnit, number][] = [
+        ["second", 60], ["minute", 60], ["hour", 24], ["day", 30], ["month", 12],
+      ];
+      let value = sec;
+      for (const [unit, size] of steps) {
+        if (Math.abs(value) < size) return unit === "second" ? "ahora mismo" : rtf.format(value, unit);
+        value = Math.round(value / size);
+      }
+      return rtf.format(value, "year");
+    }
     if (Number.isNaN(then)) return "recently";
     const diff = Date.now() - then;
     const sec = Math.max(0, Math.round(diff / 1000));
@@ -160,7 +176,7 @@ const isDev = import.meta.env.DEV;
     }
 
     if (data.isPlaying) {
-      if (statusText) statusText.textContent = "Listening to";
+      if (statusText) statusText.textContent = es ? "Escuchando" : "Listening to";
       iconPlaying?.classList.remove("hidden");
       iconPaused?.classList.add("hidden");
 
@@ -181,7 +197,11 @@ const isDev = import.meta.env.DEV;
       }
     } else {
       const suffix = data.playedAt ? ` ${formatRelative(data.playedAt)}` : "";
-      if (statusText) statusText.textContent = `Last played${suffix}`;
+      if (statusText) {
+        statusText.textContent = es
+          ? `Última canción${suffix}`
+          : `Last played${suffix}`;
+      }
       iconPlaying?.classList.add("hidden");
       iconPaused?.classList.remove("hidden");
       progress?.classList.add("hidden");

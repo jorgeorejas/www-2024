@@ -36,9 +36,9 @@ export const PROJECTS: Metadata = {
 };
 
 export const WISHLIST: Metadata = {
-  TITLE: "Wishlist",
+  TITLE: "Lista de deseos",
   DESCRIPTION:
-    "Things I like: gift ideas, objects and aesthetic references I keep coming back to.",
+    "Ideas por si no sabes qué regalarme. Cada cosa lleva a la tienda donde comprarla, y lo que pone «lo tengo» ya lo tengo.",
 };
 
 export const GAMES: Metadata = {

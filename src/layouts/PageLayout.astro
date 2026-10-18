@@ -15,6 +15,8 @@ type Props = {
   modifiedTime?: Date;
   author?: string;
   structuredData?: Record<string, unknown> | Record<string, unknown>[];
+  /** Page language; the site is English, a few pages (e.g. /wishlist) are Spanish */
+  lang?: "en" | "es";
 };
 
 const {
@@ -26,11 +28,12 @@ const {
   modifiedTime,
   author,
   structuredData,
+  lang = "en",
 } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
   <head>
     <Head
       title={`${title} | ${SITE.NAME}`}
@@ -41,6 +44,7 @@ const {
       modifiedTime={modifiedTime}
       author={author}
       structuredData={structuredData}
+      locale={lang === "es" ? "es_ES" : undefined}
     />
   </head>
   <body class="relative">
@@ -48,7 +52,7 @@ const {
       href="#main-content"
       class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-international-orange focus:text-white focus:rounded-md focus:font-semibold"
     >
-      Skip to main content
+      {lang === "es" ? "Saltar al contenido" : "Skip to main content"}
     </a>
     <SpeedInsights />
     <div
@@ -58,7 +62,7 @@ const {
     </div>
     <main id="main-content" class="relative antialiased">
       <slot />
-      <Footer />
+      <Footer lang={lang} />
     </main>
   </body>
 </html>

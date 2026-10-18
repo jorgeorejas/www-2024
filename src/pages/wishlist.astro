@@ -63,8 +63,8 @@ const filterGroups = [
   {
     name: "owned",
     options: [
-      { id: "no", label: "Want it" },
-      { id: "yes", label: "Have it" },
+      { id: "no", label: "Lo quiero" },
+      { id: "yes", label: "Ya lo tengo" },
     ],
   },
 ].filter((group) => group.options.length > 0);
@@ -90,6 +90,8 @@ const entries = items.map(({ id, data }) => {
   };
 });
 
+const countLabel = (n: number) => `${n} ${n === 1 ? "cosa" : "cosas"}`;
+
 const linkProps = (url?: string) =>
   url ? { href: url, target: "_blank", rel: "noopener noreferrer" } : {};
 
@@ -105,15 +107,15 @@ const underline =
   "absolute left-0 -bottom-px w-full h-px bg-blue-800 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-in-out";
 ---
 
-<PageLayout title={WISHLIST.TITLE} description={WISHLIST.DESCRIPTION}>
+<PageLayout title={WISHLIST.TITLE} description={WISHLIST.DESCRIPTION} lang="es">
   <Container>
     <div class="space-y-2">
-      <Nav breadCrumbsItems={[{ href: "/wishlist", label: "Wishlist" }]} />
+      <Nav lang="es" breadCrumbsItems={[{ href: "/wishlist", label: WISHLIST.TITLE }]} />
     </div>
     <div class="space-y-8 my-12">
       <div class="space-y-4">
         <h1 class="text-3xl font-semibold text-flexoki-ink dark:text-flexoki-base-50 font-serif">
-          Wishlist
+          {WISHLIST.TITLE}
         </h1>
         <p>{WISHLIST.DESCRIPTION}</p>
       </div>
@@ -129,7 +131,7 @@ const underline =
                   aria-pressed="true"
                   class={buttonClass}
                 >
-                  All
+                  Todo
                 </button>
                 {group.options.map((option) => (
                   <button
@@ -150,22 +152,22 @@ const underline =
       {
         error ? (
           <p class="text-flexoki-base-500">
-            The list couldn't be loaded right now. Try again in a minute.
+            Ahora mismo no se puede cargar la lista. Prueba de nuevo en un minuto.
           </p>
         ) : entries.length === 0 ? (
-          <p class="text-flexoki-base-500">Nothing here yet.</p>
+          <p class="text-flexoki-base-500">Todavía no hay nada por aquí.</p>
         ) : (
           <div class="space-y-6">
             <div class="flex items-center justify-between gap-4 text-sm">
               <span class="text-flexoki-base-500" id="wishlist-count">
-                {entries.length} items
+                {countLabel(entries.length)}
               </span>
               <div class="flex gap-2" id="wishlist-view">
                 <button type="button" data-view="grid" aria-pressed="true" class={buttonClass}>
-                  Grid
+                  Cuadrícula
                 </button>
                 <button type="button" data-view="list" aria-pressed="false" class={buttonClass}>
-                  List
+                  Lista
                 </button>
               </div>
             </div>
@@ -287,7 +289,7 @@ const underline =
     cards.forEach((card) => (card.hidden = !matches(card)));
     if (count) {
       const shown = document.querySelectorAll("[data-list=grid] > li:not([hidden])");
-      count.textContent = `${shown.length} items`;
+      count.textContent = `${shown.length} ${shown.length === 1 ? "cosa" : "cosas"}`;
     }
     groups.forEach((group) => {
       const name = group.dataset.group ?? "";

@@ -6,9 +6,10 @@ type Props = {
     href: string;
     label: string;
   }[];
+  lang?: "en" | "es";
 };
 
-const { breadCrumbsItems } = Astro.props;
+const { breadCrumbsItems, lang = "en" } = Astro.props;
 ---
 
 <div
@@ -19,9 +20,18 @@ const { breadCrumbsItems } = Astro.props;
       <p class="text-3xl font-semibold font-serif text-flexoki-ink dark:text-flexoki-base-50">
         {SITE.NAME}
       </p>
-      <p class="w-full font-medium">{SITE.POSITION}</p>
+      <p class="w-full font-medium">
+        {lang === "es" ? "Desarrollador y emprendedor" : SITE.POSITION}
+      </p>
     </a>
-    {breadCrumbsItems && <Breadcrumbs items={breadCrumbsItems} />}
+    {
+      breadCrumbsItems && (
+        <Breadcrumbs
+          items={breadCrumbsItems}
+          homeLabel={lang === "es" ? "Inicio" : undefined}
+        />
+      )
+    }
   </div>
 </div>
 

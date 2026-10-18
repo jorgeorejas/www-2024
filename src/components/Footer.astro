@@ -3,6 +3,10 @@ import Link from "@components/Link.astro";
 import Container from "@components/Container.astro";
 import SpotifyNowPlaying from "@components/SpotifyNowPlaying.astro";
 import { SITE, SOCIALS } from "@consts";
+
+type Props = { lang?: "en" | "es" };
+const { lang = "en" } = Astro.props;
+const es = lang === "es";
 ---
 
 <Container>
@@ -12,14 +16,15 @@ import { SITE, SOCIALS } from "@consts";
     <section class="space-y-4">
       <SpotifyNowPlaying />
       <h5 class="font-semibold text-black dark:text-white font-serif">
-        Let's Connect
+        {es ? "Hablamos" : "Let's Connect"}
       </h5>
       <article>
         <p>
-          If you want to get in touch with me about something or just to say hi,
-          reach out on social media or send me an email. You can also use the
-          information from llms.txt and llms-full.txt to connect my information
-          to your AI.
+          {
+            es
+              ? "Si quieres comentarme algo o simplemente saludar, escríbeme por redes o por email. También puedes usar llms.txt y llms-full.txt para pasarle mi información a tu IA."
+              : "If you want to get in touch with me about something or just to say hi, reach out on social media or send me an email. You can also use the information from llms.txt and llms-full.txt to connect my information to your AI."
+          }
         </p>
       </article>
       <ul class="flex flex-wrap gap-2">
@@ -29,7 +34,7 @@ import { SITE, SOCIALS } from "@consts";
               <Link
                 href={SOCIAL.HREF}
                 external
-                aria-label={`${SITE.NAME} on ${SOCIAL.NAME}`}
+                aria-label={`${SITE.NAME} ${es ? "en" : "on"} ${SOCIAL.NAME}`}
               >
                 {SOCIAL.NAME}
               </Link>
@@ -38,7 +43,7 @@ import { SITE, SOCIALS } from "@consts";
           ))
         }
         <li class="flex gap-x-2 text-nowrap">
-          <Link href={`mailto:${SITE.EMAIL}`} aria-label={`Email ${SITE.NAME}`}>
+          <Link href={`mailto:${SITE.EMAIL}`} aria-label={`${es ? "Escribir a" : "Email"} ${SITE.NAME}`}>
             {SITE.EMAIL}
           </Link>
           {"/"}
@@ -46,7 +51,7 @@ import { SITE, SOCIALS } from "@consts";
         <li class="flex gap-x-2 text-nowrap">
           <Link
             href="/llms.txt"
-            aria-label="llms.txt - Basic information for LLMs"
+            aria-label={es ? "llms.txt: información básica para IAs" : "llms.txt - Basic information for LLMs"}
           >
             llms.txt
           </Link>
@@ -55,7 +60,7 @@ import { SITE, SOCIALS } from "@consts";
         <li class="line-clamp-1">
           <Link
             href="/llms-full.txt"
-            aria-label="llms-full.txt - Extended information for LLMs"
+            aria-label={es ? "llms-full.txt: información ampliada para IAs" : "llms-full.txt - Extended information for LLMs"}
           >
             llms-full.txt
           </Link>

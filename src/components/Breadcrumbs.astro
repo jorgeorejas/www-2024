@@ -4,11 +4,12 @@ type Props = {
     href: string;
     label: string;
   }[];
+  homeLabel?: string;
 };
 
-const { items } = Astro.props;
+const { items, homeLabel = "Home" } = Astro.props;
 
-const allItems = [{ href: "/", label: "Home" }, ...items];
+const allItems = [{ href: "/", label: homeLabel }, ...items];
 ---
 
 <nav class="md:flex hidden" aria-label="Breadcrumb">
