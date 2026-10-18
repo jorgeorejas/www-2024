@@ -1,0 +1,23 @@
+# Rebuilds the site once a day so content pulled at build time (the Notion
+# wishlist) stays fresh. Triggers a Vercel deploy hook stored as a repo secret.
+name: Daily deploy
+
+on:
+  schedule:
+    # 04:00 UTC = 06:00 Madrid in summer, 05:00 in winter
+    - cron: "0 4 * * *"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel deploy hook
+        env:
+          VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$VERCEL_DEPLOY_HOOK" ]; then
+            echo "::error::VERCEL_DEPLOY_HOOK secret is not set"
+            exit 1
+          fi
+          curl --fail --silent --show-error -X POST "$VERCEL_DEPLOY_HOOK"
