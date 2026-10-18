@@ -1,5 +1,6 @@
 ---
 company: "Vivla"
+website: "https://vivla.com"
 roles:
   - title: "AI Enablement Engineer"
     dateStart: "01/01/2026"

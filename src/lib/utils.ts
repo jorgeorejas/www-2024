@@ -82,6 +82,7 @@ export function processWorkEntry(workEntry: {
   id: string;
   data: {
     company: string;
+    website?: string;
     roles: Array<{
       title: string;
       dateStart: Date;
@@ -96,6 +97,7 @@ export function processWorkEntry(workEntry: {
   return {
     slug: workEntry.id,
     name: workEntry.data.company,
+    website: workEntry.data.website,
     description: (workEntry.body ?? "").trim(),
     startDate,
     endDate,

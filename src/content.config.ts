@@ -16,6 +16,7 @@ const work = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/work" }),
   schema: z.object({
     company: z.string(),
+    website: z.string().optional(),
     roles: z.array(
       z.object({
         title: z.string(),

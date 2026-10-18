@@ -54,7 +54,13 @@ const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
   title="CV"
   description={`${SITE.NAME} — Curriculum Vitae`}
 >
-  <div class="cv-sheet">
+  <div
+    class="cv-sheet"
+    data-drop-project-desc
+    data-drop-prev-bios
+    data-drop-prev-roles
+    data-drop-projects-section
+  >
     <div class="cv-header">
       <div class="cv-header-main">
         <h1 class="cv-name">{SITE.NAME}</h1>
@@ -89,7 +95,7 @@ const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
       </ul>
     </div>
 
-    <section class="cv-section">
+    <section class="cv-section" data-section="profile">
       <h2 class="cv-section-title">Profile</h2>
       <p class="cv-summary">
         Developer and entrepreneur from Asturias, Spain. I build at the
@@ -99,13 +105,25 @@ const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
       </p>
     </section>
 
-    <section class="cv-section">
+    <section class="cv-section" data-section="experience">
       <h2 class="cv-section-title">Experience</h2>
       {
-        processedWork.map((work) => (
-          <div class="cv-entry">
+        processedWork.map((work, i) => (
+          <div class="cv-entry" data-entry="work" data-index={i}>
             <div class="cv-entry-head">
-              <h3 class="cv-entry-title">{work.name}</h3>
+              <div class="cv-entry-title-group">
+                <h3 class="cv-entry-title">{work.name}</h3>
+                {work.website && (
+                  <a
+                    class="cv-entry-website"
+                    href={work.website}
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    {work.website.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+                  </a>
+                )}
+              </div>
               <span class="cv-entry-date">
                 {fmtMonthYear(work.startDate)} — {fmtMonthYear(work.endDate)}
               </span>
@@ -114,8 +132,8 @@ const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
               <p class="cv-entry-context">{work.description}</p>
             )}
             <ul class="cv-roles">
-              {work.positions.map((role) => (
-                <li class="cv-role">
+              {work.positions.map((role, ri) => (
+                <li class="cv-role" data-role-index={ri}>
                   <div class="cv-role-head">
                     <span class="cv-role-title">{role.title}</span>
                     <span class="cv-role-date">
@@ -129,16 +147,21 @@ const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
                 </li>
               ))}
             </ul>
+            {work.positions.length > 0 && (
+              <p class="cv-roles-compact">
+                {work.positions.map((r) => r.title).join(" · ")}
+              </p>
+            )}
           </div>
         ))
       }
     </section>
 
-    <section class="cv-section">
+    <section class="cv-section" data-section="education">
       <h2 class="cv-section-title">Education</h2>
       {
-        processedEducation.map((edu) => (
-          <div class="cv-entry">
+        processedEducation.map((edu, i) => (
+          <div class="cv-entry" data-entry="education" data-index={i}>
             <div class="cv-entry-head">
               <h3 class="cv-entry-title">{edu.institution}</h3>
               <span class="cv-entry-date">
@@ -157,30 +180,41 @@ const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
       }
     </section>
 
-    <section class="cv-section">
+    <section class="cv-section" data-section="projects">
       <h2 class="cv-section-title">Selected Projects</h2>
       <ul class="cv-projects">
         {
-          projects.map((p) => (
-            <li class="cv-project">
+          projects.map((p, i) => (
+            <li class="cv-project" data-entry="project" data-index={i}>
               <div class="cv-project-head">
-                <span class="cv-project-title">{p.data.title}</span>
+                <div class="cv-project-title-group">
+                  <span class="cv-project-title">{p.data.title}</span>
+                  {p.data.demoURL && (
+                    <a
+                      class="cv-project-link"
+                      href={p.data.demoURL}
+                      target="_blank"
+                      rel="noopener"
+                    >
+                      {p.data.demoURL.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+                    </a>
+                  )}
+                  {p.data.repoURL && (
+                    <a
+                      class="cv-project-link"
+                      href={p.data.repoURL}
+                      target="_blank"
+                      rel="noopener"
+                    >
+                      {p.data.repoURL.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+                    </a>
+                  )}
+                </div>
                 <span class="cv-project-date">
                   {p.data.date.getFullYear()}
                 </span>
               </div>
               <p class="cv-project-desc">{p.data.description}</p>
-              {(p.data.demoURL || p.data.repoURL) && (
-                <p class="cv-project-links">
-                  {p.data.demoURL && (
-                    <a href={p.data.demoURL}>{p.data.demoURL.replace(/^https?:\/\//, "")}</a>
-                  )}
-                  {p.data.demoURL && p.data.repoURL && <span> · </span>}
-                  {p.data.repoURL && (
-                    <a href={p.data.repoURL}>{p.data.repoURL.replace(/^https?:\/\//, "")}</a>
-                  )}
-                </p>
-              )}
             </li>
           ))
         }
@@ -229,18 +263,20 @@ const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
     text-decoration-color: rgba(255, 255, 255, 0.25);
   }
 
-  /* The A4 sheet — body text is mono to match the rest of the site
-     (the global `body { @apply font-mono }`); headings stay serif. */
+  /* CSS variables driven by the tuning panel. Everything that contributes
+     to vertical rhythm is multiplied by --cv-scale (font sizes) and
+     --cv-density (margins/paddings). */
   .cv-sheet {
+    --cv-scale: 1;
+    --cv-density: 1;
+
     width: 210mm;
     max-width: 100%;
     margin: 0 auto;
     padding: 0 14mm;
-    /* No paper framing on screen — inherits the site background.
-       White background + sheet sizing kick in only on print. */
     background: transparent;
     color: inherit;
-    font-size: 9.5pt;
+    font-size: calc(9.5pt * var(--cv-scale));
     line-height: 1.55;
   }
 
@@ -250,9 +286,9 @@ const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
     justify-content: space-between;
     align-items: flex-end;
     gap: 24px;
-    padding-top: 8px;
-    padding-bottom: 18px;
-    margin-bottom: 22px;
+    padding-top: calc(8px * var(--cv-density));
+    padding-bottom: calc(18px * var(--cv-density));
+    margin-bottom: calc(22px * var(--cv-density));
     border-bottom: 1px solid;
     border-bottom-color: rgba(0, 0, 0, 0.15);
   }
@@ -261,22 +297,22 @@ const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
   }
   .cv-name {
     font-family: "Instrument Serif", ui-serif, Georgia, serif !important;
-    font-size: 36pt;
+    font-size: calc(36pt * var(--cv-scale));
     line-height: 1;
     margin: 0;
     font-weight: 400;
     letter-spacing: -0.01em;
   }
   .cv-position {
-    margin: 8px 0 0;
-    font-size: 10pt;
+    margin: calc(8px * var(--cv-density)) 0 0;
+    font-size: calc(10pt * var(--cv-scale));
   }
   .cv-contact {
     list-style: none;
     margin: 0;
-    padding: 28px 0 0;
+    padding: calc(28px * var(--cv-density)) 0 0;
     text-align: right;
-    font-size: 8.5pt;
+    font-size: calc(8.5pt * var(--cv-scale));
     line-height: 1.7;
   }
   .cv-contact a {
@@ -286,19 +322,17 @@ const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
 
   /* Sections */
   .cv-section {
-    margin-bottom: 16px;
+    margin-bottom: calc(16px * var(--cv-density));
     page-break-inside: auto;
   }
   .cv-section-title {
     font-family: "Instrument Serif", ui-serif, Georgia, serif !important;
-    font-size: 14pt;
+    font-size: calc(14pt * var(--cv-scale));
     font-weight: 600;
-    margin: 0 0 8px;
+    margin: 0 0 calc(8px * var(--cv-density));
     padding-bottom: 3px;
     border-bottom: 1px solid #cecdc3;
     letter-spacing: 0.02em;
-    /* Never let a section heading be the last thing on a page —
-       it must stay attached to the first entry that follows. */
     break-after: avoid;
     page-break-after: avoid;
   }
@@ -308,7 +342,7 @@ const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
 
   /* Entries */
   .cv-entry {
-    margin-bottom: 12px;
+    margin-bottom: calc(12px * var(--cv-density));
     page-break-inside: avoid;
   }
   .cv-entry:last-child {
@@ -320,23 +354,62 @@ const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
     align-items: baseline;
     gap: 12px;
   }
+  .cv-entry-title-group {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 10px;
+    min-width: 0;
+  }
   .cv-entry-title {
     margin: 0;
-    font-size: 11pt;
+    font-size: calc(11pt * var(--cv-scale));
     font-weight: 600;
   }
   .cv-entry-date {
     font-family: "Ioskeley Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
-    font-size: 8.5pt;
+    font-size: calc(8.5pt * var(--cv-scale));
     color: #575653;
     white-space: nowrap;
   }
   .cv-entry-context {
-    margin: 2px 0 6px;
-    font-size: 9.5pt;
+    margin: 2px 0 calc(6px * var(--cv-density));
+    font-size: calc(9.5pt * var(--cv-scale));
     color: #575653;
     font-style: italic;
   }
+  .cv-entry-website,
+  .cv-project-link {
+    font-family: "Ioskeley Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+    font-size: calc(8pt * var(--cv-scale));
+    color: inherit;
+    text-decoration: none !important;
+    opacity: 0.55;
+    white-space: nowrap;
+    transition: opacity 150ms ease;
+  }
+  .cv-entry-website:hover,
+  .cv-project-link:hover {
+    opacity: 1;
+    text-decoration: underline !important;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+
+  /* Compact horizontal roles list — shown only in print when drop 3 is
+     active for non-latest jobs (replaces the bordered .cv-roles list). */
+  .cv-roles-compact {
+    display: none;
+    margin: 2px 0 0;
+    font-size: calc(9.5pt * var(--cv-scale));
+    color: #403e3c;
+  }
+
+  /* Drop priority rules — print-only. The on-screen /cv view always
+     shows the full content. Order: 1) project descriptions,
+     2) previous company bios, 3) previous company roles → replaced
+     with a horizontal compact list, 4) entire Selected Projects
+     section. See the corresponding @media print block below. */
 
   /* Roles */
   .cv-roles {
@@ -346,11 +419,11 @@ const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
     border-left: 1px solid #cecdc3;
   }
   .cv-role {
-    padding: 4px 0 4px 12px;
+    padding: calc(4px * var(--cv-density)) 0 calc(4px * var(--cv-density)) 12px;
     page-break-inside: avoid;
   }
   .cv-role:not(:last-child) {
-    margin-bottom: 4px;
+    margin-bottom: calc(4px * var(--cv-density));
   }
   .cv-role-head {
     display: flex;
@@ -360,24 +433,24 @@ const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
   }
   .cv-role-title {
     font-weight: 500;
-    font-size: 10pt;
+    font-size: calc(10pt * var(--cv-scale));
   }
   .cv-role-date {
     font-family: "Ioskeley Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
-    font-size: 8pt;
+    font-size: calc(8pt * var(--cv-scale));
     color: #6f6e69;
     white-space: nowrap;
   }
   .cv-role-desc {
     margin: 2px 0 0;
-    font-size: 9.5pt;
+    font-size: calc(9.5pt * var(--cv-scale));
     color: #282726;
   }
 
   /* Education */
   .cv-edu-degree {
     margin: 2px 0 0;
-    font-size: 10pt;
+    font-size: calc(10pt * var(--cv-scale));
   }
   .cv-edu-field {
     color: #575653;
@@ -390,7 +463,7 @@ const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
     padding: 0;
   }
   .cv-project {
-    margin-bottom: 8px;
+    margin-bottom: calc(8px * var(--cv-density));
     page-break-inside: avoid;
   }
   .cv-project-head {
@@ -399,45 +472,36 @@ const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
     align-items: baseline;
     gap: 12px;
   }
+  .cv-project-title-group {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 10px;
+    min-width: 0;
+  }
   .cv-project-title {
     font-weight: 600;
-    font-size: 10.5pt;
+    font-size: calc(10.5pt * var(--cv-scale));
   }
   .cv-project-date {
     font-family: "Ioskeley Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
-    font-size: 8.5pt;
+    font-size: calc(8.5pt * var(--cv-scale));
     color: #575653;
   }
   .cv-project-desc {
     margin: 1px 0 0;
-    font-size: 9.5pt;
-  }
-  .cv-project-links {
-    margin: 1px 0 0;
-    font-family: "Ioskeley Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
-    font-size: 8.5pt;
-    color: #575653;
-  }
-  .cv-project-links a {
-    color: inherit;
-    text-decoration: underline;
-    text-decoration-color: #cecdc3;
+    font-size: calc(9.5pt * var(--cv-scale));
   }
 
   /* Print rules */
   @media print {
-    /* Force light scheme on print */
-    :root {
-      color-scheme: light;
-    }
-    html,
-    body {
+    :root { color-scheme: light; }
+    html, body {
       background: #ffffff !important;
       color: #100f0f !important;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
-    /* Hide everything we don't want on the printed page */
     nav,
     .fixed.inset-0.pointer-events-none,
     a[href="#main-content"] {
@@ -548,25 +612,31 @@ const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
     .cv-project-links {
       font-size: 7.5pt;
     }
+
+    /* Drop priority — print-only application. */
+    .cv-sheet[data-drop-project-desc] .cv-project-desc { display: none; }
+    .cv-sheet[data-drop-prev-bios]
+      [data-entry="work"]:not([data-index="0"]) .cv-entry-context { display: none; }
+    .cv-sheet[data-drop-prev-roles]
+      [data-entry="work"]:not([data-index="0"]) .cv-roles { display: none; }
+    .cv-sheet[data-drop-prev-roles]
+      [data-entry="work"]:not([data-index="0"]) .cv-roles-compact { display: block; }
+    .cv-sheet[data-drop-projects-section] [data-section="projects"] { display: none; }
   }
 
-  /* On screen, muted text uses opacity so it adapts to light & dark. */
+  /* Opacity-based muted text (adapts to light & dark on screen) */
   .cv-position,
   .cv-contact,
   .cv-entry-context,
   .cv-entry-date,
   .cv-role-date,
   .cv-project-date,
-  .cv-project-links,
   .cv-edu-field {
     color: inherit;
     opacity: 0.65;
   }
-  .cv-header {
-    border-bottom-color: currentColor;
-  }
-  .cv-section-title,
-  .cv-roles {
+  .cv-header { border-bottom-color: currentColor; }
+  .cv-section-title, .cv-roles {
     border-color: currentColor;
     opacity: 1;
   }
@@ -577,7 +647,6 @@ const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
     border-left-color: color-mix(in srgb, currentColor 25%, transparent);
   }
 
-  /* On print, restore solid greys against white paper */
   @media print {
     .cv-position,
     .cv-contact,
@@ -585,19 +654,14 @@ const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
     .cv-entry-date,
     .cv-role-date,
     .cv-project-date,
-    .cv-project-links,
     .cv-edu-field {
       color: #403e3c;
       opacity: 1;
     }
-    .cv-header {
-      border-bottom-color: #100f0f;
-    }
-    .cv-section-title {
-      border-bottom-color: #cecdc3;
-    }
-    .cv-roles {
-      border-left-color: #cecdc3;
-    }
+    .cv-header { border-bottom-color: #100f0f; }
+    .cv-section-title { border-bottom-color: #cecdc3; }
+    .cv-roles { border-left-color: #cecdc3; }
   }
+
 </style>
+

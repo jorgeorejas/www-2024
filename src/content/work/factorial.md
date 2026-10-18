@@ -1,5 +1,6 @@
 ---
 company: "Factorial"
+website: "https://factorialhr.com"
 roles:
   - title: "Junior Growth Engineer"
     dateStart: "11/21/2022"
