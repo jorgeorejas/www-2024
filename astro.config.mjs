@@ -19,7 +19,8 @@ export default defineConfig({
     mdx({
       remarkPlugins: [remarkCorrection],
     }),
-    sitemap(),
+    // /wishlist is unlisted: reachable by URL only
+    sitemap({ filter: (page) => !page.includes("/wishlist") }),
     react(),
     pageInsight(),
   ],

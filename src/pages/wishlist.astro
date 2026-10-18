@@ -1,0 +1,329 @@
+---
+import AnimatedArrow from "@components/AnimatedArrow.astro";
+import Container from "@components/Container.astro";
+import Nav from "@components/Nav.astro";
+import { WISHLIST } from "@consts";
+import PageLayout from "@layouts/PageLayout.astro";
+import { getCollection } from "astro:content";
+
+export const prerender = true;
+
+const items = (await getCollection("wishlist")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+// Column names in the Notion database
+const CATEGORY = "Categoría";
+const STATUS = "Estado";
+const OWNED = "Lo tengo";
+const PRICE_RANGE = "Rango de Precios";
+
+const categoryOf = (fields: Record<string, string[]>) => fields[CATEGORY]?.[0];
+const priceRangeOf = (fields: Record<string, string[]>) =>
+  fields[PRICE_RANGE]?.[0];
+
+const distinct = (values: (string | undefined)[]) =>
+  [...new Set(values)].filter((v): v is string => !!v);
+
+// "Menos de 20€" → 0, "20–50€" → 20, "+5000€" → 5000, "Sin precio" → last
+const rangeFloor = (label: string) =>
+  /^menos/i.test(label) ? 0 : Number(label.match(/\d+/)?.[0] ?? Infinity);
+
+const rangeLabel = (range?: string) => range?.replace(/(\d)-(\d)/, "$1–$2");
+
+const categories = distinct(items.map((i) => categoryOf(i.data.fields))).sort(
+  (a, b) => a.localeCompare(b, "es"),
+);
+const priceRanges = distinct(items.map((i) => priceRangeOf(i.data.fields))).sort(
+  (a, b) => rangeFloor(a) - rangeFloor(b),
+);
+
+const filterGroups = [
+  { name: "category", options: categories.map((c) => ({ id: c, label: c })) },
+  {
+    name: "price",
+    options: priceRanges.map((r) => ({
+      id: r,
+      label: rangeLabel(r)!,
+    })),
+  },
+  {
+    name: "owned",
+    options: [
+      { id: "no", label: "Want it" },
+      { id: "yes", label: "Have it" },
+    ],
+  },
+].filter((group) => group.options.length > 0);
+
+const buttonClass =
+  "px-2 py-0.5 border border-flexoki-base-200 aria-pressed:bg-flexoki-ink aria-pressed:text-flexoki-paper aria-pressed:border-flexoki-ink hover:border-flexoki-base-500 transition-colors";
+
+// Titles come in as "Brand · Product"; split so the product never gets cut
+const entries = items.map(({ id, data }) => {
+  const [brand, ...rest] = data.title.split(" · ");
+  return {
+    id,
+    brand: rest.length ? brand : undefined,
+    name: rest.length ? rest.join(" · ") : data.title,
+    url: data.url,
+    image: data.image,
+    range: priceRangeOf(data.fields),
+    category: categoryOf(data.fields),
+    owned: !!data.fields[STATUS]?.includes(OWNED),
+    meta: [rangeLabel(priceRangeOf(data.fields)), categoryOf(data.fields)]
+      .filter(Boolean)
+      .join(" · "),
+  };
+});
+
+const linkProps = (url?: string) =>
+  url ? { href: url, target: "_blank", rel: "noopener noreferrer" } : {};
+
+// Shared by both views so grid and list read the same
+const brandClass =
+  "text-[0.68rem] uppercase tracking-[0.08em] text-flexoki-base-500 truncate";
+const nameClass =
+  "font-serif text-lg leading-tight text-flexoki-ink dark:text-flexoki-base-50 truncate";
+const metaClass = "text-xs text-flexoki-base-500 truncate";
+const ownedName = "line-through decoration-blue-800 decoration-[1.5px]";
+
+const underline =
+  "absolute left-0 -bottom-px w-full h-px bg-blue-800 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-in-out";
+---
+
+<PageLayout title={WISHLIST.TITLE} description={WISHLIST.DESCRIPTION}>
+  <Container>
+    <div class="space-y-2">
+      <Nav breadCrumbsItems={[{ href: "/wishlist", label: "Wishlist" }]} />
+    </div>
+    <div class="space-y-8 my-12">
+      <div class="space-y-4">
+        <h1 class="text-3xl font-semibold text-flexoki-ink dark:text-flexoki-base-50 font-serif">
+          Wishlist
+        </h1>
+        <p>{WISHLIST.DESCRIPTION}</p>
+      </div>
+
+      {
+        filterGroups.length > 0 && (
+          <div class="space-y-2 text-sm" id="wishlist-filters">
+            {filterGroups.map((group) => (
+              <div class="flex flex-wrap gap-2" data-group={group.name}>
+                <button
+                  type="button"
+                  data-value=""
+                  aria-pressed="true"
+                  class={buttonClass}
+                >
+                  All
+                </button>
+                {group.options.map((option) => (
+                  <button
+                    type="button"
+                    data-value={option.id}
+                    aria-pressed="false"
+                    class={buttonClass}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            ))}
+          </div>
+        )
+      }
+
+      {
+        entries.length === 0 ? (
+          <p class="text-flexoki-base-500">Nothing here yet.</p>
+        ) : (
+          <div class="space-y-6">
+            <div class="flex items-center justify-between gap-4 text-sm">
+              <span class="text-flexoki-base-500" id="wishlist-count">
+                {entries.length} items
+              </span>
+              <div class="flex gap-2" id="wishlist-view">
+                <button type="button" data-view="grid" aria-pressed="true" class={buttonClass}>
+                  Grid
+                </button>
+                <button type="button" data-view="list" aria-pressed="false" class={buttonClass}>
+                  List
+                </button>
+              </div>
+            </div>
+
+            <ul class="grid grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-8" data-list="grid">
+              {entries.map((item) => {
+                const Tag = item.url ? "a" : "div";
+                return (
+                  <li
+                    data-category={item.category ?? ""}
+                    data-price={item.range ?? ""}
+                    data-owned={item.owned ? "yes" : "no"}
+                  >
+                    <Tag {...linkProps(item.url)} class="group flex flex-col gap-2.5">
+                      <div class="relative aspect-square overflow-hidden bg-flexoki-base-50">
+                        {item.image && (
+                          <img
+                            src={item.image}
+                            alt=""
+                            loading="lazy"
+                            decoding="async"
+                            class="size-full object-contain p-[12%] mix-blend-multiply group-hover:scale-[1.04] transition-transform duration-500 ease-out"
+                          />
+                        )}
+                        {item.owned && (
+                          <span class="absolute top-1.5 right-2.5 font-handwritten text-lg text-blue-800 -rotate-6">
+                            lo tengo
+                          </span>
+                        )}
+                      </div>
+                      <div class="relative flex flex-col gap-0.5 min-w-0 pr-8">
+                        {item.brand && <span class={brandClass}>{item.brand}</span>}
+                        <span class={nameClass}>
+                          <span class:list={["relative", item.owned && ownedName]}>
+                            {item.name}
+                            <span class={underline} />
+                          </span>
+                        </span>
+                        {item.meta && <span class={metaClass}>{item.meta}</span>}
+                        {item.url && <AnimatedArrow />}
+                      </div>
+                    </Tag>
+                  </li>
+                );
+              })}
+            </ul>
+
+            <ul class="flex flex-col border-t border-flexoki-base-200" data-list="list" hidden>
+              {entries.map((item) => {
+                const Tag = item.url ? "a" : "div";
+                return (
+                  <li
+                    data-category={item.category ?? ""}
+                    data-price={item.range ?? ""}
+                    data-owned={item.owned ? "yes" : "no"}
+                  >
+                    <Tag
+                      {...linkProps(item.url)}
+                      class="relative group flex items-center gap-3.5 py-2.5 pl-1.5 pr-10 border-b border-flexoki-base-200 hover:bg-flexoki-base-50 transition-colors duration-300 ease-in-out"
+                    >
+                      <div class="relative shrink-0 size-14 bg-flexoki-base-50">
+                        {item.image && (
+                          <img
+                            src={item.image}
+                            alt=""
+                            width="56"
+                            height="56"
+                            loading="lazy"
+                            decoding="async"
+                            class="size-full object-contain p-1.5 mix-blend-multiply"
+                          />
+                        )}
+                        {item.owned && (
+                          <span class="absolute -bottom-1 -right-3 font-handwritten text-sm leading-none text-blue-800 -rotate-6 whitespace-nowrap">
+                            lo tengo
+                          </span>
+                        )}
+                      </div>
+                      <div class="flex flex-col gap-0.5 min-w-0 flex-1">
+                        {item.brand && <span class={brandClass}>{item.brand}</span>}
+                        <span class={nameClass}>
+                          <span class:list={["relative", item.owned && ownedName]}>
+                            {item.name}
+                            <span class={underline} />
+                          </span>
+                        </span>
+                        {item.meta && <span class={metaClass}>{item.meta}</span>}
+                      </div>
+                      {item.url && <AnimatedArrow />}
+                    </Tag>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )
+      }
+    </div>
+  </Container>
+</PageLayout>
+
+<script>
+  const groups = [...document.querySelectorAll("#wishlist-filters [data-group]")]
+    .filter((el) => el instanceof HTMLElement);
+  const cards = [...document.querySelectorAll("[data-list] > li")].filter(
+    (el) => el instanceof HTMLElement,
+  );
+  const count = document.getElementById("wishlist-count");
+  const active = new Map(groups.map((g) => [g.dataset.group ?? "", ""]));
+
+  const matches = (card: HTMLElement, skip?: string) =>
+    [...active].every(
+      ([name, value]) => name === skip || !value || card.dataset[name] === value,
+    );
+
+  // Faceted filters: each option only shows if picking it would leave results
+  // given what's selected in the other groups
+  const update = () => {
+    cards.forEach((card) => (card.hidden = !matches(card)));
+    if (count) {
+      const shown = document.querySelectorAll("[data-list=grid] > li:not([hidden])");
+      count.textContent = `${shown.length} items`;
+    }
+    groups.forEach((group) => {
+      const name = group.dataset.group ?? "";
+      const pool = cards.filter((card) => matches(card, name));
+      group.querySelectorAll("button").forEach((button) => {
+        const value = button.dataset.value;
+        button.hidden =
+          !!value &&
+          active.get(name) !== value &&
+          !pool.some((card) => card.dataset[name] === value);
+      });
+    });
+  };
+
+  groups.forEach((group) => {
+    const buttons = [...group.querySelectorAll("button")];
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        active.set(group.dataset.group ?? "", button.dataset.value ?? "");
+        buttons.forEach((b) =>
+          b.setAttribute("aria-pressed", String(b === button)),
+        );
+        update();
+      });
+    });
+  });
+
+  // Grid / list switch, remembered per browser
+  const VIEW_KEY = "wishlist-view";
+  const viewButtons = [...document.querySelectorAll("#wishlist-view [data-view]")]
+    .filter((el) => el instanceof HTMLElement);
+  const lists = [...document.querySelectorAll("[data-list]")]
+    .filter((el) => el instanceof HTMLElement);
+
+  const setView = (view: string) => {
+    lists.forEach((list) => (list.hidden = list.dataset.list !== view));
+    viewButtons.forEach((b) =>
+      b.setAttribute("aria-pressed", String(b.dataset.view === view)),
+    );
+    try {
+      localStorage.setItem(VIEW_KEY, view);
+    } catch {
+      // storage blocked: the switch still works for this visit
+    }
+  };
+
+  viewButtons.forEach((button) =>
+    button.addEventListener("click", () => setView(button.dataset.view ?? "grid")),
+  );
+  try {
+    const saved = localStorage.getItem(VIEW_KEY);
+    if (saved === "list") setView(saved);
+  } catch {
+    // ignore
+  }
+</script>

@@ -35,6 +35,12 @@ export const PROJECTS: Metadata = {
     "A collection of my projects, with links to repositories and demos.",
 };
 
+export const WISHLIST: Metadata = {
+  TITLE: "Wishlist",
+  DESCRIPTION:
+    "Things I like: gift ideas, objects and aesthetic references I keep coming back to.",
+};
+
 export const GAMES: Metadata = {
   TITLE: "Games",
   DESCRIPTION:

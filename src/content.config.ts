@@ -1,5 +1,6 @@
 import { defineCollection, z } from "astro:content";
 import { glob } from "astro/loaders";
+import { notionLoader } from "./lib/notion-loader";
 
 const blog = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/blog" }),
@@ -64,10 +65,34 @@ const blocks = defineCollection({
   }),
 });
 
+// Wishlist: gift ideas & aesthetic references, pulled from Notion at build time
+const wishlist = defineCollection({
+  loader: notionLoader({
+    token: import.meta.env.NOTION_TOKEN ?? process.env.NOTION_TOKEN,
+    databaseId:
+      import.meta.env.NOTION_WISHLIST_DATABASE_ID ??
+      process.env.NOTION_WISHLIST_DATABASE_ID,
+  }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    url: z.string().url().optional(),
+    image: z.string().optional(),
+    price: z.number().optional(),
+    currency: z.string().optional(),
+    category: z.string().optional(),
+    tags: z.array(z.string()),
+    date: z.coerce.date(),
+    hidden: z.boolean(),
+    fields: z.record(z.string(), z.array(z.string())),
+  }),
+});
+
 export const collections = {
   blog,
   work,
   education,
   projects,
   blocks,
+  wishlist,
 };
