@@ -7,17 +7,19 @@ import PageLayout from "@layouts/PageLayout.astro";
 import { getLiveCollection } from "astro:content";
 
 // Read live from Notion; the CDN serves a cached copy and refreshes it in the
-// background at most every 10 minutes (Notion allows ~3 req/s)
+// background at most every 10 minutes (Notion allows ~3 req/s). If Notion is
+// down, stale-if-error keeps the last good copy up for a week.
 const { entries: liveEntries = [], error } = await getLiveCollection("wishlist");
 
 if (error) {
   console.error("[wishlist] Notion load failed:", error);
-  // Never cache the failure; the CDN keeps serving the last good copy meanwhile
+  // A 5xx lets the CDN fall back to the stale copy; never cache the failure
+  Astro.response.status = 503;
   Astro.response.headers.set("Cache-Control", "no-store");
 } else {
   Astro.response.headers.set(
     "Cache-Control",
-    "public, max-age=0, s-maxage=600, stale-while-revalidate=86400",
+    "public, max-age=0, s-maxage=600, stale-while-revalidate=86400, stale-if-error=604800",
   );
 }
 
