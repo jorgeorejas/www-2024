@@ -18,7 +18,8 @@ const SKIP = /^\/(api|_astro|_image|_server-islands|og|fonts|img)\//;
 
 export const onRequest = defineMiddleware(async (context, next) => {
   if (context.url.hostname === OLD_COCINA_HOST) {
-    return context.redirect(`https://jorgeorejas.com${cocinaRedirect(context.url.pathname)}`, 301);
+    // Straight to www: the apex would add a second redirect
+    return context.redirect(`https://www.jorgeorejas.com${cocinaRedirect(context.url.pathname)}`, 301);
   }
 
   if (SKIP.test(context.url.pathname)) return next();
