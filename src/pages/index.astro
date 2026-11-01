@@ -4,26 +4,35 @@ import ArrowCard from "@components/ArrowCard.astro";
 import Container from "@components/Container.astro";
 import ContentBlock from "@components/ContentBlock.astro";
 import Nav from "@components/Nav.astro";
+import RecipeCard from "@components/cocina/RecipeCard.astro";
 import WorkTimeline from "@components/WorkTimeline.astro";
 import { HOME, SITE } from "@consts";
 import PageLayout from "@layouts/PageLayout.astro";
-import { getWorkDateRange, processWorkEntry } from "@lib/utils";
+import { cachePage } from "@lib/cache-headers";
+import { processWorkEntry } from "@lib/utils";
 import { generatePersonSchema } from "@lib/seo-utils";
-import { getCollection } from "astro:content";
-const today = new Date();
-today.setHours(0, 0, 0, 0);
+import { getLiveCollection } from "astro:content";
 
-const isDev = import.meta.env.DEV;
+// Which blocks show on the home page, in which order and with which titles,
+// comes from the "Secciones" database in Notion (En inicio, Orden…)
+const sections = Astro.locals.sections ?? [];
+const home = sections.find((s) => s.path === "/");
+const homeSections = sections.filter((s) => s.onHome);
 
-const blog = (await getCollection("blog"))
-  .filter((post) => !post.data.draft && (isDev || post.data.date <= today))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, SITE.NUM_POSTS_ON_HOMEPAGE);
-
-const projects = (await getCollection("projects"))
-  .filter((project) => !project.data.draft)
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, SITE.NUM_PROJECTS_ON_HOMEPAGE);
+const [blog, projects, work, recipes, blocks] = await Promise.all([
+  getLiveCollection("blog"),
+  getLiveCollection("projects"),
+  getLiveCollection("work"),
+  homeSections.some((s) => s.path === "/cocina")
+    ? getLiveCollection("recipes")
+    : Promise.resolve({ entries: [], error: undefined }),
+  getLiveCollection("blocks"),
+]);
+cachePage(
+  Astro.response,
+  ["blog", "projects", "work", "recipes"],
+  blog.error ?? projects.error ?? work.error ?? recipes.error ?? blocks.error,
+);
 
 const games = [
   {
@@ -44,21 +53,32 @@ const games = [
       "The classic logic puzzle. Reveal every safe square without detonating a mine.",
     href: "/games/minesweeper",
   },
-].slice(0, SITE.NUM_GAMES_ON_HOMEPAGE);
+];
 
-const allwork = (await getCollection("work"))
-  .sort((a, b) => {
-    const aDateRange = getWorkDateRange(a.data.roles);
-    const bDateRange = getWorkDateRange(b.data.roles);
-    return bDateRange.startDate.valueOf() - aDateRange.startDate.valueOf();
-  })
-  .slice(0, SITE.NUM_WORKS_ON_HOMEPAGE);
+const count = (path: string, fallback: number) =>
+  sections.find((s) => s.path === path)?.homeCount ?? fallback;
 
-// Process work entries for timeline
-const processedWork = allwork.map((item) => processWorkEntry(item));
+const posts = (blog.entries ?? []).slice(0, count("/blog", SITE.NUM_POSTS_ON_HOMEPAGE));
+const recentProjects = (projects.entries ?? []).slice(0, count("/projects", SITE.NUM_PROJECTS_ON_HOMEPAGE));
+const processedWork = (work.entries ?? [])
+  .slice(0, count("/work", SITE.NUM_WORKS_ON_HOMEPAGE))
+  .map((entry) => processWorkEntry({ id: entry.id, data: entry.data, body: entry.data.body }));
+const homeGames = games.slice(0, count("/games", SITE.NUM_GAMES_ON_HOMEPAGE));
+const homeRecipes = (recipes.entries ?? []).slice(0, count("/cocina", 3));
 
-// Generate Person schema for SEO
+// Without Notion sections (first run, or Notion down) show the classic layout
+const layout = homeSections.length
+  ? homeSections
+  : [
+      { path: "/blog", homeTitle: "Latest posts", homeLink: "See all posts" },
+      { path: "/projects", homeTitle: "Recent projects", homeLink: "See all projects" },
+      { path: "/work", homeTitle: "Work Experience", homeLink: "See all work" },
+    ];
+
+const bioBlocks = home?.blocks.length ? home.blocks : ["bio"];
+
 const personSchema = generatePersonSchema(Astro.site!.toString());
+const headingClass = "text-2xl font-semibold text-flexoki-ink dark:text-flexoki-base-50 font-serif";
 ---
 
 <PageLayout
@@ -70,99 +90,72 @@ const personSchema = generatePersonSchema(Astro.site!.toString());
   <Container>
     <Nav />
     <div class="space-y-20">
-      <section>
-        <ContentBlock slug="bio" class="space-y-4" />
+      <section class="space-y-4">
+        {bioBlocks.map((slug) => <ContentBlock slug={slug} class="space-y-4" />)}
       </section>
 
-      <section class="space-y-8">
-        <div class="flex flex-wrap gap-y-2 items-center justify-between">
-          <h2 class="text-2xl font-semibold text-flexoki-ink dark:text-flexoki-base-50 font-serif">
-            Latest posts
-          </h2>
-          <AnimatedLink href="/blog"> See all posts </AnimatedLink>
-        </div>
-        <ul class="flex flex-col gap-4">
-          {
-            blog.map((post) => (
-              <li>
-                <ArrowCard entry={post} dateFormat="day" />
-              </li>
-            ))
-          }
-        </ul>
-      </section>
+      {
+        layout.map((section) => (
+          <section class="space-y-8">
+            <div class="flex flex-wrap gap-y-2 items-center justify-between">
+              <h2 class={headingClass}>{section.homeTitle}</h2>
+              {section.homeLink && (
+                <AnimatedLink href={section.path}>{section.homeLink}</AnimatedLink>
+              )}
+            </div>
 
-      <section class="space-y-8">
-        <div class="flex flex-wrap gap-y-2 items-center justify-between">
-          <h2 class="text-2xl font-semibold text-flexoki-ink font-serif dark:text-flexoki-base-50">
-            Recent projects
-          </h2>
-          <AnimatedLink href="/projects"> See all projects </AnimatedLink>
-        </div>
-        <ul class="flex flex-col gap-4">
-          {
-            projects.map((project) => (
-              <li>
-                <ArrowCard entry={project} />
-              </li>
-            ))
-          }
-        </ul>
-      </section>
+            {section.path === "/blog" && (
+              <ul class="flex flex-col gap-4">
+                {posts.map((post) => (
+                  <li>
+                    <ArrowCard entry={post} collection="blog" dateFormat="day" />
+                  </li>
+                ))}
+              </ul>
+            )}
 
-      {/* TODO: re-enable Games section on homepage */}
-      {false && (
-        <section class="space-y-8">
-          <div class="flex flex-wrap gap-y-2 items-center justify-between">
-            <h2 class="text-2xl font-semibold text-flexoki-ink font-serif dark:text-flexoki-base-50">
-              Games
-            </h2>
-            <AnimatedLink href="/games"> See all games </AnimatedLink>
-          </div>
-          <ul class="flex flex-col gap-4">
-            {games.map((game) => (
-              <li>
-                <a
-                  href={game.href}
-                  class="relative group flex flex-nowrap py-3 px-4 pr-10 border-l border-flexoki-base-200 dark:border-flexoki-base-800 hover:bg-flexoki-base-100 dark:hover:bg-flexoki-base-900 hover:text-flexoki-ink dark:hover:text-flexoki-base-50 transition-colors duration-300 ease-in-out"
-                >
-                  <div class="flex flex-col gap-1 flex-1">
-                    <div class="font-semibold font-serif">{game.title}</div>
-                    <div class="text-sm">{game.description}</div>
-                  </div>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    class="absolute top-1/2 right-2 -translate-y-1/2 size-5 stroke-2 fill-none stroke-current"
-                  >
-                    <line
-                      x1="5"
-                      y1="12"
-                      x2="19"
-                      y2="12"
-                      class="translate-x-3 group-hover:translate-x-0 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out"
-                    />
-                    <polyline
-                      points="12 5 19 12 12 19"
-                      class="-translate-x-1 group-hover:translate-x-0 transition-transform duration-300 ease-in-out"
-                    />
-                  </svg>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+            {section.path === "/projects" && (
+              <ul class="flex flex-col gap-4">
+                {recentProjects.map((project) => (
+                  <li>
+                    <ArrowCard entry={project} collection="projects" />
+                  </li>
+                ))}
+              </ul>
+            )}
 
-      <section class="space-y-8">
-        <div class="flex flex-wrap gap-y-2 items-center justify-between">
-          <h2 class="text-2xl font-semibold text-flexoki-ink font-serif dark:text-flexoki-base-50">
-            Work Experience
-          </h2>
-          <AnimatedLink href="/work"> See all work </AnimatedLink>
-        </div>
-        <WorkTimeline processedWork={processedWork} />
-      </section>
+            {section.path === "/work" && <WorkTimeline processedWork={processedWork} />}
+
+            {section.path === "/cocina" && (
+              <ul class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                {homeRecipes.map((recipe) => (
+                  <li>
+                    <RecipeCard recipe={recipe} size="small" />
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {section.path === "/games" && (
+              <ul class="flex flex-col gap-4">
+                {homeGames.map((game) => (
+                  <li>
+                    <a
+                      href={game.href}
+                      class="relative group flex flex-nowrap py-3 px-4 pr-10 border-l border-flexoki-base-200 dark:border-flexoki-base-800 hover:bg-flexoki-base-100 dark:hover:bg-flexoki-base-900 hover:text-flexoki-ink dark:hover:text-flexoki-base-50 transition-colors duration-300 ease-in-out"
+                    >
+                      <div class="flex flex-col gap-1 flex-1">
+                        <div class="font-semibold font-serif">{game.title}</div>
+                        <div class="text-sm">{game.description}</div>
+                      </div>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        ))
+      }
     </div>
   </Container>
 </PageLayout>

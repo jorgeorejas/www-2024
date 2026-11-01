@@ -4,11 +4,11 @@ import Container from "@components/Container.astro";
 import Nav from "@components/Nav.astro";
 import { PROJECTS } from "@consts";
 import PageLayout from "@layouts/PageLayout.astro";
-import { getCollection } from "astro:content";
+import { cachePage } from "@lib/cache-headers";
+import { getLiveCollection } from "astro:content";
 
-const projects = (await getCollection("projects"))
-  .filter((project) => !project.data.draft)
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const { entries: projects = [], error } = await getLiveCollection("projects");
+cachePage(Astro.response, ["projects"], error);
 ---
 
 <PageLayout title={PROJECTS.TITLE} description={PROJECTS.DESCRIPTION}>
@@ -24,7 +24,7 @@ const projects = (await getCollection("projects"))
         {
           projects.map((project) => (
             <li>
-              <ArrowCard entry={project} />
+              <ArrowCard entry={project} collection="projects" />
             </li>
           ))
         }

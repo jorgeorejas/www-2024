@@ -1,45 +1,27 @@
 import OG from "@components/OG";
 import type { APIRoute } from "astro";
-import { getCollection, getEntry } from "astro:content";
+import { getLiveEntry } from "astro:content";
+import { cacheHeaders, isNotFound } from "@lib/cache-headers";
 import { PNG } from "./createImage";
 
-export const getStaticPaths = async () => {
-  const blogEntries = await getCollection("blog");
-  return blogEntries.map((entry) => ({
-    params: { slug: entry.id },
-  }));
-};
+// Share image for a blog post, drawn on request from its Notion title and description
+export const GET: APIRoute = async ({ params, url }) => {
+  const slug = params.slug;
+  if (!slug) return new Response("Slug is required", { status: 400 });
 
-export const GET: APIRoute = async ({ params }) => {
-  const { slug } = params;
-
-  if (!slug) {
-    return new Response(JSON.stringify({ error: "Slug is required" }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" },
-    });
+  const { entry, error } = await getLiveEntry("blog", { id: slug });
+  if (error && !isNotFound(error)) {
+    return new Response("Unavailable", { status: 503, headers: { "Cache-Control": "no-store" } });
   }
+  if (!entry) return new Response("Blog post not found", { status: 404 });
 
   try {
-    const entry = await getEntry("blog", slug);
-
-    if (!entry) {
-      return new Response(JSON.stringify({ error: "Blog post not found" }), {
-        status: 404,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
-    const image = await PNG(OG(entry.data.title, entry.data.description));
+    const image = await PNG(OG(entry.data.title, entry.data.description), url.origin);
     return new Response(new Uint8Array(image), {
-      status: 200,
-      headers: { "Content-Type": "image/png" },
+      headers: { "Content-Type": "image/png", ...cacheHeaders(["blog", `blog:${slug}`]) },
     });
-  } catch (error) {
-    console.error("Error fetching blog post:", error);
-    return new Response(JSON.stringify({ error: "Internal server error" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+  } catch (err) {
+    console.error("[og] render failed", err);
+    return new Response("Internal server error", { status: 500, headers: { "Cache-Control": "no-store" } });
   }
 };

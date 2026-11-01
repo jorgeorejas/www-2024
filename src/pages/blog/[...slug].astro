@@ -5,32 +5,25 @@ import FormattedDate from "@components/FormattedDate.astro";
 import Nav from "@components/Nav.astro";
 import PageLayout from "@layouts/PageLayout.astro";
 import { AnimatedSignature } from "@components/AnimatedSignature";
-import { readingTime } from "@lib/utils";
+import { cachePage, isNotFound, notionUnavailable } from "@lib/cache-headers";
 import {
   generateBlogPostingSchema,
   generateBreadcrumbSchema,
 } from "@lib/seo-utils";
-import { type CollectionEntry, getCollection, render } from "astro:content";
+import { getLiveCollection, getLiveEntry } from "astro:content";
 import { SITE } from "@consts";
 
-export const prerender = true;
+const slug = Astro.params.slug ?? "";
+const { entry: post, error } = await getLiveEntry("blog", { id: slug });
+if (error && !isNotFound(error)) return notionUnavailable(error);
+if (!post) return Astro.rewrite("/404");
 
-export async function getStaticPaths() {
-  const posts = (await getCollection("blog"))
-    .filter((post: CollectionEntry<"blog">) => !post.data.draft)
-    .sort(
-      (a: CollectionEntry<"blog">, b: CollectionEntry<"blog">) =>
-        b.data.date.valueOf() - a.data.date.valueOf(),
-    );
-  return posts.map((post: CollectionEntry<"blog">) => ({
-    params: { slug: post.id },
-    props: post,
-  }));
-}
-type Props = CollectionEntry<"blog">;
-
-const post = Astro.props;
-const { Content } = await render(post);
+// Projects this post talks about (Notion relation "Proyectos")
+const { entries: allProjects = [], error: projectsError } = post.data.projects.length
+  ? await getLiveCollection("projects")
+  : { entries: [], error: undefined };
+cachePage(Astro.response, ["blog", `blog:${post.id}`, "projects"], projectsError);
+const related = allProjects.filter((p) => post.data.projects.includes(p.id));
 
 // Generate structured data for SEO
 const blogPostingSchema = generateBlogPostingSchema(
@@ -82,7 +75,7 @@ const breadcrumbSchema = generateBreadcrumbSchema(
         </div>
         &bull;
         <div class="font-base text-sm">
-          {readingTime(post.body)}
+          {post.data.readingTime}
         </div>
       </div>
       {
@@ -107,8 +100,26 @@ const breadcrumbSchema = generateBreadcrumbSchema(
       </div>
     </div>
     <article>
-      <Content />
+      <Fragment set:html={post.rendered?.html} />
     </article>
+
+    {
+      related.length > 0 && (
+        <aside class="mt-12 space-y-3">
+          <h2 class="text-lg font-semibold font-serif">About the project</h2>
+          <ul class="flex flex-col gap-2">
+            {related.map((project) => (
+              <li>
+                <a class="underline decoration-flexoki-base-300 underline-offset-4 hover:decoration-current" href={`/projects/${project.id}`}>
+                  {project.data.titleCorrection ?? project.data.title}
+                </a>
+                <span class="text-sm text-flexoki-base-500"> · {project.data.description}</span>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )
+    }
 
     <!-- Animated Signature -->
     <div class="mt-16 mb-8 space-y-4 pt-8 border-black/10 dark:border-white/10">

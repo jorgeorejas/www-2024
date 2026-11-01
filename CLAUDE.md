@@ -42,16 +42,22 @@ pnpm lint:fix
 - Deployed using `@astrojs/vercel` adapter
 - This enables dynamic API routes and server-side features like the Spotify integration
 
-### Content Collections
-Content is managed through Astro's content collections in `src/content/`:
+### Content: Notion live collections
+All content lives in Notion, under the hub page **jorgeorejas.com** (tabs: Inicio, Escribir, Trayectoria, Cocina, Wishlist, Web, Guía). There is no `src/content/` folder anymore.
 
-- **blog**: Blog posts with optional `titleCorrection` field for the correction component
-- **work**: Work experience with support for multiple roles per company
-- **education**: Education timeline entries
-- **projects**: Project showcase items with optional demo/repo URLs
-- **blocks**: Reusable markdown blocks (bios, mottos, etc.)
+- Collections are defined in `src/live.config.ts` as Astro **live collections**: read from Notion on each request, addressed by slug (`getLiveEntry("blog", { id: slug })`).
+- One fetcher per database in `src/lib/notion/collections.ts`; property names are the Spanish Notion column names (Título, Slug, Descripción, Fecha, Publicado…). Rename a column in Notion → rename it there.
+- Database ids: `src/lib/notion/databases.ts` (not secret). Collections: blog, projects, work (Empresas + Puestos), education, blocks, recipes, recipeTags, sections, settings, wishlist.
+- Page bodies: Notion blocks → Markdown (`src/lib/notion/markdown.ts`) → the same remark pipeline as `astro.config.mjs` (`src/lib/notion/render.ts`), so the correction syntax still works.
+- Drafts: "Publicado" unchecked → only visible in `pnpm dev`.
+- "Ajustes" (name, email, socials) and "Secciones" (page titles/descriptions, home blocks and order) are applied by `src/middleware.ts` over the defaults in `src/consts.ts`.
+- Images hosted by Notion expire, so they go through `/api/notion-image/[...path]` (resized WebP via sharp, no EXIF).
 
-All content schemas are defined in `src/content.config.ts`. Collections use the Content Layer API with the `glob()` loader (Astro 6+), and entries are addressed by `id` (not the legacy `slug`). Use Zod schemas when modifying collection structures.
+### Caching and instant updates
+Pages call `cachePage(Astro.response, tags, error)` from `src/lib/cache-headers.ts`: CDN keeps HTML 1 h, serves stale while revalidating, and up to a week if Notion fails. Responses carry `Vercel-Cache-Tag`. Notion webhooks reach `/api/notion/webhook` (via Vercel Connect, OIDC-verified) and call `invalidateByTag`.
+
+### Cocina (recipes)
+`/cocina`, `/cocina/[slug]`, `/cocina/etiqueta/[slug]`. Recipe bodies are split into intro / ingredients / steps / extra / gallery (`src/lib/notion/recipe.ts`); quantities are tagged for the servings scaler. Old `cocina.jorgeorejas.com` URLs are redirected by the middleware.
 
 ### Custom Markdown Correction Syntax
 The site implements a unique inline correction feature for showing typos and corrections:
@@ -81,7 +87,7 @@ The site displays currently playing Spotify tracks in the footer via:
 2. **Component**: `src/components/SpotifyNowPlaying.astro` - Client-side component that polls the API every 30 seconds
 3. **Auth Flow**: `src/pages/spotify-auth.astro` - OAuth callback page for initial setup
 
-**Required Environment Variables** (see `.env.example`):
+**Required Environment Variables** (see `.env.example`; Notion reads `NOTION_TOKEN`, and Vercel Connect connector `notion/notion-www` delivers the webhooks):
 - `SPOTIFY_CLIENT_ID`
 - `SPOTIFY_CLIENT_SECRET`
 - `SPOTIFY_REFRESH_TOKEN`
@@ -120,22 +126,19 @@ This is the single source of truth for site configuration.
 
 ## Common Patterns
 
-### Adding a New Blog Post
-1. Create a new `.md` or `.mdx` file in `src/content/blog/`
-2. Add frontmatter with required fields: `title`, `description`, `date`
-3. Optional: Add `draft: true` to hide from production
-4. Optional: Add `titleCorrection` for the correction component
+### Adding a Blog Post, Project or Recipe
+Create a row in the matching Notion database, fill Slug/Descripción/Fecha, write the body, tick **Publicado**. No code or deploy needed.
 
-### Adding a New Project
-Similar to blog posts, but in `src/content/projects/` with optional `demoURL` and `repoURL` fields.
-
-### Working with Content Collections
-When querying collections, use Astro's `getCollection` and `getEntry` helpers:
-
+### Reading content
 ```typescript
-import { getCollection } from "astro:content";
-const posts = await getCollection("blog", ({ data }) => !data.draft);
+import { getLiveCollection, getLiveEntry } from "astro:content";
+const { entries: posts = [], error } = await getLiveCollection("blog");
+cachePage(Astro.response, ["blog"], error);
 ```
+Render bodies with `<Fragment set:html={entry.rendered?.html} />`.
+
+### Adding a collection
+Create the database inside the Notion hub page, add its id to `src/lib/notion/databases.ts`, add a fetcher in `collections.ts`, define it in `live.config.ts`.
 
 ### Adding API Routes
 API routes go in `src/pages/api/` and must return a `Response` object. The site is in SSR mode, so all routes are dynamic by default.
@@ -143,7 +146,7 @@ API routes go in `src/pages/api/` and must return a `Response` object. The site 
 ## Important Notes
 
 - **Node Version**: Requires Node >= 22.22.0 (Astro 7 requirement, specified in `package.json` engines)
-- **Custom Remark Plugin**: The `remarkCorrection` plugin is registered once, in `markdown.processor` in `astro.config.mjs`; MDX (`@astrojs/mdx` 8+) inherits it from there. Astro 7 defaults Markdown to the native Sätteri pipeline, so the config opts back into the remark/rehype processor via `unified()` from `@astrojs/markdown-remark` to keep the correction plugin working.
+- **Custom Remark Plugin**: The `remarkCorrection` plugin is registered in `markdown.processor` in `astro.config.mjs` and again in `src/lib/notion/render.ts` for Notion bodies. Astro 7 defaults Markdown to the native Sätteri pipeline, so the config opts back into the remark/rehype processor via `unified()` from `@astrojs/markdown-remark` to keep the correction plugin working.
 - **Vercel Configuration**: The site uses Vercel Web Analytics, enabled in the adapter config
 - **ngrok Configuration**: Vite server is configured to allow ngrok domains for local testing with Spotify OAuth callbacks
 - **Git Worktrees**: The project uses git worktrees (see `worktree/` directory) - avoid touching these

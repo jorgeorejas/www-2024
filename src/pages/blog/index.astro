@@ -4,19 +4,15 @@ import Container from "@components/Container.astro";
 import Nav from "@components/Nav.astro";
 import { BLOG } from "@consts";
 import PageLayout from "@layouts/PageLayout.astro";
-import { type CollectionEntry, getCollection } from "astro:content";
+import { cachePage } from "@lib/cache-headers";
+import { getLiveCollection } from "astro:content";
 
-const today = new Date();
-today.setHours(0, 0, 0, 0);
-
-const isDev = import.meta.env.DEV;
-
-const data = (await getCollection("blog"))
-  .filter((post) => !post.data.draft && (isDev || post.data.date <= today))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+// Published posts from Notion, newest first (drafts only show locally)
+const { entries: data = [], error } = await getLiveCollection("blog");
+cachePage(Astro.response, ["blog"], error);
 
 type Acc = {
-  [year: string]: CollectionEntry<"blog">[];
+  [year: string]: typeof data;
 };
 
 const posts = data.reduce((acc: Acc, post) => {
@@ -52,7 +48,7 @@ const monthYears = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a));
                 <ul class="flex flex-col gap-4">
                   {posts[year].map((post) => (
                     <li>
-                      <ArrowCard entry={post} dateFormat="day" />
+                      <ArrowCard entry={post} collection="blog" dateFormat="day" />
                     </li>
                   ))}
                 </ul>

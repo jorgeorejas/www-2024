@@ -1,7 +1,6 @@
 // @ts-check
 import mdx from "@astrojs/mdx";
 import react from "@astrojs/react";
-import sitemap from "@astrojs/sitemap";
 import { defineConfig } from "astro/config";
 
 import vercel from "@astrojs/vercel";
@@ -18,8 +17,6 @@ export default defineConfig({
   integrations: [
     // MDX inherits remark plugins from markdown.processor below.
     mdx(),
-    // /wishlist is unlisted: reachable by URL only
-    sitemap({ filter: (page) => !page.includes("/wishlist") }),
     react(),
     pageInsight(),
   ],
@@ -32,6 +29,8 @@ export default defineConfig({
   // Keep the previous behavior to avoid regressions in inline-element spacing.
   compressHTML: true,
   output: "server",
+  // @astrojs/sitemap used to write sitemap-0.xml; search engines may still ask for it
+  redirects: { "/sitemap-0.xml": "/sitemap-index.xml" },
   adapter: vercel({
     webAnalytics: { enabled: true },
   }),

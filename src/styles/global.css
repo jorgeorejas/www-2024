@@ -308,3 +308,45 @@
     transparent 4px
   );
 }
+
+/* Blocks that only come from Notion bodies (see lib/notion/markdown.ts) */
+@layer components {
+  article .notion-columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: 1rem;
+    margin-block: 1.5rem;
+  }
+  article .notion-column > :first-child {
+    margin-top: 0;
+  }
+  article .notion-column img {
+    margin: 0;
+  }
+  article aside.callout {
+    @apply my-6 px-4 py-3 bg-flexoki-base-50 border-l-2 border-flexoki-base-300;
+  }
+  article aside.callout > :first-child {
+    margin-top: 0;
+  }
+  article aside.callout > :last-child {
+    margin-bottom: 0;
+  }
+  article details {
+    @apply my-4 border-l border-flexoki-base-200 pl-4;
+  }
+  article details summary {
+    @apply cursor-pointer font-serif text-lg text-flexoki-ink;
+  }
+  article figure figcaption {
+    @apply text-center text-sm text-flexoki-base-500;
+  }
+  article video,
+  article .video iframe {
+    @apply w-full my-6;
+  }
+  article .video iframe {
+    aspect-ratio: 16 / 9;
+    height: auto;
+  }
+}

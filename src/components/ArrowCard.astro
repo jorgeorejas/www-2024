@@ -1,19 +1,22 @@
 ---
-import type { CollectionEntry } from "astro:content";
 import FormattedDate from "./FormattedDate.astro";
 import Correction from "./Correction.astro";
 import AnimatedArrow from "./AnimatedArrow.astro";
 
 type Props = {
-  entry: CollectionEntry<"blog"> | CollectionEntry<"projects">;
+  entry: {
+    id: string;
+    data: { title: string; titleCorrection?: string; description: string; date: Date };
+  };
+  collection: "blog" | "projects";
   dateFormat?: "short" | "day" | "month";
 };
 
-const { entry, dateFormat } = Astro.props;
+const { entry, collection, dateFormat } = Astro.props;
 ---
 
 <a
-  href={`/${entry.collection}/${entry.id}`}
+  href={`/${collection}/${entry.id}`}
   class="relative group flex flex-nowrap py-3 px-4 pr-10 border-l border-flexoki-base-200 dark:border-flexoki-base-800 hover:bg-flexoki-base-100 dark:hover:bg-flexoki-base-900 hover:text-flexoki-ink dark:hover:text-flexoki-base-50 transition-colors duration-300 ease-in-out"
 >
   <div class="flex flex-col gap-2 flex-1">

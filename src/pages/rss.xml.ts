@@ -1,26 +1,27 @@
 import rss from "@astrojs/rss";
-import { getCollection } from "astro:content";
+import type { APIContext } from "astro";
+import { getLiveCollection } from "astro:content";
 import { HOME } from "@consts";
+import { cacheHeaders } from "@lib/cache-headers";
 
-type Context = {
-  site: string;
-};
+export async function GET(context: APIContext) {
+  const [blog, projects] = await Promise.all([
+    getLiveCollection("blog"),
+    getLiveCollection("projects"),
+  ]);
+  if (blog.error || projects.error) {
+    return new Response("Feed unavailable", { status: 503, headers: { "Cache-Control": "no-store" } });
+  }
 
-export async function GET(context: Context) {
-  const blog = (await getCollection("blog")).filter((post) => !post.data.draft);
+  const items = [
+    ...(blog.entries ?? []).filter((e) => !e.data.draft).map((e) => ({ ...e, collection: "blog" })),
+    ...(projects.entries ?? []).filter((e) => !e.data.draft).map((e) => ({ ...e, collection: "projects" })),
+  ].sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
-  const projects = (await getCollection("projects")).filter(
-    (project) => !project.data.draft,
-  );
-
-  const items = [...blog, ...projects].sort(
-    (a, b) => new Date(b.data.date).valueOf() - new Date(a.data.date).valueOf(),
-  );
-
-  return rss({
+  const response = await rss({
     title: HOME.TITLE,
     description: HOME.DESCRIPTION,
-    site: context.site,
+    site: context.site!,
     items: items.map((item) => ({
       title: item.data.title,
       description: item.data.description,
@@ -28,4 +29,8 @@ export async function GET(context: Context) {
       link: `/${item.collection}/${item.id}/`,
     })),
   });
+  for (const [name, value] of Object.entries(cacheHeaders(["blog", "projects"]))) {
+    response.headers.set(name, value);
+  }
+  return response;
 }

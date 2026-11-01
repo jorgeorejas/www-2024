@@ -4,6 +4,9 @@ import { visit } from "unist-util-visit";
  * Remark plugin to transform ~~original text~~(correction text) into custom correction markup
  * Example: ~~mistake~~(correct) becomes a strikethrough with correction inline to the right
  */
+const escapeHtml = (value) =>
+  value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+
 export function remarkCorrection() {
   return (tree) => {
     visit(tree, "paragraph", (node, index, parent) => {
@@ -33,7 +36,7 @@ export function remarkCorrection() {
               // Create inline correction
               const correctionNode = {
                 type: "html",
-                value: `<span class="line-through decoration-blue-800">${originalText}</span> <span class="font-handwritten font-bold text-blue-800 text-xl">${correctionText}</span>`,
+                value: `<span class="line-through decoration-blue-800">${escapeHtml(originalText)}</span> <span class="font-handwritten font-bold text-blue-800 text-xl">${escapeHtml(correctionText)}</span>`,
               };
 
               // Replace the delete node with our correction node
