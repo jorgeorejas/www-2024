@@ -1,0 +1,55 @@
+---
+import Container from "@components/Container.astro";
+import Nav from "@components/Nav.astro";
+import RecipeCard from "@components/cocina/RecipeCard.astro";
+import PageLayout from "@layouts/PageLayout.astro";
+import { cachePage, isNotFound, notionUnavailable } from "@lib/cache-headers";
+import { getLiveCollection, getLiveEntry } from "astro:content";
+
+const slug = Astro.params.slug ?? "";
+const [{ entry: tag, error }, { entries: recipes = [], error: recipesError }] = await Promise.all([
+  getLiveEntry("recipeTags", { id: slug }),
+  getLiveCollection("recipes"),
+]);
+if (recipesError) return notionUnavailable(recipesError);
+if (error && !isNotFound(error)) return notionUnavailable(error);
+if (!tag) return Astro.rewrite("/404");
+cachePage(Astro.response, ["recipes"]);
+
+const tagged = recipes.filter((r) => r.data.tags.some((t) => t.slug === slug));
+const title = `Recetas: ${tag.data.name}`;
+---
+
+<PageLayout title={title} description={tag.data.description ?? title} lang="es">
+  <Container>
+    <Nav
+      lang="es"
+      breadCrumbsItems={[
+        { href: "/cocina", label: "Cocina" },
+        { href: `/cocina/etiqueta/${slug}`, label: tag.data.name },
+      ]}
+    />
+    <div class="my-12 space-y-3">
+      {tag.data.emoji && <p class="text-5xl" aria-hidden="true">{tag.data.emoji}</p>}
+      <h1 class="font-serif text-4xl text-flexoki-ink">{tag.data.name}</h1>
+      {tag.data.description && <p class="max-w-prose">{tag.data.description}</p>}
+      <p class="text-sm text-flexoki-base-500">
+        {tagged.length} {tagged.length === 1 ? "receta" : "recetas"} · <a class="underline underline-offset-4" href="/cocina">ver todas</a>
+      </p>
+    </div>
+
+    {
+      tagged.length ? (
+        <ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-10">
+          {tagged.map((recipe) => (
+            <li>
+              <RecipeCard recipe={recipe} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>Todavía no hay recetas con esta etiqueta.</p>
+      )
+    }
+  </Container>
+</PageLayout>

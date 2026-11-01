@@ -4,8 +4,7 @@ import type {
   BreadcrumbListSchema,
   BreadcrumbItem,
 } from "@types";
-import { SITE } from "@consts";
-import type { CollectionEntry } from "astro:content";
+import { SITE, SOCIALS } from "@consts";
 
 /**
  * Generate Person schema for the homepage
@@ -18,23 +17,21 @@ export function generatePersonSchema(baseUrl: string): PersonSchema {
     url: baseUrl,
     email: SITE.EMAIL,
     jobTitle: SITE.POSITION,
-    sameAs: [
-      "https://twitter.com/jorejasrojo",
-      "https://github.com/jorgeorejas",
-      "https://www.linkedin.com/in/jorgeorejas/",
-    ],
+    sameAs: SOCIALS.map((social) => social.HREF),
   };
 }
 
 /**
  * Generate BlogPosting schema for blog posts
  */
+type Dated = { id: string; data: { title: string; description: string; date: Date } };
+
 export function generateBlogPostingSchema(
-  post: CollectionEntry<"blog">,
+  post: Dated,
   baseUrl: string,
 ): BlogPostingSchema {
   const postUrl = `${baseUrl}blog/${post.id}`;
-  const ogImageUrl = `${baseUrl}og/blog/${post.id}.png`;
+  const ogImageUrl = `${baseUrl}og/${post.id}.png`;
 
   return {
     "@context": "https://schema.org",
@@ -76,7 +73,7 @@ export function generateBreadcrumbSchema(
  * Generate schema for project pages
  */
 export function generateProjectSchema(
-  project: CollectionEntry<"projects">,
+  project: Dated,
   baseUrl: string,
 ): Record<string, unknown> {
   const projectUrl = `${baseUrl}projects/${project.id}`;

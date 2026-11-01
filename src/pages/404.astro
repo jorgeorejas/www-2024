@@ -1,0 +1,35 @@
+---
+import Container from "@components/Container.astro";
+import Nav from "@components/Nav.astro";
+import PageLayout from "@layouts/PageLayout.astro";
+
+Astro.response.status = 404;
+Astro.response.headers.set("Cache-Control", "public, max-age=0, s-maxage=300");
+
+const inCocina = Astro.url.pathname.startsWith("/cocina");
+---
+
+<PageLayout
+  title={inCocina ? "No encontrada" : "Not found"}
+  description={inCocina ? "Esta receta no existe." : "This page doesn't exist."}
+  lang={inCocina ? "es" : "en"}
+>
+  <Container>
+    <Nav lang={inCocina ? "es" : "en"} />
+    <div class="my-16 space-y-4">
+      <p class="font-handwritten text-2xl text-blue-800 -rotate-2">404</p>
+      <h1 class="font-serif text-4xl text-flexoki-ink">
+        {inCocina ? "Esta receta no existe" : "This page doesn't exist"}
+      </h1>
+      <p>
+        {
+          inCocina ? (
+            <a class="underline underline-offset-4" href="/cocina">Ver todas las recetas</a>
+          ) : (
+            <a class="underline underline-offset-4" href="/">Go to the home page</a>
+          )
+        }
+      </p>
+    </div>
+  </Container>
+</PageLayout>

@@ -1,5 +1,5 @@
 ---
-import { SITE } from "@consts";
+import { SITE, SITE_ES } from "@consts";
 import Breadcrumbs from "./Breadcrumbs.astro";
 type Props = {
   breadCrumbsItems?: {
@@ -21,7 +21,7 @@ const { breadCrumbsItems, lang = "en" } = Astro.props;
         {SITE.NAME}
       </p>
       <p class="w-full font-medium">
-        {lang === "es" ? "Desarrollador y emprendedor" : SITE.POSITION}
+        {lang === "es" ? SITE_ES.POSITION : SITE.POSITION}
       </p>
     </a>
     {

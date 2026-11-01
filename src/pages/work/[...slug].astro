@@ -1,30 +1,17 @@
 ---
 import Container from "@components/Container.astro";
 import Nav from "@components/Nav.astro";
-import WorkEntry from "@components/WorkEntry.astro";
 import PageLayout from "@layouts/PageLayout.astro";
+import { cachePage, isNotFound, notionUnavailable } from "@lib/cache-headers";
 import { dateRange, getWorkDateRange } from "@lib/utils";
-import { type CollectionEntry, getCollection, render } from "astro:content";
+import { getLiveEntry } from "astro:content";
 
-export const prerender = true;
+const slug = Astro.params.slug ?? "";
+const { entry: work, error } = await getLiveEntry("work", { id: slug });
+if (error && !isNotFound(error)) return notionUnavailable(error);
+if (!work) return Astro.rewrite("/404");
+cachePage(Astro.response, ["work", `work:${work.id}`]);
 
-export async function getStaticPaths() {
-  const workEntries = (await getCollection("work")).sort(
-    (a: CollectionEntry<"work">, b: CollectionEntry<"work">) => {
-      const aDateRange = getWorkDateRange(a.data.roles);
-      const bDateRange = getWorkDateRange(b.data.roles);
-      return bDateRange.startDate.valueOf() - aDateRange.startDate.valueOf();
-    },
-  );
-  return workEntries.map((work: CollectionEntry<"work">) => ({
-    params: { slug: work.id },
-    props: work,
-  }));
-}
-type Props = CollectionEntry<"work">;
-
-const work = Astro.props;
-const { Content } = await render(work);
 
 // Derive the overall date range from roles
 const { startDate, endDate } = getWorkDateRange(work.data.roles);
@@ -55,21 +42,19 @@ const { startDate, endDate } = getWorkDateRange(work.data.roles);
       </div>
 
       <div class="prose prose-neutral dark:prose-invert max-w-none">
-        <Content />
+        <Fragment set:html={work.rendered?.html} />
       </div>
 
       <div class="space-y-4">
         <h3 class="text-lg font-semibold font-serif">Positions</h3>
         <div class="space-y-3">
           {
-            work.data.roles
-              .sort((a, b) => b.dateStart.valueOf() - a.dateStart.valueOf())
-              .map((position, i) => (
+            work.data.roles.map((position, i) => (
                 <div class="space-y-2">
                   <div class="text-sm text-black/50 dark:text-white/50">
-                    {position.dateEnd
-                      ? new Date(position.dateEnd).toLocaleDateString("es-ES")
-                      : "Present"}
+                    {position.dateEnd === "Present"
+                      ? "Present"
+                      : position.dateEnd.toLocaleDateString("es-ES")}
                   </div>
                   <div class="border-l border-black/15 dark:border-white/20 pl-4 space-y-2">
                     <div class="font-medium font-serif">{position.title}</div>

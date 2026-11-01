@@ -1,40 +1,27 @@
 ---
 import PageLayout from "@layouts/PageLayout.astro";
 import { SITE, SOCIALS } from "@consts";
-import {
-  getWorkDateRange,
-  processWorkEntry,
-  processEducationEntry,
-} from "@lib/utils";
-import { getCollection } from "astro:content";
+import { cachePage } from "@lib/cache-headers";
+import { processWorkEntry, processEducationEntry } from "@lib/utils";
+import { getLiveCollection } from "astro:content";
 
-// Work
-const workCollection = (await getCollection("work")).sort((a, b) => {
-  const aRange = getWorkDateRange(a.data.roles);
-  const bRange = getWorkDateRange(b.data.roles);
-  return bRange.startDate.valueOf() - aRange.startDate.valueOf();
-});
-const processedWork = workCollection.map((item) =>
-  processWorkEntry({ ...item, body: item.body }),
+const [work, education, allProjects] = await Promise.all([
+  getLiveCollection("work"),
+  getLiveCollection("education"),
+  getLiveCollection("projects"),
+]);
+cachePage(Astro.response, ["work", "education", "projects"], work.error ?? education.error ?? allProjects.error);
+
+// Work and education come sorted newest first from Notion
+const processedWork = (work.entries ?? []).map((item) =>
+  processWorkEntry({ id: item.id, data: item.data, body: item.data.body }),
+);
+const processedEducation = (education.entries ?? []).map((item) =>
+  processEducationEntry({ id: item.id, data: item.data, body: item.data.body }),
 );
 
-// Education
-const educationCollection = (await getCollection("education")).sort((a, b) => {
-  const aEnd = a.data.dateEnd === "Present" ? new Date() : a.data.dateEnd;
-  const bEnd = b.data.dateEnd === "Present" ? new Date() : b.data.dateEnd;
-  return bEnd.valueOf() - aEnd.valueOf();
-});
-const processedEducation = educationCollection.map((item) =>
-  processEducationEntry({ ...item, body: item.body }),
-);
-
-// Projects (hideFromCV opt-out, draft hides everywhere)
-const projects = (
-  await getCollection(
-    "projects",
-    ({ data }) => !data.draft && !data.hideFromCV,
-  )
-).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+// Projects marked "Ocultar en CV" in Notion stay off the CV
+const projects = (allProjects.entries ?? []).filter((p) => !p.data.hideFromCV && !p.data.draft);
 
 // Helpers
 const fmtMonthYear = (d: Date | string) =>

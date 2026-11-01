@@ -1,34 +1,14 @@
 import type { LiveLoader } from "astro/loaders";
+import { cached } from "./notion/cache";
+import { notionRequest, queryDatabase, type NotionPage, type RichText } from "./notion/client";
+import { ALL_NOTION } from "./notion/databases";
+import { pageImageSource, pageImageUrl } from "./notion/images";
 
-const NOTION_API = "https://api.notion.com/v1";
-const NOTION_VERSION = "2022-06-28";
-
-// Notion's minimal property shapes we care about. Anything else is ignored.
-type RichText = { plain_text: string }[];
-type NotionFile =
-  | { type: "external"; external: { url: string } }
-  | { type: "file"; file: { url: string } };
-
-type NotionProperty =
-  | { type: "title"; title: RichText }
-  | { type: "rich_text"; rich_text: RichText }
-  | { type: "url"; url: string | null }
-  | { type: "number"; number: number | null }
-  | { type: "select"; select: { name: string } | null }
-  | { type: "status"; status: { name: string } | null }
-  | { type: "multi_select"; multi_select: { name: string }[] }
-  | { type: "checkbox"; checkbox: boolean }
-  | { type: "files"; files: NotionFile[] }
-  | { type: "date"; date: { start: string } | null }
-  | { type: string; [key: string]: unknown };
-
-export type NotionPage = {
-  id: string;
-  created_time: string;
-  last_edited_time: string;
-  cover: NotionFile | null;
-  properties: Record<string, NotionProperty>;
-};
+/*
+ * Wishlist loader. Unlike the other collections it reads columns by type
+ * (the first text column is the description, the first select the category…)
+ * so the Notion table can change shape without touching code.
+ */
 
 type NotionDatabase = {
   properties: Record<string, { type: string; number?: { format: string } }>;
@@ -44,55 +24,7 @@ const CURRENCIES: Record<string, string> = {
 const HIDDEN_CHECKBOX = /^(hide|hidden|draft|private|oculto)$/i;
 const PRICE_NUMBER = /price|precio|cost|€|\$/i;
 
-export async function notionRequest<T>(
-  token: string,
-  path: string,
-  init?: RequestInit,
-  retries = 4,
-): Promise<T> {
-  const res = await fetch(`${NOTION_API}${path}`, {
-    ...init,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Notion-Version": NOTION_VERSION,
-      "Content-Type": "application/json",
-      ...init?.headers,
-    },
-  });
-  // Notion allows ~3 req/s; back off and retry when rate limited
-  if (res.status === 429 && retries > 0) {
-    const wait = Number(res.headers.get("Retry-After")) || 1;
-    await new Promise((resolve) => setTimeout(resolve, wait * 1000 + Math.random() * 500));
-    return notionRequest(token, path, init, retries - 1);
-  }
-  if (!res.ok) {
-    throw new Error(`Notion ${path} failed: ${res.status} ${await res.text()}`);
-  }
-  return res.json() as Promise<T>;
-}
-
 const plain = (rt: RichText) => rt.map((t) => t.plain_text).join("").trim();
-
-/**
- * Picks the image for a page: cover first, then the first file in any
- * `files` property. Notion-hosted files get signed URLs that expire after
- * an hour, so for those we return null and flag `hosted` so callers can
- * route through `/api/notion-image/[id]` instead.
- */
-export function resolvePageImage(
-  page: NotionPage,
-): { url: string; hosted: boolean } | null {
-  const candidates: NotionFile[] = [];
-  if (page.cover) candidates.push(page.cover);
-  for (const prop of Object.values(page.properties)) {
-    if (prop.type === "files") candidates.push(...(prop.files as NotionFile[]));
-  }
-  const first = candidates[0];
-  if (!first) return null;
-  return first.type === "external"
-    ? { url: first.external.url, hosted: false }
-    : { url: first.file.url, hosted: true };
-}
 
 function mapPage(page: NotionPage, currency: string | undefined) {
   let title = "";
@@ -127,9 +59,7 @@ function mapPage(page: NotionPage, currency: string | undefined) {
       }
       case "select":
       case "status": {
-        const option = (prop as Record<string, unknown>)[prop.type] as
-          | { name: string }
-          | null;
+        const option = prop[prop.type] as { name: string } | null;
         if (option) category ??= option.name;
         if (option) fields[name] = [option.name];
         break;
@@ -152,7 +82,7 @@ function mapPage(page: NotionPage, currency: string | undefined) {
     }
   }
 
-  const image = resolvePageImage(page);
+  const image = pageImageSource(page);
 
   return {
     title: title || "Untitled",
@@ -165,21 +95,14 @@ function mapPage(page: NotionPage, currency: string | undefined) {
     fields,
     date: date ?? page.created_time,
     hidden,
-    image: image
-      ? image.hosted
-        ? `/api/notion-image/${page.id}`
-        : image.url
-      : undefined,
+    image: image ? (image.hosted ? pageImageUrl(page.id, 640, page.last_edited_time) : image.url) : undefined,
   };
 }
 
 export type NotionItem = ReturnType<typeof mapPage>;
 
-async function fetchCurrency(token: string, databaseId: string) {
-  const database = await notionRequest<NotionDatabase>(
-    token,
-    `/databases/${databaseId}`,
-  );
+async function fetchCurrency(databaseId: string) {
+  const database = await notionRequest<NotionDatabase>(`/databases/${databaseId}`);
   const priceProp =
     Object.entries(database.properties).find(
       ([name, p]) => p.type === "number" && PRICE_NUMBER.test(name),
@@ -187,50 +110,20 @@ async function fetchCurrency(token: string, databaseId: string) {
   return priceProp?.[1].number ? CURRENCIES[priceProp[1].number.format] : undefined;
 }
 
-async function fetchPages(token: string, databaseId: string) {
-  const pages: NotionPage[] = [];
-  let cursor: string | undefined;
-  do {
-    const res = await notionRequest<{
-      results: NotionPage[];
-      has_more: boolean;
-      next_cursor: string | null;
-    }>(token, `/databases/${databaseId}/query`, {
-      method: "POST",
-      body: JSON.stringify({ start_cursor: cursor, page_size: 100 }),
-    });
-    pages.push(...res.results);
-    cursor = res.has_more ? (res.next_cursor ?? undefined) : undefined;
-  } while (cursor);
-  return pages;
-}
-
-/**
- * Astro live loader for a Notion database: rows are fetched on request, so
- * edits in Notion show up without a rebuild. Callers should cache the
- * response (the Notion API allows ~3 req/s).
- */
 export function notionLiveLoader(options: {
-  token: string | undefined;
-  databaseId: string | undefined;
+  databaseId: string;
 }): LiveLoader<NotionItem, { id: string }> {
-  const config = () => {
-    const { token, databaseId } = options;
-    if (!token || !databaseId) {
-      throw new Error("NOTION_TOKEN or NOTION_WISHLIST_DATABASE_ID missing");
-    }
-    return { token, databaseId };
-  };
+  const { databaseId } = options;
+  const load = () =>
+    cached(`wishlist:${databaseId}`, () =>
+      Promise.all([fetchCurrency(databaseId), queryDatabase(databaseId)]),
+    );
 
   return {
     name: "notion-live-loader",
     loadCollection: async () => {
       try {
-        const { token, databaseId } = config();
-        const [currency, pages] = await Promise.all([
-          fetchCurrency(token, databaseId),
-          fetchPages(token, databaseId),
-        ]);
+        const [currency, pages] = await load();
         const entries = pages
           .map((page) => ({ id: page.id, data: mapPage(page, currency) }))
           .filter((entry) => !entry.data.hidden);
@@ -241,7 +134,7 @@ export function notionLiveLoader(options: {
         return {
           entries,
           cacheHint: {
-            tags: ["wishlist"],
+            tags: [ALL_NOTION, "wishlist"],
             lastModified: lastModified ? new Date(lastModified) : undefined,
           },
         };
@@ -251,17 +144,15 @@ export function notionLiveLoader(options: {
     },
     loadEntry: async ({ filter }) => {
       try {
-        const { token, databaseId } = config();
-        const [currency, page] = await Promise.all([
-          fetchCurrency(token, databaseId),
-          notionRequest<NotionPage>(token, `/pages/${filter.id}`),
-        ]);
+        const [currency, pages] = await load();
+        const page = pages.find((p) => p.id === filter.id);
+        if (!page) return undefined;
         const data = mapPage(page, currency);
         if (data.hidden) return undefined;
         return {
           id: page.id,
           data,
-          cacheHint: { tags: ["wishlist", `wishlist:${page.id}`] },
+          cacheHint: { tags: [ALL_NOTION, "wishlist", `wishlist:${page.id}`] },
         };
       } catch (error) {
         return { error: error instanceof Error ? error : new Error(String(error)) };

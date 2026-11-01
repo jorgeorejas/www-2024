@@ -1,28 +1,20 @@
 ---
 import Container from "@components/Container.astro";
 import Nav from "@components/Nav.astro";
-import WorkEntry from "@components/WorkEntry.astro";
 import WorkTimeline from "@components/WorkTimeline.astro";
 import { WORK } from "@consts";
 import PageLayout from "@layouts/PageLayout.astro";
-import { getWorkDateRange, processWorkEntry } from "@lib/utils";
-import { getCollection, render } from "astro:content";
+import { cachePage } from "@lib/cache-headers";
+import { processWorkEntry } from "@lib/utils";
+import { getLiveCollection } from "astro:content";
 
-const collection = (await getCollection("work")).sort((a, b) => {
-  const aDateRange = getWorkDateRange(a.data.roles);
-  const bDateRange = getWorkDateRange(b.data.roles);
-  return bDateRange.startDate.valueOf() - aDateRange.startDate.valueOf();
-});
+// Companies from Notion with their roles, newest first
+const { entries: work = [], error } = await getLiveCollection("work");
+cachePage(Astro.response, ["work"], error);
 
-const work = await Promise.all(
-  collection.map(async (item) => {
-    const { Content } = await render(item);
-    return { ...item, Content };
-  }),
+const processedWork = work.map((item) =>
+  processWorkEntry({ id: item.id, data: item.data, body: item.data.body }),
 );
-
-// Process work entries into structured format
-const processedWork = work.map((item) => processWorkEntry(item));
 ---
 
 <PageLayout title={WORK.TITLE} description={WORK.DESCRIPTION}>

@@ -5,28 +5,27 @@ import FormattedDate from "@components/FormattedDate.astro";
 import Link from "@components/Link.astro";
 import Nav from "@components/Nav.astro";
 import PageLayout from "@layouts/PageLayout.astro";
-import { readingTime } from "@lib/utils";
+import { cachePage, isNotFound, notionUnavailable } from "@lib/cache-headers";
 import { generateProjectSchema, generateBreadcrumbSchema } from "@lib/seo-utils";
-import { type CollectionEntry, getCollection, render } from "astro:content";
+import { getLiveCollection, getLiveEntry } from "astro:content";
 
-export const prerender = true;
+const slug = Astro.params.slug ?? "";
+const { entry: project, error } = await getLiveEntry("projects", { id: slug });
+if (error && !isNotFound(error)) return notionUnavailable(error);
+if (!project) return Astro.rewrite("/404");
 
-export async function getStaticPaths() {
-  const projects = (await getCollection("projects"))
-    .filter((project: CollectionEntry<"projects">) => !project.data.draft)
-    .sort(
-      (a: CollectionEntry<"projects">, b: CollectionEntry<"projects">) =>
-        b.data.date.valueOf() - a.data.date.valueOf(),
-    );
-  return projects.map((project: CollectionEntry<"projects">) => ({
-    params: { slug: project.id },
-    props: project,
-  }));
-}
-type Props = CollectionEntry<"projects">;
-
-const project = Astro.props;
-const { Content } = await render(project);
+// Notion relations: earlier/later versions and posts about the project
+const [{ entries: allProjects = [], error: projectsError }, { entries: posts = [], error: blogError }] =
+  await Promise.all([
+    getLiveCollection("projects"),
+    project.data.articles.length
+      ? getLiveCollection("blog")
+      : Promise.resolve({ entries: [], error: undefined }),
+  ]);
+cachePage(Astro.response, ["projects", `projects:${project.id}`, "blog"], projectsError ?? blogError);
+const previous = allProjects.find((p) => p.id === project.data.previous);
+const next = allProjects.find((p) => p.id === project.data.next);
+const articles = posts.filter((p) => project.data.articles.includes(p.id));
 
 // Generate structured data for SEO
 const projectSchema = generateProjectSchema(project, Astro.site!.toString());
@@ -61,7 +60,7 @@ const breadcrumbSchema = generateBreadcrumbSchema(
         </div>
         &bull;
         <div class="font-base text-sm">
-          {readingTime(project.body)}
+          {project.data.readingTime}
         </div>
       </div>
       {
@@ -99,7 +98,44 @@ const breadcrumbSchema = generateBreadcrumbSchema(
       }
     </div>
     <article>
-      <Content />
+      <Fragment set:html={project.rendered?.html} />
     </article>
+
+    {
+      (previous || next || articles.length > 0) && (
+        <aside class="mt-12 space-y-6 border-t border-flexoki-base-200 pt-6">
+          {articles.length > 0 && (
+            <div class="space-y-2">
+              <h2 class="text-lg font-semibold font-serif">Written about it</h2>
+              <ul class="flex flex-col gap-1">
+                {articles.map((post) => (
+                  <li>
+                    <a class="underline decoration-flexoki-base-300 underline-offset-4 hover:decoration-current" href={`/blog/${post.id}`}>
+                      {post.data.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {(previous || next) && (
+            <nav class="flex flex-wrap justify-between gap-4 text-sm">
+              {previous && (
+                <a class="group" href={`/projects/${previous.id}`}>
+                  <span class="block text-flexoki-base-500">Previous version</span>
+                  <span class="font-serif text-base group-hover:underline">← {previous.data.titleCorrection ?? previous.data.title}</span>
+                </a>
+              )}
+              {next && (
+                <a class="group text-right ml-auto" href={`/projects/${next.id}`}>
+                  <span class="block text-flexoki-base-500">Next version</span>
+                  <span class="font-serif text-base group-hover:underline">{next.data.titleCorrection ?? next.data.title} →</span>
+                </a>
+              )}
+            </nav>
+          )}
+        </aside>
+      )
+    }
   </Container>
 </PageLayout>
