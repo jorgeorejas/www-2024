@@ -9,7 +9,7 @@ type Props = {
   lang?: "en" | "es";
 };
 
-const { breadCrumbsItems, lang = "en" } = Astro.props;
+const { breadCrumbsItems, lang = "es" } = Astro.props;
 ---
 
 <div
@@ -28,7 +28,7 @@ const { breadCrumbsItems, lang = "en" } = Astro.props;
       breadCrumbsItems && (
         <Breadcrumbs
           items={breadCrumbsItems}
-          homeLabel={lang === "es" ? "Inicio" : undefined}
+          homeLabel={lang === "en" ? "Home" : undefined}
         />
       )
     }

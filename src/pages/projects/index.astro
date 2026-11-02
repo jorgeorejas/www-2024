@@ -17,20 +17,20 @@ const hasPick = projects.some((p) => p.data.pick);
 const hasNew = projects.some((p) => isNew(p.data.date));
 const legend =
   hasPick && hasNew
-    ? "◆ my pick · NEW last 60 days"
+    ? "◆ mi favorito · NUEVO últimos 60 días"
     : hasPick
-      ? "◆ my pick"
+      ? "◆ mi favorito"
       : hasNew
-        ? "NEW last 60 days"
+        ? "NUEVO últimos 60 días"
         : undefined;
 ---
 
 <MarginPage
   title={PROJECTS.TITLE}
   description={PROJECTS.DESCRIPTION}
-  breadcrumbs={[{ href: "/projects", label: "Projects" }]}
+  breadcrumbs={[{ href: "/projects", label: PROJECTS.TITLE }]}
 >
-  <Row label="projects">
+  <Row label="proyectos">
     <header class="grid gap-3">
       <h1 class="m-h1">{PROJECTS.TITLE}</h1>
       <p class="m-lede">{PROJECTS.DESCRIPTION}</p>

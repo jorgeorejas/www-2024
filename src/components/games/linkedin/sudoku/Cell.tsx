@@ -43,9 +43,9 @@ function CellImpl({
   return (
     <button
       type="button"
-      aria-label={`Row ${row + 1}, column ${col + 1}${
-        value ? `, value ${value}` : ", empty"
-      }${locked ? ", locked" : ""}`}
+      aria-label={`Fila ${row + 1}, columna ${col + 1}${
+        value ? `, valor ${value}` : ", vacía"
+      }${locked ? ", fija" : ""}`}
       data-row={row}
       data-col={col}
       data-locked={locked ? "true" : "false"}

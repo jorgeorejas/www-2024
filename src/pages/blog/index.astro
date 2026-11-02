@@ -23,9 +23,9 @@ for (const post of posts) {
 function legendFor(items: typeof posts): string | undefined {
   const pick = items.some((p) => p.data.pick);
   const fresh = items.some((p) => isNew(p.data.date));
-  if (pick && fresh) return "◆ my pick · NEW last 60 days";
-  if (pick) return "◆ my pick";
-  if (fresh) return "NEW last 60 days";
+  if (pick && fresh) return "◆ mi favorito · NUEVO últimos 60 días";
+  if (pick) return "◆ mi favorito";
+  if (fresh) return "NUEVO últimos 60 días";
   return undefined;
 }
 ---
@@ -33,7 +33,7 @@ function legendFor(items: typeof posts): string | undefined {
 <MarginPage
   title={BLOG.TITLE}
   description={BLOG.DESCRIPTION}
-  breadcrumbs={[{ href: "/blog", label: "Blog" }]}
+  breadcrumbs={[{ href: "/blog", label: BLOG.TITLE }]}
 >
   <Row>
     <header class="grid gap-3">

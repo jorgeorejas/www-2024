@@ -6,11 +6,11 @@ type Props = {
   class?: string;
 };
 
-const { items, homeLabel = "Home", class: className } = Astro.props;
+const { items, homeLabel = "Inicio", class: className } = Astro.props;
 const all = [{ href: "/", label: homeLabel }, ...items];
 ---
 
-<nav class:list={["m-crumbs", className]} aria-label="Breadcrumb">
+<nav class:list={["m-crumbs", className]} aria-label="Ruta de navegación">
   <ol>
     {
       all.map((item, i) => (

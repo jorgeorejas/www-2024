@@ -1,7 +1,7 @@
 import rss from "@astrojs/rss";
 import type { APIContext } from "astro";
 import { getLiveCollection } from "astro:content";
-import { HOME } from "@consts";
+import { HOME, SITE } from "@consts";
 import { cacheHeaders } from "@lib/cache-headers";
 
 export async function GET(context: APIContext) {
@@ -19,9 +19,10 @@ export async function GET(context: APIContext) {
   ].sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
   const response = await rss({
-    title: HOME.TITLE,
+    title: SITE.NAME,
     description: HOME.DESCRIPTION,
     site: context.site!,
+    customData: "<language>es-es</language>",
     items: items.map((item) => ({
       title: item.data.title,
       description: item.data.description,

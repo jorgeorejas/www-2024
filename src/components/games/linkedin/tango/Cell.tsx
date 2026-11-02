@@ -29,6 +29,9 @@ interface CellProps {
   disabled: boolean;
 }
 
+// What a screen reader says for each value
+const VALUE_LABEL: Record<CellValue, string> ={ empty: "vacía", sun: "sol", moon: "luna" };
+
 const THIN = "1px solid var(--tango-border-thin)";
 const THICK = "2px solid var(--tango-border-thick)";
 
@@ -52,7 +55,7 @@ function CellImpl({
   const borderRight = hasEastNeighbor ? THIN : THICK;
   const borderBottom = hasSouthNeighbor ? THIN : THICK;
 
-  const label = `Row ${row + 1}, column ${col + 1}, ${value}${locked ? ", locked" : ""}`;
+  const label = `Fila ${row + 1}, columna ${col + 1}, ${VALUE_LABEL[value]}${locked ? ", fija" : ""}`;
 
   return (
     <button

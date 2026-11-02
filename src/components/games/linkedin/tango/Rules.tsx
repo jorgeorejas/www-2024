@@ -2,18 +2,18 @@ export function Rules() {
   return (
     <details className="mt-6 text-sm text-flexoki-base-700 dark:text-flexoki-base-300">
       <summary className="cursor-pointer font-serif text-flexoki-ink dark:text-flexoki-base-50">
-        How to play
+        Cómo se juega
       </summary>
       <ul className="mt-2 list-disc pl-5 space-y-1">
-        <li>Fill every cell with a sun (☀️) or a moon (🌑).</li>
-        <li>Each row and column must hold exactly three suns and three moons.</li>
-        <li>No three identical symbols may sit next to each other in any row or column.</li>
+        <li>Rellena cada casilla con un sol (☀️) o una luna (🌑).</li>
+        <li>Cada fila y cada columna tiene que llevar exactamente tres soles y tres lunas.</li>
+        <li>No puede haber tres símbolos iguales seguidos en ninguna fila ni columna.</li>
         <li>
-          A <span className="font-mono">=</span> between two cells means they must match;
-          a <span className="font-mono">×</span> means they must differ.
+          Un <span className="font-mono">=</span> entre dos casillas quiere decir que son iguales;
+          un <span className="font-mono">×</span>, que son distintas.
         </li>
-        <li>Click a cell to cycle: empty → sun → moon → empty. Locked clue cells can't change.</li>
-        <li>The board outlines conflicts in red as you go.</li>
+        <li>Toca una casilla para ir cambiándola: vacía → sol → luna → vacía. Las pistas fijas no se pueden cambiar.</li>
+        <li>El tablero marca en rojo los choques según juegas.</li>
       </ul>
     </details>
   );

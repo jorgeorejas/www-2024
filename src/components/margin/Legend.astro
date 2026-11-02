@@ -5,7 +5,7 @@ type Props = {
   class?: string;
 };
 
-const { text = "◆ my pick · NEW last 60 days", class: className } = Astro.props;
+const { text = "◆ mi favorito · NUEVO últimos 60 días", class: className } = Astro.props;
 ---
 
 <p class:list={["m-legend", className]}>{text}</p>

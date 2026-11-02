@@ -1,8 +1,8 @@
 import { SITE } from "@consts";
 
 export default function OG(
-  title: string = "<Site Name> - Default Title",
-  description: string = "Default Description",
+  title: string = SITE.NAME,
+  description: string = "",
 ) {
   return (
     <div
@@ -60,7 +60,7 @@ export default function OG(
           padding: "2rem 4rem",
         }}
       >
-        By {SITE.NAME}
+        Por {SITE.NAME}
       </p>
     </div>
   );

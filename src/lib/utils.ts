@@ -6,22 +6,31 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatDate(date: Date) {
-  return Intl.DateTimeFormat("en-US", {
+  return Intl.DateTimeFormat("es-ES", {
     month: "short",
     day: "2-digit",
     year: "numeric",
+    timeZone: "UTC",
   }).format(date);
+}
+
+/** What a role or a degree that hasn't ended shows instead of an end date */
+export const PRESENT_LABEL = "actualidad";
+
+/** Short month and year in Spanish, e.g. "oct 2026" (UTC, Notion dates are date-only) */
+export function formatMonthYear(date: Date): string {
+  return date.toLocaleDateString("es-ES", { month: "short", year: "numeric", timeZone: "UTC" });
 }
 
 export function readingTime(html: string = "") {
   const textOnly = html.replace(/<[^>]+>/g, "");
   const wordCount = textOnly.split(/\s+/).length;
   const readingTimeMinutes = (wordCount / 200 + 1).toFixed();
-  return `${readingTimeMinutes} min read`;
+  return `${readingTimeMinutes} min de lectura`;
 }
 
 export function dateRange(startDate: Date, endDate?: Date | string): string {
-  const startMonth = startDate.toLocaleString("default", { month: "short" });
+  const startMonth = startDate.toLocaleString("es-ES", { month: "short", timeZone: "UTC" });
   const startYear = startDate.getFullYear().toString();
   let endMonth;
   let endYear;
@@ -29,9 +38,9 @@ export function dateRange(startDate: Date, endDate?: Date | string): string {
   if (endDate) {
     if (typeof endDate === "string") {
       endMonth = "";
-      endYear = endDate;
+      endYear = endDate === "Present" ? PRESENT_LABEL : endDate;
     } else {
-      endMonth = endDate.toLocaleString("default", { month: "short" });
+      endMonth = endDate.toLocaleString("es-ES", { month: "short", timeZone: "UTC" });
       endYear = endDate.getFullYear().toString();
     }
   }
@@ -114,12 +123,13 @@ export function processWorkEntry(workEntry: {
 
 export function formatWorkDate(date: Date | string): string {
   if (typeof date === "string") {
-    return date;
+    return date === "Present" ? PRESENT_LABEL : date;
   }
-  return date.toLocaleDateString("en-EN", {
+  return date.toLocaleDateString("es-ES", {
     day: "2-digit",
     month: "long",
     year: "numeric",
+    timeZone: "UTC",
   });
 }
 
@@ -151,9 +161,9 @@ export function processEducationEntry(educationEntry: {
 
 export function formatEducationDate(date: Date | string): string {
   if (typeof date === "string") {
-    return date;
+    return date === "Present" ? PRESENT_LABEL : date;
   }
-  return date.toLocaleDateString("en-EN", { month: "short", year: "numeric" });
+  return formatMonthYear(date);
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -177,7 +187,7 @@ export function formatYear(date: Date): string {
 }
 
 /**
- * Length of a period in years and months, e.g. "10 mo", "2 yr 3 mo".
+ * Length of a period in years and months, e.g. "10 meses", "2 años y 3 meses".
  * `end` defaults to now ("Present" counts as now).
  */
 export function formatDuration(start: Date, end?: Date | string): string {
@@ -185,5 +195,10 @@ export function formatDuration(start: Date, end?: Date | string): string {
   const months = Math.max(1, Math.round((until.valueOf() - start.valueOf()) / (DAY_MS * 30.44)));
   const years = Math.floor(months / 12);
   const rest = months % 12;
-  return [years ? `${years} yr` : "", rest ? `${rest} mo` : ""].filter(Boolean).join(" ");
+  return [
+    years ? `${years} ${years === 1 ? "año" : "años"}` : "",
+    rest ? `${rest} ${rest === 1 ? "mes" : "meses"}` : "",
+  ]
+    .filter(Boolean)
+    .join(" y ");
 }

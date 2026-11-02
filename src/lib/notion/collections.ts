@@ -67,7 +67,7 @@ async function pageBody(page: NotionPage, skipBlockId?: string): Promise<Body> {
 
 export function readingTime(text: string) {
   const words = text.split(/\s+/).filter(Boolean).length;
-  return `${Math.max(1, Math.round(words / 200 + 1))} min read`;
+  return `${Math.max(1, Math.round(words / 200 + 1))} min de lectura`;
 }
 
 // ---------------------------------------------------------------------------
@@ -464,7 +464,8 @@ export async function sections() {
         homeLink: p.text("Enlace en inicio"),
         homeCount: p.number("Elementos en inicio"),
         order: p.number("Orden") ?? 99,
-        lang: p.select("Idioma") === "Español" ? "es" : "en",
+        // Spanish unless the section says otherwise ("Inglés")
+        lang: p.select("Idioma") === "Inglés" ? "en" : "es",
         blocks: p.relation("Bloques").flatMap((id) => blockSlug.get(id) ?? []),
       };
       return { id: path, page, data };

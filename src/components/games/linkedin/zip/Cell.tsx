@@ -31,8 +31,8 @@ function CellImpl({
   // top + left so shared edges aren't double-drawn.
   const isRightEdge = col === size - 1;
   const isBottomEdge = row === size - 1;
-  const labelText = label != null ? `, label ${label}` : "";
-  const pathText = pathIndex >= 0 ? `, path step ${pathIndex + 1}` : "";
+  const labelText = label != null ? `, número ${label}` : "";
+  const pathText = pathIndex >= 0 ? `, paso ${pathIndex + 1} del camino` : "";
 
   return (
     <button
@@ -41,7 +41,7 @@ function CellImpl({
       data-col={col}
       data-label={label ?? ""}
       data-path-index={pathIndex}
-      aria-label={`Row ${row + 1}, column ${col + 1}${labelText}${pathText}`}
+      aria-label={`Fila ${row + 1}, columna ${col + 1}${labelText}${pathText}`}
       onClick={() => onClick(row, col)}
       disabled={disabled}
       className={

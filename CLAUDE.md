@@ -8,6 +8,18 @@ This is a personal website built with Astro 7, deployed on Vercel. The site feat
 
 **Stack**: Astro 7 (SSR mode), TypeScript, React, Tailwind CSS 4, MDX
 
+## Language and voice
+
+The site is in **Spanish (Spain)**: `html lang="es"`, `og:locale` `es_ES`, `inLanguage: "es"` in JSON-LD, dates with `es-ES` (`formatMonthYear` → "oct 2026", `formatDuration` → "1 año y 3 meses", `PRESENT_LABEL` → "actualidad" in `src/lib/utils.ts`). The `lang` prop on `PageLayout`/`MarginPage` (and Notion "Idioma" on Secciones) still exists, but defaults to `"es"`; English is only the opt-in branch.
+
+Every string in code (labels, buttons, empty states, aria-labels, fallbacks in `src/consts.ts`) should sound like Jorge talking, not like a translation:
+- First person, direct, warm, short sentences. Casual but public: no swearing, no "jajaja".
+- Almost **no compound tenses** (Asturian Spanish): use the pretérito indefinido even for the recent past ("monté", "aprendí", "escribí"), never "he hecho" / "ha cambiado".
+- Anglicisms he really uses are fine (startup, side project, build, deploy, feature, growth, IA). No calques ("hace sentido", "aplicar a"), no AI filler, no Title Case: Spanish titles use sentence case. Correct accents and ¿? / ¡!.
+- Margin notes stay short, lowercase and playful; the `~~typo~~(fix)` correction joke keeps its parentheses.
+
+Where the rules come from: `~/.claude/jorge-writing-style.md` and `~/.claude/skills/slack-reporter/references/voice.md` (his everyday voice and vocabulary). Developer-facing text (console logs, thrown errors, code comments, the `/calendar` JSON API) stays in English.
+
 ## Development Commands
 
 ```bash

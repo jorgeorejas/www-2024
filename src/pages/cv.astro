@@ -1,8 +1,8 @@
 ---
 import PageLayout from "@layouts/PageLayout.astro";
-import { SITE, SOCIALS } from "@consts";
+import { SITE, SITE_ES, SOCIALS } from "@consts";
 import { cachePage } from "@lib/cache-headers";
-import { processWorkEntry, processEducationEntry } from "@lib/utils";
+import { PRESENT_LABEL, formatMonthYear, processWorkEntry, processEducationEntry } from "@lib/utils";
 import { getLiveCollection } from "astro:content";
 
 const [work, education, allProjects] = await Promise.all([
@@ -24,13 +24,12 @@ const processedEducation = (education.entries ?? []).map((item) =>
 const projects = (allProjects.entries ?? []).filter((p) => !p.data.hideFromCV && !p.data.draft);
 
 // Helpers
-const fmtMonthYear = (d: Date | string) =>
-  typeof d === "string"
-    ? d
-    : d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+const label = (d: string) => (d === "Present" ? PRESENT_LABEL : d);
+
+const fmtMonthYear = (d: Date | string) => (typeof d === "string" ? label(d) : formatMonthYear(d));
 
 const fmtYear = (d: Date | string) =>
-  typeof d === "string" ? d : d.getFullYear().toString();
+  typeof d === "string" ? label(d) : d.getFullYear().toString();
 
 const linkedin = SOCIALS.find((s) => s.NAME === "linkedin")?.HREF;
 const github = SOCIALS.find((s) => s.NAME === "github")?.HREF;
@@ -39,7 +38,7 @@ const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
 
 <PageLayout
   title="CV"
-  description={`${SITE.NAME} — Curriculum Vitae`}
+  description={`Currículum de ${SITE.NAME}`}
 >
   <div
     class="cv-sheet"
@@ -51,10 +50,10 @@ const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
     <div class="cv-header">
       <div class="cv-header-main">
         <h1 class="cv-name">{SITE.NAME}</h1>
-        <p class="cv-position">{SITE.POSITION}</p>
+        <p class="cv-position">{SITE_ES.POSITION}</p>
       </div>
       <ul class="cv-contact">
-        <li>Madrid + Asturias, Spain</li>
+        <li>Madrid + Asturias</li>
         <li>
           <a href="https://jorgeorejas.com">jorgeorejas.com</a>
         </li>
@@ -83,17 +82,16 @@ const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
     </div>
 
     <section class="cv-section" data-section="profile">
-      <h2 class="cv-section-title">Profile</h2>
+      <h2 class="cv-section-title">Perfil</h2>
       <p class="cv-summary">
-        Developer and entrepreneur from Asturias, Spain. I build at the
-        intersection of growth, AI and product — shipping data-driven
-        experiments, full-stack web features, and tools that turn ideas into
-        scalable products.
+        Desarrollador y emprendedor asturiano. Me muevo entre growth, IA y
+        producto: lanzo experimentos con datos, hago features web full-stack y
+        monto herramientas para que una idea acabe siendo un producto que escala.
       </p>
     </section>
 
     <section class="cv-section" data-section="experience">
-      <h2 class="cv-section-title">Experience</h2>
+      <h2 class="cv-section-title">Experiencia</h2>
       {
         processedWork.map((work, i) => (
           <div class="cv-entry" data-entry="work" data-index={i}>
@@ -145,7 +143,7 @@ const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
     </section>
 
     <section class="cv-section" data-section="education">
-      <h2 class="cv-section-title">Education</h2>
+      <h2 class="cv-section-title">Formación</h2>
       {
         processedEducation.map((edu, i) => (
           <div class="cv-entry" data-entry="education" data-index={i}>
@@ -154,7 +152,7 @@ const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
               <span class="cv-entry-date">
                 {fmtYear(edu.startDate)} —{" "}
                 {edu.endDate === "Present" && edu.expectedEnd
-                  ? `${fmtYear(edu.expectedEnd)} (expected)`
+                  ? `${fmtYear(edu.expectedEnd)} (previsto)`
                   : fmtYear(edu.endDate)}
               </span>
             </div>
@@ -168,7 +166,7 @@ const x = SOCIALS.find((s) => s.NAME === "x")?.HREF;
     </section>
 
     <section class="cv-section" data-section="projects">
-      <h2 class="cv-section-title">Selected Projects</h2>
+      <h2 class="cv-section-title">Proyectos destacados</h2>
       <ul class="cv-projects">
         {
           projects.map((p, i) => (

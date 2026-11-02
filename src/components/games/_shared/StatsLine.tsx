@@ -1,6 +1,6 @@
 import { type GameId, useGameStats } from "./history";
 import { formatDuration } from "./timer";
-import type { Difficulty, Mode } from "./types";
+import { DIFFICULTY_LABEL, type Difficulty, type Mode } from "./types";
 
 interface StatsLineProps {
   gameId: GameId;
@@ -15,7 +15,7 @@ export function StatsLine({ gameId, mode, difficulty }: StatsLineProps) {
     if (totalSolved === 0) return null;
     return (
       <div className="mt-1 text-xs text-flexoki-base-600 dark:text-flexoki-base-400 font-mono">
-        Daily streak: {currentStreak} (best {longestStreak}) · {totalSolved} total
+        Racha diaria: {currentStreak} (récord: {longestStreak}) · {totalSolved} en total
       </div>
     );
   }
@@ -24,8 +24,8 @@ export function StatsLine({ gameId, mode, difficulty }: StatsLineProps) {
   if (solved === 0) return null;
   return (
     <div className="mt-1 text-xs text-flexoki-base-600 dark:text-flexoki-base-400 font-mono">
-      {solved} {difficulty} {solved === 1 ? "puzzle" : "puzzles"} solved
-      {best != null ? ` · best ${formatDuration(best)}` : ""}
+      {solved} {solved === 1 ? "resuelto" : "resueltos"} en {DIFFICULTY_LABEL[difficulty].toLowerCase()}
+      {best != null ? ` · récord: ${formatDuration(best)}` : ""}
     </div>
   );
 }

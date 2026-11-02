@@ -59,7 +59,7 @@ export default function Foundations() {
   return (
     <div className="col-span-4 col-start-4 space-y-2">
       <div className="text-xs text-flexoki-base-700 dark:text-flexoki-base-300 text-center font-medium font-mono select-none">
-        Foundations
+        Bases
       </div>
       <div className="grid grid-cols-4 gap-4">
         {suits.map((suit) => {
