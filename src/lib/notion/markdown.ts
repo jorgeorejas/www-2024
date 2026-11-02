@@ -1,3 +1,4 @@
+import { HAND_ARROW_SVG, TRAILING_ARROW } from "@components/margin/hand-arrow";
 import { isHighlight } from "./annotations";
 import type { NotionBlock, RichText } from "./client";
 import { blockImage, externalImage, imageSrcset } from "./images";
@@ -119,10 +120,12 @@ export type MarkdownOptions = {
 /** A margin note as inline HTML, first thing in its block so phones show it above */
 function noteHtml(note: string | undefined) {
   if (!note) return "";
-  const text = escapeHtml(note)
+  // A trailing "→" becomes the same pen arrow as the other margin notes
+  const arrow = TRAILING_ARROW.test(note);
+  const text = escapeHtml(arrow ? note.replace(TRAILING_ARROW, "") : note)
     .replace(/[\\`*_[\]|~]/g, (c) => `&#${c.charCodeAt(0)};`)
     .replaceAll("\n", "<br>");
-  return `<span class="hn m-anno">${text}</span>`;
+  return `<span class="hn m-anno">${text}${arrow ? HAND_ARROW_SVG : ""}</span>`;
 }
 
 /** A list of sibling blocks → Markdown, with blank lines between blocks */
