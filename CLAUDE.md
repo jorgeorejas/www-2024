@@ -124,6 +124,7 @@ The redesign is called **Margin**: a left margin column (numbered side nav, vert
 - CSS: the `Margin` block at the end of `global.css` (`.m-*` classes, `.hn` hand notes, `.m-prose` for reading views incl. footnotes and corrections) plus tokens `signal` (Flexoki orange-500), `signal-ink` (orange-600), `pen` (blue-600), `rule`, `mute`, and the `mg:` breakpoint. Flexoki colours only; don't use `international-orange` in Margin pages.
 - Classic element rules (`header`, `main`, `article` prose…) skip Margin pages (`body.margin-ui`), so pages not yet migrated keep working with `Container` + `Nav`.
 - Margin notes and picks are content from Notion ("Nota al margen", "Destacado"/"Destacada"), never copy in code.
+- Annotations: in a Notion body, give words the yellow background colour and leave a comment on them. The site draws a marker over the words, a pen bracket next to those lines and the comment as a hand note in the margin, animated the first time they scroll into view (`src/lib/notion/annotations.ts` reads the comments, `src/lib/annotate.ts` draws). Only Jorge's open comments show: resolving a comment hides its note, and a highlight without a comment is just the marker. The site's Notion token is read-only, and it only asks for comments on blocks that have a highlight.
 
 ### Code Style
 - ESLint configured for Astro and TypeScript
