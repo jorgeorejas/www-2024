@@ -50,6 +50,8 @@ export async function spotifyAccessToken(fresh = false): Promise<string> {
     const { getToken } = await import("@vercel/connect");
     return await getToken(SPOTIFY_CONNECTOR, { subject: OWNER }, { forceRefresh: fresh });
   } catch (error) {
+    const { name, message, code } = error as Error & { code?: string };
+    console.warn(`[spotify] no token from Vercel Connect (${name} ${code ?? ""}: ${message}), trying the env refresh token`);
     const fallback = await legacyToken();
     if (fallback) return fallback;
     throw error;
