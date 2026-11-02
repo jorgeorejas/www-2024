@@ -98,7 +98,7 @@ const breadcrumbSchema = generateBreadcrumbSchema(
         )
       }
 
-      <dl class="m-meta">
+      <dl class="m-meta" data-sketch>
         <div>
           <dt>Date</dt>
           <dd><FormattedDate date={project.data.date} /></dd>
@@ -225,3 +225,8 @@ const breadcrumbSchema = generateBreadcrumbSchema(
     )
   }
 </MarginPage>
+
+<script>
+  import { sketchRules } from "@lib/sketch-rules";
+  document.addEventListener("astro:page-load", sketchRules);
+</script>

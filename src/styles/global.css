@@ -939,6 +939,27 @@
     font-size: 0.85em;
     color: var(--color-mute);
   }
+  /* architect's pen (src/lib/sketch-rules.ts) redraws the rules by hand;
+     the flat outline above is only the no-JS fallback */
+  .m-meta[data-sketch] {
+    position: relative;
+  }
+  @media (scripting: enabled) {
+    .m-meta[data-sketch] > div {
+      outline-color: transparent;
+    }
+  }
+  .m-meta .sketch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    fill: none;
+    stroke: var(--color-flexoki-base-600);
+    stroke-linecap: round;
+  }
 
   /* ---------- now playing, one line ---------- */
   .np-mini {
