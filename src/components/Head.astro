@@ -41,6 +41,12 @@ const {
 
 <!-- Font preloads -->
 <link rel="preload" href={instrumentSerif400} as="font" type="font/woff2" crossorigin />
+<!-- The mono body, subset to Latin and the symbols the site uses (~28 KB each;
+     the glyph range is in the commit that subset them). Early, so the text
+     doesn't reflow when it swaps in. -->
+<link rel="preload" href="/fonts/IoskeleyMono/IoskeleyMono-Regular.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/IoskeleyMono/IoskeleyMono-Medium.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/IoskeleyMono/IoskeleyMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin />
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
 

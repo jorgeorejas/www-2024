@@ -967,7 +967,7 @@
       outline-color: transparent;
     }
   }
-  .m-meta .sketch {
+  [data-sketch] > .sketch {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -1542,13 +1542,14 @@
    (9px each). Every line of text sits between two rows of dots, the content
    column starts on a column of dots, and titles take two rows.
    CSS sets the metrics; src/lib/dot-grid.ts nudges any block that still lands
-   between rows (images, cards, odd heights) back onto the grid.
+   between rows (images, page-specific layouts) back onto the grid, before the
+   first paint, so nothing jumps.
    Unlayered on purpose, so it wins over the component layer.
    ========================================================================== */
 :root {
   --g: 27px;
   --g-half: 13.5px;
-  --g-dot: rgb(16 15 15 / 0.2);
+  --g-dot: rgb(16 15 15 / 0.14);
 }
 body.margin-ui {
   --m-mw: 189px; /* 7 cells */
@@ -1575,7 +1576,7 @@ body.margin-ui .m::after {
   left: -100vw;
   right: -100vw;
   pointer-events: none;
-  background-image: radial-gradient(circle, var(--g-dot) 0.9px, transparent 1.3px);
+  background-image: radial-gradient(circle, var(--g-dot) 0.85px, transparent 1.25px);
   background-size: var(--g) var(--g);
   background-position: calc(100vw + var(--m-mw) + var(--m-gap) - var(--g-half)) calc(-1 * var(--g-half));
 }
@@ -1595,6 +1596,27 @@ body.margin-ui .m-main :where(.m-name, .m-h1, .m-prose h1, .m-prose h2, .m-secti
 }
 body.margin-ui .m-main :where(.m-prose h3, .m-prose h4, h3, h4) {
   line-height: var(--g);
+}
+/* small or raised inline bits (NEW, ◆, footnote refs, inline code) can't make
+   their line taller than a row */
+body.margin-ui .m-main :where(sup, sub, small, code, kbd, .m-new, .m-pick, .m-meta-x),
+body.margin-ui .m-main :where(sup, sub, small, code, kbd, .m-new, .m-pick, .m-meta-x) * {
+  line-height: 0;
+}
+body.margin-ui .m-new {
+  position: relative;
+  top: -0.18em;
+  vertical-align: baseline;
+}
+/* page headers (title, date, lede) stack row after row; an empty row before the body */
+body.margin-ui .m-main header {
+  row-gap: 0;
+}
+body.margin-ui .m-main header[class*="mb-"] {
+  margin-bottom: var(--g);
+}
+body.margin-ui .m-article {
+  row-gap: var(--g);
 }
 /* body text at 15px: 9px per character */
 body.margin-ui :where(.m-prose, .m-lede) {
@@ -1616,6 +1638,12 @@ body.margin-ui .m-prose li > :where(ul, ol) {
 }
 body.margin-ui .m-prose pre {
   padding: var(--g-half) 18px;
+}
+/* a video's size is only known once it loads: keep a 16:9 box meanwhile */
+body.margin-ui .m-prose video:not([height]) {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
 }
 /* head: name (two rows), role, nav and crumbs on rows */
 body.margin-ui .m-head {
@@ -1645,15 +1673,22 @@ body.margin-ui .m-sec-h {
 body.margin-ui .m-more-list {
   margin-top: 0;
 }
+body.margin-ui .m-legend {
+  margin-top: var(--g);
+}
 /* horizontal rules can't take a pixel of height, or every row below drifts:
    they are drawn as shadows or backgrounds instead */
 body.margin-ui .m-more-i {
   align-items: flex-start;
-  padding: var(--g-half) 0;
+  padding: 0 0 var(--g);
   border-bottom: 0;
-  box-shadow: inset 0 -1px var(--color-rule);
+  background: linear-gradient(var(--color-rule), var(--color-rule)) left bottom var(--g-half) / 100% 1px no-repeat;
+}
+body.margin-ui .m-more-i:has(.m-corr) {
+  padding-top: var(--g);
 }
 body.margin-ui .m-foot {
+  padding-top: var(--g);
   border-top: 0;
   box-shadow: inset 0 1px var(--color-rule);
 }
@@ -1676,6 +1711,50 @@ body.margin-ui .m-prose .footnotes {
 body.margin-ui .m-ingr li {
   border-bottom: 0;
   background: linear-gradient(to right, var(--color-rule) 50%, transparent 0) bottom / 6px 1px repeat-x;
+}
+/* list cards: each line of a card is a row, cards are one empty row apart, and
+   the left rule is drawn with the architect's pen from dot to dot
+   (data-sketch="left", src/lib/sketch-rules.ts). The hover wash spills half a
+   row above and below without taking any room. */
+body.margin-ui .m-list {
+  row-gap: var(--g);
+}
+body.margin-ui .m-card {
+  row-gap: 0;
+  padding-block: 0;
+}
+body.margin-ui .m-card::before {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--g-half)) 0;
+  z-index: -1;
+  transition: background-color 0.3s ease;
+}
+body.margin-ui .m-card:hover {
+  background-color: transparent;
+}
+body.margin-ui a.m-card:hover::before {
+  background-color: var(--color-flexoki-base-100);
+}
+body.margin-ui .m-card-t {
+  align-items: flex-start;
+}
+body.margin-ui .m-lead {
+  align-self: flex-start;
+  margin-top: 18px; /* the leader sits on the title's baseline */
+  transform: none;
+}
+@media (scripting: enabled) {
+  body.margin-ui .m-card[data-sketch] {
+    border-left-color: transparent;
+  }
+}
+/* square photo tiles (wishlist grid): the square is cut down to whole rows */
+@supports (height: round(down, 1px, 1px)) {
+  body.margin-ui .m-tile-img {
+    aspect-ratio: auto;
+    height: round(down, 100cqi, var(--g));
+  }
 }
 /* boxed buttons (square selectors, servings): 21px tall plus 3px above and
    below, so each one fills exactly a row and its label sits in the middle */
@@ -1727,6 +1806,18 @@ body.margin-ui .m-main :where(.hn, .hn *) {
 @media (max-width: 760px) {
   body.margin-ui .m-main {
     padding: 27px 16px 54px;
+  }
+  body.margin-ui .m-row,
+  body.margin-ui .m-mar {
+    row-gap: 0;
+  }
+  body.margin-ui .m-nav--row {
+    margin-top: 0;
+  }
+  /* section labels lie down in one row */
+  body.margin-ui .m-vert,
+  body.margin-ui .m-vert :where(*) {
+    line-height: var(--g);
   }
   body.margin-ui .m {
     gap: 54px;

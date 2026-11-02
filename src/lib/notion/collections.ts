@@ -3,6 +3,7 @@ import { cached, cachedBody } from "./cache";
 import { getBlockTree, queryDatabase, type NotionPage } from "./client";
 import { DATABASES } from "./databases";
 import { firstImageBlock, pageImage, blockImage } from "./images";
+import { imageSizes } from "./image-size";
 import { blocksToMarkdown, blocksToPlainText } from "./markdown";
 import { pageEmoji, readProperties, slugify } from "./properties";
 import {
@@ -58,9 +59,11 @@ async function pageBody(page: NotionPage, skipBlockId?: string): Promise<Body> {
   const notesKey = hash([...notes].flat().join("\u0000"));
 
   return cachedBody(`body:${edited}:${skipBlockId ?? ""}:${notesKey}`, async () => {
+    // Read once per edit: images keep their space before they load
+    const sizes = await cachedBody(`sizes:${edited}`, () => imageSizes(blocks));
     // The plain Markdown (llms.txt, .md routes) leaves the margin notes out
-    const markdown = blocksToMarkdown(blocks, { skipBlockId });
-    const annotated = notes.size ? blocksToMarkdown(blocks, { skipBlockId, notes }) : markdown;
+    const markdown = blocksToMarkdown(blocks, { skipBlockId, sizes });
+    const annotated = notes.size ? blocksToMarkdown(blocks, { skipBlockId, notes, sizes }) : markdown;
     return { markdown, html: await renderMarkdown(annotated), text: blocksToPlainText(blocks) };
   });
 }
@@ -397,12 +400,13 @@ export async function recipeBody(page: NotionPage, hasCover: boolean): Promise<R
     const hero = hasCover ? undefined : firstImageBlock(blocks);
     const withoutHero = hero ? removeBlock(blocks, hero.id) : blocks;
     const parts = splitRecipe(withoutHero);
+    const sizes = await imageSizes(withoutHero);
     const [intro, ingredients, steps, extra, gallery] = await Promise.all([
-      renderMarkdown(blocksToMarkdown(parts.intro)),
+      renderMarkdown(blocksToMarkdown(parts.intro, { sizes })),
       renderMarkdown(ingredientsToMarkdown(parts.ingredients)),
       renderMarkdown(stepsToMarkdown(parts.steps)),
-      renderMarkdown(blocksToMarkdown(parts.extra)),
-      renderMarkdown(blocksToMarkdown(parts.gallery)),
+      renderMarkdown(blocksToMarkdown(parts.extra, { sizes })),
+      renderMarkdown(blocksToMarkdown(parts.gallery, { sizes })),
     ]);
     return {
       intro,

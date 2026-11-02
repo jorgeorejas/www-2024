@@ -152,7 +152,7 @@ const button =
 
       <div
         id="recipe-tools"
-        class="sticky top-0 z-10 flex flex-wrap items-center gap-2 border-y border-rule bg-flexoki-paper/90 py-3 backdrop-blur-xs"
+        class="sticky top-0 z-10 flex flex-wrap items-center gap-2 border-y border-rule bg-flexoki-paper/90 py-[12.5px] backdrop-blur-xs"
       >
         {
           hasIngredients && (
@@ -217,18 +217,18 @@ const button =
                   <h2 id="preparacion">Preparación</h2>
                 </div>
                 <p class="m-0 font-mono text-[11px] text-mute">Toca un paso para tacharlo.</p>
-                <div class="recipe-steps m-prose mt-4" set:html={body.steps} />
+                <div class="recipe-steps m-prose" set:html={body.steps} />
               </section>
             )}
           </div>
         )
       }
 
-      {body.extra && <div class="recipe-extra m-prose mt-6" set:html={body.extra} />}
+      {body.extra && <div class="recipe-extra m-prose mt-(--g)" set:html={body.extra} />}
 
       {
         body.gallery && (
-          <section class="mt-6" aria-labelledby="fotos">
+          <section class="mt-(--g)" aria-labelledby="fotos">
             <div class="m-sec-h mb-4">
               <h2 id="fotos">Fotos</h2>
             </div>
@@ -237,9 +237,9 @@ const button =
         )
       }
 
-      <div class="mt-8">
+      <div class="mt-(--g)">
         <p class="hn m-0 inline-block -rotate-2 text-2xl">¡Que aproveche!</p>
-        <AnimatedSignature client:visible tone="pen" className="w-33 mt-4" aria-hidden="true" />
+        <AnimatedSignature client:visible tone="pen" className="h-[54px] w-33" aria-hidden="true" />
       </div>
     </div>
   </Row>

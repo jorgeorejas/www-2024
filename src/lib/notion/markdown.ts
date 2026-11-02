@@ -115,6 +115,8 @@ export type MarkdownOptions = {
   skipBlockId?: string;
   /** Margin notes by block id (Notion comments on highlighted text) */
   notes?: Map<string, string>;
+  /** Image sizes by block id, so each <img> keeps its space while it loads */
+  sizes?: Map<string, { width: number; height: number }>;
 };
 
 /** A margin note as inline HTML, first thing in its block so phones show it above */
@@ -225,7 +227,9 @@ function blockToMarkdown(block: NotionBlock, options: MarkdownOptions, index: nu
       const caption = blockCaption(block).replace(/\s+/g, " ");
       const srcset = imageSrcset(src);
       const responsive = srcset ? ` srcset="${escapeHtml(srcset)}" sizes="(min-width: 768px) 728px, 100vw"` : "";
-      return `<img src="${escapeHtml(src)}"${responsive} alt="${escapeHtml(caption)}" loading="lazy" decoding="async" />`;
+      const size = options.sizes?.get(block.id);
+      const dims = size ? ` width="${size.width}" height="${size.height}"` : "";
+      return `<img src="${escapeHtml(src)}"${responsive}${dims} alt="${escapeHtml(caption)}" loading="lazy" decoding="async" />`;
     }
     case "video": {
       const video = block.video as { type: string; external?: { url: string } };

@@ -174,7 +174,7 @@ const breadcrumbSchema = generateBreadcrumbSchema(
         )
       }
 
-      <AnimatedSignature client:visible tone="pen" className="w-33 mt-6" />
+      <AnimatedSignature client:visible tone="pen" className="h-[54px] w-33" />
     </article>
   </Row>
 
@@ -227,7 +227,3 @@ const breadcrumbSchema = generateBreadcrumbSchema(
   }
 </MarginPage>
 
-<script>
-  import { sketchRules } from "@lib/sketch-rules";
-  document.addEventListener("astro:page-load", sketchRules);
-</script>

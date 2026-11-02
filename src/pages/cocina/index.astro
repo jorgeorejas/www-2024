@@ -114,7 +114,7 @@ const legend = [
 
     {
       tagOptions.length > 0 && (
-        <div id="recipe-tags" class="mb-8 flex flex-wrap gap-2" role="group" aria-label="Filtrar por etiqueta">
+        <div id="recipe-tags" class="mb-(--g) flex flex-wrap gap-2" role="group" aria-label="Filtrar por etiqueta">
           <button type="button" class:list={[squareSelector, "text-sm"]} data-tag="" aria-pressed="true">
             Todas
           </button>
@@ -140,7 +140,7 @@ const legend = [
     <p id="recipe-empty" class="py-[18px] font-mono text-xs text-mute" hidden>
       Ninguna receta coincide. Prueba con otra palabra.
     </p>
-    {legend && <Legend text={legend} class="mt-8" />}
+    {legend && <Legend text={legend} />}
   </Row>
 </MarginPage>
 

@@ -6,6 +6,8 @@
  *
  * Markup: put `data-sketch` on the grid. Each direct child is a cell. CSS
  * keeps a plain 1px rule as the fallback and hides it once the sketch is in.
+ * `data-sketch="left"` draws only the element's own left rule (list cards):
+ * one stroke from the row of dots above it to the row below.
  */
 
 type Segment = { x1: number; y1: number; x2: number; y2: number };
@@ -56,6 +58,8 @@ function merge(edges: Edge[]): Edge[] {
 
 /** Every rule of the grid: the outline of each cell, shared edges merged */
 function segments(grid: HTMLElement): Segment[] {
+  // on the card's outer edge, where its 1px border was
+  if (grid.dataset.sketch === "left") return [{ x1: -0.5, y1: 0, x2: -0.5, y2: grid.offsetHeight }];
   const box = grid.getBoundingClientRect();
   const across: Edge[] = [];
   const down: Edge[] = [];
@@ -103,7 +107,7 @@ function stroke(seg: Segment, rand: () => number) {
 
 const SVG = "http://www.w3.org/2000/svg";
 
-function draw(grid: HTMLElement, animate: boolean) {
+function draw(grid: HTMLElement, animate: boolean, delay = 0) {
   grid.querySelector(":scope > svg.sketch")?.remove();
   const svg = document.createElementNS(SVG, "svg");
   svg.setAttribute("class", "sketch");
@@ -136,7 +140,7 @@ function draw(grid: HTMLElement, animate: boolean) {
     path.style.strokeDasharray = `${length} ${length}`;
     path.animate([{ strokeDashoffset: length }, { strokeDashoffset: 0 }], {
       duration: 260 + Math.min(length, 700) * 0.45,
-      delay: i * 75,
+      delay: delay + i * 75,
       easing: "cubic-bezier(.55,0,.25,1)",
       fill: "backwards",
     });
@@ -166,12 +170,14 @@ export function sketchRules() {
 
   const seen = new IntersectionObserver(
     (entries) => {
+      // cards that come into view together draw one after another
+      let order = 0;
       for (const { target, isIntersecting } of entries) {
         if (!isIntersecting) continue;
         const grid = target as HTMLElement;
         seen.unobserve(grid);
         sizes.set(grid, `${grid.offsetWidth}x${grid.offsetHeight}`);
-        draw(grid, !still);
+        draw(grid, !still, Math.min(order++, 8) * 90);
       }
     },
     { rootMargin: "0px 0px -10% 0px" },

@@ -61,12 +61,15 @@ const Name = nameAsHeading ? "h1" : "p";
 </PageLayout>
 
 <script>
-  // Dot grid first (it moves blocks onto rows), then the Notion annotations
-  // drawn over the prose (no-op without them)
+  // Dot grid first (it moves blocks onto rows), then what's drawn over the
+  // page: the architect's pen rules (meta table, list cards) and the Notion
+  // annotations over the prose (each a no-op when the page has none)
   import { annotate } from "@lib/annotate";
   import { dotGrid } from "@lib/dot-grid";
+  import { sketchRules } from "@lib/sketch-rules";
   document.addEventListener("astro:page-load", () => {
     dotGrid();
+    sketchRules();
     annotate();
   });
 </script>

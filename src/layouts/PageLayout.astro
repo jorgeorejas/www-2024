@@ -5,6 +5,7 @@ import MarginFooter from "@components/margin/MarginFooter.astro";
 import Row from "@components/margin/Row.astro";
 import { SITE } from "@consts";
 import { PREVIEW_PARAM } from "@lib/preview";
+import gridSnapSource from "@lib/dot-grid-snap.js?raw";
 import SpeedInsights from "@vercel/speed-insights/astro";
 import "@fontsource-variable/caveat";
 import "../styles/ioskeley-mono.css";
@@ -44,6 +45,11 @@ const {
 } = Astro.props;
 const margin = variant === "margin";
 
+// The dot grid's first pass runs inline, right after the page content and
+// before the first paint (rel="expect" holds rendering until it has run), so
+// blocks never visibly jump onto their rows. dot-grid.ts re-snaps later on.
+const gridSnap = `(() => {\n${gridSnapSource.replace(/^export /gm, "")}\nsnapDotGrid(document.querySelector("body.margin-ui .m"));\n})();`;
+
 // ?preview=true (see src/lib/preview.ts): a badge, and a way back out
 const preview = Astro.locals.preview;
 const exit = new URL(Astro.url);
@@ -65,6 +71,7 @@ const exitHref = exit.pathname + exit.search + exit.hash;
       structuredData={structuredData}
       locale={lang === "en" ? "en_US" : "es_ES"}
     />
+    {margin && <link rel="expect" href="#m-grid-ready" blocking="render" />}
   </head>
   <body class:list={["relative", { "margin-ui": margin }]}>
     <a
@@ -115,6 +122,8 @@ const exitHref = exit.pathname + exit.search + exit.hash;
               <MarginFooter lang={lang} nowPlaying={footerNowPlaying} />
             </Row>
           </div>
+          <script is:inline set:html={gridSnap} />
+          <span id="m-grid-ready" hidden />
         </main>
       ) : (
         <main id="main-content" class="relative antialiased">
