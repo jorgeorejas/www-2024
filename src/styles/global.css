@@ -1535,3 +1535,203 @@
 .preview-badge:hover .preview-badge-x {
   color: var(--color-signal-ink);
 }
+
+/* ==========================================================================
+   Dot grid (libreta punteada)
+   One cell = 27px = one line of the 15px mono body = three of its characters
+   (9px each). Every line of text sits between two rows of dots, the content
+   column starts on a column of dots, and titles take two rows.
+   CSS sets the metrics; src/lib/dot-grid.ts nudges any block that still lands
+   between rows (images, cards, odd heights) back onto the grid.
+   Unlayered on purpose, so it wins over the component layer.
+   ========================================================================== */
+:root {
+  --g: 27px;
+  --g-half: 13.5px;
+  --g-dot: rgb(16 15 15 / 0.2);
+}
+body.margin-ui {
+  --m-mw: 189px; /* 7 cells */
+  --m-gap: 54px; /* 2 cells, the ruler lives here */
+  --m-col: 729px; /* 27 cells, 81 characters */
+  --m-lane: 27px;
+}
+body.margin-ui .m-main {
+  overflow-x: clip;
+  padding-top: 54px;
+  font-size: 15px;
+}
+body.margin-ui .m {
+  isolation: isolate;
+  gap: 81px;
+}
+/* the paper: dots on cell corners, full width, anchored to the content column */
+body.margin-ui .m::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -270px;
+  bottom: -270px;
+  left: -100vw;
+  right: -100vw;
+  pointer-events: none;
+  background-image: radial-gradient(circle, var(--g-dot) 0.9px, transparent 1.3px);
+  background-size: var(--g) var(--g);
+  background-position: calc(100vw + var(--m-mw) + var(--m-gap) - var(--g-half)) calc(-1 * var(--g-half));
+}
+/* the ruler marks the rows: a long tick on every row of dots, short ones per character */
+body.margin-ui .m::before {
+  left: calc(var(--m-mw) + 20px);
+  background-image:
+    repeating-linear-gradient(to bottom, var(--color-flexoki-base-400) 0 1px, transparent 1px var(--g)),
+    repeating-linear-gradient(to bottom, var(--color-flexoki-base-200) 0 1px, transparent 1px 9px);
+}
+/* one line = one row, everywhere; titles get two rows */
+body.margin-ui .m-main :where(*) {
+  line-height: var(--g);
+}
+body.margin-ui .m-main :where(.m-name, .m-h1, .m-prose h1, .m-prose h2, .m-section-title, .m-r-head h2, h1, h2) {
+  line-height: calc(var(--g) * 2);
+}
+body.margin-ui .m-main :where(.m-prose h3, .m-prose h4, h3, h4) {
+  line-height: var(--g);
+}
+/* body text at 15px: 9px per character */
+body.margin-ui :where(.m-prose, .m-lede) {
+  font-size: 15px;
+}
+body.margin-ui .m-prose > * + *,
+body.margin-ui .m-prose :where(p, ul, ol, blockquote, pre, table, figure, hr, details, .video, video) {
+  margin-top: 0;
+  margin-bottom: var(--g);
+}
+body.margin-ui .m-prose :where(h2, h3, h4) {
+  margin-top: var(--g);
+  margin-bottom: 0;
+}
+body.margin-ui .m-prose li + li,
+body.margin-ui .m-prose li > :where(ul, ol) {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+body.margin-ui .m-prose pre {
+  padding: var(--g-half) 18px;
+}
+/* head: name (two rows), role, nav and crumbs on rows */
+body.margin-ui .m-head {
+  gap: 0;
+}
+body.margin-ui .m-crumbs {
+  margin-top: var(--g);
+}
+body.margin-ui .m-mar {
+  gap: 0;
+  padding-top: 0;
+}
+/* the project meta table: each cell is two rows, so its pen lines sit on the dots */
+body.margin-ui .m-meta {
+  gap: 0;
+  padding: 0;
+}
+body.margin-ui .m-meta > div {
+  padding: 0 9px;
+}
+/* rows that used flex centring or baseline alignment line up by rows instead */
+body.margin-ui .m-sec-h {
+  align-items: flex-end;
+  gap: 0 18px;
+  margin-bottom: var(--g);
+}
+body.margin-ui .m-more-list {
+  margin-top: 0;
+}
+/* horizontal rules can't take a pixel of height, or every row below drifts:
+   they are drawn as shadows or backgrounds instead */
+body.margin-ui .m-more-i {
+  align-items: flex-start;
+  padding: var(--g-half) 0;
+  border-bottom: 0;
+  box-shadow: inset 0 -1px var(--color-rule);
+}
+body.margin-ui .m-foot {
+  border-top: 0;
+  box-shadow: inset 0 1px var(--color-rule);
+}
+body.margin-ui .m-prose hr {
+  height: var(--g);
+  border: 0;
+  background: linear-gradient(var(--color-rule), var(--color-rule)) center / 100% 1px no-repeat;
+}
+body.margin-ui .m-prose :where(th, td) {
+  padding-top: 0;
+  padding-bottom: 0;
+  border-top: 0;
+  box-shadow: inset 0 1px var(--color-rule);
+}
+body.margin-ui .m-prose .footnotes {
+  border-top: 0;
+  box-shadow: inset 0 1px var(--color-rule);
+  padding-top: var(--g);
+}
+body.margin-ui .m-ingr li {
+  border-bottom: 0;
+  background: linear-gradient(to right, var(--color-rule) 50%, transparent 0) bottom / 6px 1px repeat-x;
+}
+/* boxed buttons (square selectors, servings): 21px tall plus 3px above and
+   below, so each one fills exactly a row and its label sits in the middle */
+body.margin-ui .m-main :is(.py-0\.5, .py-1).border {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35em; /* the space between an emoji and its label */
+  height: 21px;
+  margin-block: 3px;
+  padding-block: 0;
+  line-height: 19px;
+}
+/* rows that wrap onto a second line keep no gap between lines: the rows are the gap */
+body.margin-ui .m-main :has(> :is(.py-0\.5, .py-1).border),
+body.margin-ui .m-foot :where(ul),
+body.margin-ui .np-mini {
+  row-gap: 0;
+}
+body.margin-ui .np-mini {
+  align-items: center;
+}
+/* footer: social links and now playing start on a row, one empty row apart when they wrap */
+body.margin-ui .m-foot {
+  align-items: flex-start;
+  row-gap: var(--g);
+}
+/* the numbered nav: one section per row */
+body.margin-ui .m-nav-i {
+  padding-block: 0;
+}
+body.margin-ui .m-nav--side ul {
+  gap: 0;
+}
+/* vertical section labels: the ↱ takes a row, each letter half a row */
+body.margin-ui .m-vert,
+body.margin-ui .m-vert :where(*) {
+  line-height: var(--g-half);
+}
+body.margin-ui .m-vert-up {
+  margin-bottom: 0;
+  line-height: var(--g);
+}
+/* hand notes keep their own handwriting rhythm; they float over the grid */
+body.margin-ui .m-main :where(.hn, .hn *) {
+  line-height: 1.02;
+}
+@media (max-width: 760px) {
+  body.margin-ui .m-main {
+    padding: 27px 16px 54px;
+  }
+  body.margin-ui .m {
+    gap: 54px;
+  }
+  body.margin-ui .m::after {
+    background-position: calc(100vw - var(--g-half)) calc(-1 * var(--g-half));
+  }
+}
