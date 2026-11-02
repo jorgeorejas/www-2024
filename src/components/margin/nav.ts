@@ -1,5 +1,5 @@
 /** Sections of the numbered side nav, in order */
-export type NavKey = "home" | "projects" | "blog" | "work" | "games" | "cocina";
+export type NavKey = "home" | "projects" | "blog" | "work" | "games" | "cocina" | "wishlist";
 
 export type NavItem = {
   key: NavKey;
@@ -17,9 +17,10 @@ export const NAV_ITEMS: NavItem[] = [
   { key: "work", n: "03", label: "Trayectoria", href: "/work" },
   { key: "games", n: "04", label: "Juegos", href: "/games", outward: true },
   { key: "cocina", n: "05", label: "Cocina", href: "/cocina" },
+  { key: "wishlist", n: "06", label: "Wishlist", href: "/wishlist" },
 ];
 
-/** The nav section a path belongs to, or null (e.g. /wishlist) */
+/** The nav section a path belongs to, or null (e.g. /calendar) */
 export function navKeyFor(pathname: string): NavKey | null {
   const path = pathname.replace(/\/+$/, "") || "/";
   if (path === "/") return "home";
