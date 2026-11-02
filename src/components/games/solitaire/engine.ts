@@ -6,6 +6,7 @@ import {
   type MoveHint,
   type Options,
   type PileRef,
+  type Rank,
   type SaveBlob,
   GameStateZ,
   MoveHintZ,
@@ -25,7 +26,7 @@ function buildDeck(): Card[] {
       cards.push({
         id: `${suit}-${rank}`,
         suit,
-        rank: rank as any,
+        rank: rank as Rank,
         color,
         faceUp: false,
       });

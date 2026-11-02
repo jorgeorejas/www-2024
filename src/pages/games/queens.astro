@@ -1,26 +1,19 @@
 ---
-import Container from "@components/Container.astro";
 import QueensGame from "@components/games/linkedin/queens";
-import Nav from "@components/Nav.astro";
-import PageLayout from "@layouts/PageLayout.astro";
+import MarginPage from "@components/margin/MarginPage.astro";
+import Row from "@components/margin/Row.astro";
 ---
 
-<PageLayout
+<MarginPage
   title="Queens"
   description="An infinite, procedurally-generated take on LinkedIn's Queens puzzle. Play today's daily or roll an unlimited supply of fresh boards."
+  breadcrumbs={[
+    { href: "/games", label: "Games" },
+    { href: "/games/queens", label: "Queens" },
+  ]}
 >
-  <Container>
-    <div class="space-y-2">
-      <Nav
-        breadCrumbsItems={[
-          { href: "/games", label: "Games" },
-          { href: "/games/queens", label: "Queens" },
-        ]}
-      />
-    </div>
-
-    <div class="my-10">
-      <QueensGame client:only="react" />
-    </div>
-  </Container>
-</PageLayout>
+  <Row>
+    <h1 class="m-h1 mb-10">Queens</h1>
+    <QueensGame client:only="react" />
+  </Row>
+</MarginPage>

@@ -1,0 +1,90 @@
+---
+/*
+ * A list row: TITLE IN MONO CAPS ____ value, description below, → on the
+ * right, pen squiggle under the title on hover. Renders an <li>, so put rows
+ * inside <ul class="m-list">. A `note` hangs in the margin at the row's height.
+ */
+import { formatDot } from "@lib/utils";
+import MarginNote from "./MarginNote.astro";
+import Markers from "./Markers.astro";
+
+type Props = {
+  href: string;
+  /** Opens in a new tab with rel="noopener noreferrer" */
+  external?: boolean;
+  title: string;
+  /** Title correction: the title is struck through and this is written above in pen */
+  titleCorrection?: string;
+  /** Text after the leader line (year, minutes…) */
+  value?: string;
+  /** Shown as yy.mm.dd in a <time> when no `value` is given */
+  date?: Date;
+  description?: string;
+  pick?: boolean;
+  isNew?: boolean;
+  pickLabel?: string;
+  /** Margin note (from Notion "Nota al margen") */
+  note?: string;
+  class?: string;
+};
+
+const {
+  href,
+  external = false,
+  title,
+  titleCorrection,
+  value,
+  date,
+  description,
+  pick = false,
+  isNew = false,
+  pickLabel,
+  note,
+  class: className,
+} = Astro.props;
+
+const hasTitleSlot = Astro.slots.has("title");
+const showValue = Boolean(value || date);
+---
+
+<li class:list={["m-anchor", className]}>
+  {note && <MarginNote placement="item" text={note} />}
+  <a
+    class="m-card"
+    href={href}
+    target={external ? "_blank" : undefined}
+    rel={external ? "noopener noreferrer" : undefined}
+  >
+    <span class="m-card-t">
+      <span class="m-card-title">
+        <Markers pick={pick} isNew={isNew} pickLabel={pickLabel} />
+        {
+          hasTitleSlot ? (
+            <span class="m-card-text">
+              <slot name="title" />
+            </span>
+          ) : titleCorrection ? (
+            <span class="m-corr">
+              <s class="m-card-text">{title}</s>
+              <span class="m-corr-new">{titleCorrection}</span>
+            </span>
+          ) : (
+            <span class="m-card-text">{title}</span>
+          )
+        }
+      </span>
+      {
+        showValue && (
+          <>
+            <span class="m-lead" aria-hidden="true" />
+            <span class="m-val">
+              {value ?? (date && <time datetime={date.toISOString()}>{formatDot(date)}</time>)}
+            </span>
+          </>
+        )
+      }
+    </span>
+    {description && <span class="m-card-d">{description}</span>}
+    <span class="m-arrow" aria-hidden="true">→</span>
+  </a>
+</li>

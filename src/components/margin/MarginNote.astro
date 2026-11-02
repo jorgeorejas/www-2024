@@ -1,0 +1,42 @@
+---
+/*
+ * A handwritten note (Caveat, pen blue). Notes are content: pass text that
+ * comes from Notion, never copy written in code. Renders nothing when there
+ * is no text and no slot content.
+ *
+ * placement:
+ *   "margin"  in the flow of a Row's margin slot (default)
+ *   "item"    inside an element with class "m-anchor" in the content column:
+ *             sits in the margin at that element's height, outside the
+ *             vertical-label lane (ListRow uses this for `note`)
+ *   "beside"  inside an "m-anchor" element: top-aligned, right against the
+ *             ruler (work roles); a <small> inside drops to a second line
+ * On phones "item" and "beside" become inline, just above their element.
+ */
+import type { HTMLAttributes } from "astro/types";
+
+type Props = HTMLAttributes<"aside"> & {
+  /** Plain text; line breaks are kept */
+  text?: string | null;
+  placement?: "margin" | "item" | "beside";
+  /** Bold first line (e.g. a Notion block title) */
+  heading?: string;
+  /** Element to render; "span" when the note sits inside inline content */
+  as?: "aside" | "div" | "span";
+};
+
+const { text, placement = "margin", heading, as: Tag = "aside", class: className, ...rest } = Astro.props;
+const hasSlot = Astro.slots.has("default");
+const lines = (text ?? "").trim().split(/\r?\n/).map((line) => line.trim());
+const content = lines.some(Boolean);
+---
+
+{
+  (content || hasSlot) && (
+    <Tag class:list={["hn", "m-note", `m-note--${placement}`, className]} {...rest}>
+      {heading && <span class="hn-h">{heading}</span>}
+      {content && lines.map((line, i) => (i ? [<br />, line] : line))}
+      <slot />
+    </Tag>
+  )
+}

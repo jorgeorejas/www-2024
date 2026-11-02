@@ -1,16 +1,18 @@
 ---
-import AnimatedLink from "@components/AnimatedLink.astro";
-import ArrowCard from "@components/ArrowCard.astro";
-import Container from "@components/Container.astro";
+import { AnimatedSignature } from "@components/AnimatedSignature";
 import ContentBlock from "@components/ContentBlock.astro";
-import Nav from "@components/Nav.astro";
-import RecipeCard from "@components/cocina/RecipeCard.astro";
-import WorkTimeline from "@components/WorkTimeline.astro";
+import Legend from "@components/margin/Legend.astro";
+import ListRow from "@components/margin/ListRow.astro";
+import MarginPage from "@components/margin/MarginPage.astro";
+import NowNote from "@components/margin/NowNote.astro";
+import NowPlayingMini from "@components/margin/NowPlayingMini.astro";
+import Row from "@components/margin/Row.astro";
+import SectionHead from "@components/margin/SectionHead.astro";
 import { HOME, SITE } from "@consts";
-import PageLayout from "@layouts/PageLayout.astro";
 import { cachePage } from "@lib/cache-headers";
-import { processWorkEntry } from "@lib/utils";
+import { formatMinutes, totalMinutes } from "@lib/cocina";
 import { generatePersonSchema } from "@lib/seo-utils";
+import { formatYear, isNew, processWorkEntry } from "@lib/utils";
 import { getLiveCollection } from "astro:content";
 
 // Which blocks show on the home page, in which order and with which titles,
@@ -66,96 +68,155 @@ const processedWork = (work.entries ?? [])
 const homeGames = games.slice(0, count("/games", SITE.NUM_GAMES_ON_HOMEPAGE));
 const homeRecipes = (recipes.entries ?? []).slice(0, count("/cocina", 3));
 
+type HomeSection = { path: string; title: string; link?: string };
+
 // Without Notion sections (first run, or Notion down) show the classic layout
-const layout = homeSections.length
-  ? homeSections
+const layout: HomeSection[] = homeSections.length
+  ? homeSections.map((s) => ({ path: s.path, title: s.homeTitle ?? s.title ?? s.name, link: s.homeLink }))
   : [
-      { path: "/blog", homeTitle: "Latest posts", homeLink: "See all posts" },
-      { path: "/projects", homeTitle: "Recent projects", homeLink: "See all projects" },
-      { path: "/work", homeTitle: "Work Experience", homeLink: "See all work" },
+      { path: "/blog", title: "Latest posts", link: "See all posts" },
+      { path: "/projects", title: "Recent projects", link: "See all projects" },
+      { path: "/work", title: "Work Experience", link: "See all work" },
     ];
 
-const bioBlocks = home?.blocks.length ? home.blocks : ["bio"];
+// Vertical label in the margin of each section
+const LABELS: Record<string, string> = {
+  "/blog": "writing",
+  "/projects": "projects",
+  "/work": "work",
+  "/cocina": "kitchen",
+  "/games": "games",
+};
+const headingId = (path: string) => `home-${path.replace(/[^a-z0-9]+/gi, "") || "section"}`;
+
+// The "now" text block (Bloques, slug "now") is a hand note in the margin of
+// the work section, or of the first section when work isn't on the home page
+const hasNow = (blocks.entries ?? []).some((b) => b.id === "now");
+const nowPath = layout.some((s) => s.path === "/work") ? "/work" : layout[0]?.path;
+
+const bioBlocks = (home?.blocks.length ? home.blocks : ["bio"]).filter((slug) => slug !== "now");
+
+const postsHaveMarkers = posts.some((p) => p.data.pick || isNew(p.data.date));
+const projectsHaveMarkers = recentProjects.some((p) => p.data.pick || isNew(p.data.date));
+const recipesHavePick = homeRecipes.some((r) => r.data.pick);
+
+/** "2024 – now", "2022 – 2024", or one year when it started and ended the same year */
+const years = (start: Date, end: Date | string) => {
+  const from = formatYear(start);
+  const to = end instanceof Date ? formatYear(end) : "now";
+  return from === to ? from : `${from} – ${to}`;
+};
 
 const personSchema = generatePersonSchema(Astro.site!.toString());
-const headingClass = "text-2xl font-semibold text-flexoki-ink dark:text-flexoki-base-50 font-serif";
 ---
 
-<PageLayout
+<MarginPage
   title={HOME.TITLE}
   description={HOME.DESCRIPTION}
   type="profile"
   structuredData={personSchema}
+  footerNowPlaying={false}
+  nameAsHeading
 >
-  <Container>
-    <Nav />
-    <div class="space-y-20">
-      <section class="space-y-4">
-        {bioBlocks.map((slug) => <ContentBlock slug={slug} class="space-y-4" />)}
-      </section>
-
-      {
-        layout.map((section) => (
-          <section class="space-y-8">
-            <div class="flex flex-wrap gap-y-2 items-center justify-between">
-              <h2 class={headingClass}>{section.homeTitle}</h2>
-              {section.homeLink && (
-                <AnimatedLink href={section.path}>{section.homeLink}</AnimatedLink>
-              )}
-            </div>
-
-            {section.path === "/blog" && (
-              <ul class="flex flex-col gap-4">
-                {posts.map((post) => (
-                  <li>
-                    <ArrowCard entry={post} collection="blog" dateFormat="day" />
-                  </li>
-                ))}
-              </ul>
-            )}
-
-            {section.path === "/projects" && (
-              <ul class="flex flex-col gap-4">
-                {recentProjects.map((project) => (
-                  <li>
-                    <ArrowCard entry={project} collection="projects" />
-                  </li>
-                ))}
-              </ul>
-            )}
-
-            {section.path === "/work" && <WorkTimeline processedWork={processedWork} />}
-
-            {section.path === "/cocina" && (
-              <ul class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                {homeRecipes.map((recipe) => (
-                  <li>
-                    <RecipeCard recipe={recipe} size="small" />
-                  </li>
-                ))}
-              </ul>
-            )}
-
-            {section.path === "/games" && (
-              <ul class="flex flex-col gap-4">
-                {homeGames.map((game) => (
-                  <li>
-                    <a
-                      href={game.href}
-                      class="relative group flex flex-nowrap py-3 px-4 pr-10 border-l border-flexoki-base-200 dark:border-flexoki-base-800 hover:bg-flexoki-base-100 dark:hover:bg-flexoki-base-900 hover:text-flexoki-ink dark:hover:text-flexoki-base-50 transition-colors duration-300 ease-in-out"
-                    >
-                      <div class="flex flex-col gap-1 flex-1">
-                        <div class="font-semibold font-serif">{game.title}</div>
-                        <div class="text-sm">{game.description}</div>
-                      </div>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-        ))
-      }
+  <div slot="intro" class="mt-11">
+    <div class="m-prose">
+      {bioBlocks.map((slug) => <ContentBlock slug={slug} as="none" />)}
     </div>
-  </Container>
-</PageLayout>
+    <NowPlayingMini class="mt-4.5" />
+    <AnimatedSignature client:visible tone="pen" className="w-33 mt-5.5" aria-hidden="true" />
+  </div>
+
+  {
+    layout.map((section) => (
+      <Row label={LABELS[section.path]} as="section" aria-labelledby={headingId(section.path)}>
+        {hasNow && section.path === nowPath && <NowNote slot="margin" />}
+        <SectionHead
+          id={headingId(section.path)}
+          title={section.title}
+          href={section.path}
+          linkLabel={section.link}
+        />
+
+        {section.path === "/blog" && (
+          <>
+            <ul class="m-list">
+              {posts.map((post) => (
+                <ListRow
+                  href={`/blog/${post.id}`}
+                  title={post.data.title}
+                  titleCorrection={post.data.titleCorrection}
+                  date={post.data.date}
+                  description={post.data.description}
+                  pick={post.data.pick}
+                  isNew={isNew(post.data.date)}
+                  note={post.data.note}
+                />
+              ))}
+            </ul>
+            {postsHaveMarkers && <Legend />}
+          </>
+        )}
+
+        {section.path === "/projects" && (
+          <>
+            <ul class="m-list">
+              {recentProjects.map((project) => (
+                <ListRow
+                  href={`/projects/${project.id}`}
+                  title={project.data.title}
+                  titleCorrection={project.data.titleCorrection}
+                  value={formatYear(project.data.date)}
+                  description={project.data.description}
+                  pick={project.data.pick}
+                  isNew={isNew(project.data.date)}
+                  note={project.data.note}
+                />
+              ))}
+            </ul>
+            {projectsHaveMarkers && <Legend />}
+          </>
+        )}
+
+        {section.path === "/work" && (
+          <ul class="m-list">
+            {processedWork.map((job) => (
+              <ListRow
+                href={`/work/${job.slug}`}
+                title={job.name}
+                value={years(job.startDate, job.endDate)}
+                description={job.positions[0]?.title}
+              />
+            ))}
+          </ul>
+        )}
+
+        {section.path === "/cocina" && (
+          <>
+            <ul class="m-list">
+              {homeRecipes.map((recipe) => (
+                <ListRow
+                  href={`/cocina/${recipe.id}`}
+                  title={recipe.data.title}
+                  value={formatMinutes(totalMinutes(recipe.data))}
+                  description={recipe.data.description}
+                  pick={recipe.data.pick}
+                  pickLabel="the favourite"
+                  note={recipe.data.note}
+                />
+              ))}
+            </ul>
+            {recipesHavePick && <Legend text="◆ the favourite" />}
+          </>
+        )}
+
+        {section.path === "/games" && (
+          <ul class="m-list">
+            {homeGames.map((game) => (
+              <ListRow href={game.href} title={game.title} description={game.description} />
+            ))}
+          </ul>
+        )}
+      </Row>
+    ))
+  }
+</MarginPage>

@@ -1,8 +1,10 @@
-import { motion, type SVGMotionProps, type Variants } from "motion/react";
+import { motion, useReducedMotion, type SVGMotionProps, type Variants } from "motion/react";
 import { cn } from "@/lib/utils";
 
 export type SignatureProps = SVGMotionProps<SVGSVGElement> & {
   className?: string;
+  /** "pen": drawn in the Margin pen blue (Flexoki blue-600); default uses currentColor */
+  tone?: "pen" | "current";
 };
 
 const paths = [
@@ -673,12 +675,14 @@ const createDrawVariant = (index: number): Variants => ({
   },
 });
 
-export const AnimatedSignature = ({ className, ...props }: SignatureProps) => {
+export const AnimatedSignature = ({ className, tone = "current", ...props }: SignatureProps) => {
+  // With reduced motion the signature is simply there, already drawn
+  const reduceMotion = useReducedMotion();
   return (
     <motion.svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="76.36185455322266 37 401.6381530761719 122.05389404296875"
-      className={cn("w-full h-auto", className)}
+      className={cn("w-full h-auto", tone === "pen" && "text-pen", className)}
       aria-label="Signature"
       {...props}
     >
@@ -694,7 +698,7 @@ export const AnimatedSignature = ({ className, ...props }: SignatureProps) => {
           pathLength={1}
           strokeDasharray="1"
           variants={createDrawVariant(index)}
-          initial="initial"
+          initial={reduceMotion ? "animate" : "initial"}
           animate="animate"
         />
       ))}

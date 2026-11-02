@@ -1,157 +1,134 @@
 ---
-import Container from "@components/Container.astro";
-import Correction from "@components/Correction.astro";
 import FormattedDate from "@components/FormattedDate.astro";
-import Nav from "@components/Nav.astro";
-import PageLayout from "@layouts/PageLayout.astro";
 import { AnimatedSignature } from "@components/AnimatedSignature";
+import ListRow from "@components/margin/ListRow.astro";
+import MarginNote from "@components/margin/MarginNote.astro";
+import MarginPage from "@components/margin/MarginPage.astro";
+import Row from "@components/margin/Row.astro";
+import SectionHead from "@components/margin/SectionHead.astro";
 import { cachePage, isNotFound, notionUnavailable } from "@lib/cache-headers";
-import {
-  generateBlogPostingSchema,
-  generateBreadcrumbSchema,
-} from "@lib/seo-utils";
+import { generateBlogPostingSchema, generateBreadcrumbSchema } from "@lib/seo-utils";
+import { formatDot, formatYear, isNew } from "@lib/utils";
 import { getLiveCollection, getLiveEntry } from "astro:content";
-import { SITE } from "@consts";
 
 const slug = Astro.params.slug ?? "";
 const { entry: post, error } = await getLiveEntry("blog", { id: slug });
 if (error && !isNotFound(error)) return notionUnavailable(error);
 if (!post) return Astro.rewrite("/404");
 
-// Projects this post talks about (Notion relation "Proyectos")
-const { entries: allProjects = [], error: projectsError } = post.data.projects.length
-  ? await getLiveCollection("projects")
-  : { entries: [], error: undefined };
-cachePage(Astro.response, ["blog", `blog:${post.id}`, "projects"], projectsError);
+// Projects this post talks about (Notion relation "Proyectos") and the
+// latest other posts for the "more" list at the end
+const [{ entries: allPosts = [], error: blogError }, { entries: allProjects = [], error: projectsError }] =
+  await Promise.all([
+    getLiveCollection("blog"),
+    post.data.projects.length
+      ? getLiveCollection("projects")
+      : Promise.resolve({ entries: [], error: undefined }),
+  ]);
+cachePage(Astro.response, ["blog", `blog:${post.id}`, "projects"], blogError ?? projectsError);
 const related = allProjects.filter((p) => post.data.projects.includes(p.id));
+const more = allPosts.filter((p) => p.id !== post.id).slice(0, 3);
+
+const crumbs = [
+  { href: "/blog", label: "Blog" },
+  { href: `/blog/${post.id}`, label: post.data.title },
+];
 
 // Generate structured data for SEO
-const blogPostingSchema = generateBlogPostingSchema(
-  post,
-  Astro.site!.toString(),
-);
+const blogPostingSchema = generateBlogPostingSchema(post, Astro.site!.toString());
 const breadcrumbSchema = generateBreadcrumbSchema(
-  [
-    { href: "/", label: "Home" },
-    { href: "/blog", label: "Blog" },
-    { href: `/blog/${post.id}`, label: post.data.title },
-  ],
+  [{ href: "/", label: "Home" }, ...crumbs],
   Astro.site!.toString(),
 );
 ---
 
-<PageLayout
+<MarginPage
   title={post.data.title}
   description={post.data.description}
   ogImage={`/og/${post.id}.png`}
   type="article"
   publishedTime={post.data.date}
   structuredData={[blogPostingSchema, breadcrumbSchema]}
+  breadcrumbs={crumbs}
 >
-  <!-- Sticky header that appears after scrolling past post header -->
-  <header id="sticky-header" class="pointer-events-none">
-    <Container>
-      <div class="text-xl font-semibold font-serif text-black dark:text-white">
-        <span class="font-semibold font-serif">Jorge Orejas</span>
-        <span class="text-black/50 dark:text-white/50">~</span>
-        <span class="whitespace-wrap">{post.data.title}</span>
-      </div>
-    </Container>
-  </header>
+  <Row>
+    <MarginNote slot="margin" text={post.data.note} />
+    <article class="m-article">
+      <header class="grid gap-3">
+        <h1 class="m-h1">
+          {
+            post.data.titleCorrection ? (
+              <span class="m-corr">
+                <s>{post.data.title}</s>
+                <span class="m-corr-new">{post.data.titleCorrection}</span>
+              </span>
+            ) : (
+              post.data.title
+            )
+          }
+        </h1>
+        <p class="m-date">
+          <FormattedDate date={post.data.date} detail="day" />
+          {post.data.readingTime && <span> · {post.data.readingTime}</span>}
+        </p>
+        {post.data.description && <p class="m-lede">{post.data.description}</p>}
+      </header>
 
-  <Container>
-    <div class="space-y-2">
-      <Nav
-        breadCrumbsItems={[
-          { href: "/blog", label: "Blog" },
-          { href: `/blog/${post.id}`, label: post.data.title },
-        ]}
-      />
-    </div>
-    <div class="space-y-4 my-10" id="post-header">
-      <div class="flex items-center gap-1.5">
-        <div class="font-base text-sm">
-          <FormattedDate date={post.data.date} />
-        </div>
-        &bull;
-        <div class="font-base text-sm">
-          {post.data.readingTime}
-        </div>
+      <div class="m-prose">
+        <Fragment set:html={post.rendered?.html} />
       </div>
-      {
-        post.data.titleCorrection ? (
-          <Correction
-            text={post.data.titleCorrection}
-            textClass="text-2xl -top-6"
-          >
-            <div class="text-2xl font-semibold font-serif text-flexoki-ink dark:text-flexoki-base-50">
-              {post.data.title}
-            </div>
-          </Correction>
-        ) : (
-          <div class="text-2xl font-semibold font-serif text-flexoki-ink dark:text-flexoki-base-50">
-            {post.data.title}
-          </div>
-        )
-      }
 
-      <div class="border-b border-flexoki-base-200 dark:border-flexoki-base-800 pb-4">
-        {post.data.description}
-      </div>
-    </div>
-    <article>
-      <Fragment set:html={post.rendered?.html} />
+      <AnimatedSignature client:visible tone="pen" className="w-33 mt-6" />
     </article>
+  </Row>
 
-    {
-      related.length > 0 && (
-        <aside class="mt-12 space-y-3">
-          <h2 class="text-lg font-semibold font-serif">About the project</h2>
-          <ul class="flex flex-col gap-2">
-            {related.map((project) => (
-              <li>
-                <a class="underline decoration-flexoki-base-300 underline-offset-4 hover:decoration-current" href={`/projects/${project.id}`}>
-                  {project.data.titleCorrection ?? project.data.title}
-                </a>
-                <span class="text-sm text-flexoki-base-500"> · {project.data.description}</span>
-              </li>
-            ))}
-          </ul>
-        </aside>
-      )
-    }
-
-    <!-- Animated Signature -->
-    <div class="mt-16 mb-8 space-y-4 pt-8 border-black/10 dark:border-white/10">
-      <p class="mb-4">By {SITE.AUTHOR_NAME}</p>
-      <AnimatedSignature
-        client:visible
-        className="w-full max-w-2xs mr-auto text-black dark:text-white"
-      />
-    </div>
-  </Container>
-</PageLayout>
-
-<script>
-  // Show sticky header after scrolling past post header
-  const stickyHeader = document.getElementById("sticky-header");
-  const postHeader = document.getElementById("post-header");
-
-  if (stickyHeader && postHeader) {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          stickyHeader.classList.add("hidden");
-        } else {
-          stickyHeader.classList.remove("hidden");
-        }
-      },
-      {
-        threshold: 0,
-        rootMargin: "-80px 0px 0px 0px", // Account for main header height
-      },
-    );
-
-    observer.observe(postHeader);
+  {
+    related.length > 0 && (
+      <Row as="aside" label="projects" aria-labelledby="about-project">
+        <SectionHead id="about-project" title="About the project" />
+        <ul class="m-list">
+          {related.map((project) => (
+            <ListRow
+              href={`/projects/${project.id}`}
+              title={project.data.title}
+              titleCorrection={project.data.titleCorrection}
+              value={formatYear(project.data.date)}
+              description={project.data.description}
+              pick={project.data.pick}
+              isNew={isNew(project.data.date)}
+            />
+          ))}
+        </ul>
+      </Row>
+    )
   }
-</script>
+
+  {
+    more.length > 0 && (
+      <Row as="aside" label="more" aria-labelledby="more-writing">
+        <SectionHead id="more-writing" title="More writing" href="/blog" linkLabel="See all posts" />
+        <ul class="m-more-list">
+          {more.map((p) => (
+            <li>
+              <a class="m-more-i" href={`/blog/${p.id}`}>
+                <span class="m-more-t">
+                  {p.data.titleCorrection ? (
+                    <span class="m-corr">
+                      <s>{p.data.title}</s>
+                      <span class="m-corr-new">{p.data.titleCorrection}</span>
+                    </span>
+                  ) : (
+                    p.data.title
+                  )}
+                </span>
+                <time class="m-more-s" datetime={p.data.date.toISOString()}>
+                  {formatDot(p.data.date)}
+                </time>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </Row>
+    )
+  }
+</MarginPage>

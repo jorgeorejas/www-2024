@@ -1,32 +1,49 @@
 ---
-import Container from "@components/Container.astro";
-import Nav from "@components/Nav.astro";
+import ListRow from "@components/margin/ListRow.astro";
+import MarginPage from "@components/margin/MarginPage.astro";
+import Row from "@components/margin/Row.astro";
+import SectionHead from "@components/margin/SectionHead.astro";
 import WorkTimeline from "@components/WorkTimeline.astro";
-import { WORK } from "@consts";
-import PageLayout from "@layouts/PageLayout.astro";
+import { PROJECTS, WORK } from "@consts";
 import { cachePage } from "@lib/cache-headers";
 import { processWorkEntry } from "@lib/utils";
 import { getLiveCollection } from "astro:content";
 
 // Companies from Notion with their roles, newest first
-const { entries: work = [], error } = await getLiveCollection("work");
-cachePage(Astro.response, ["work"], error);
+const [work, projects] = await Promise.all([
+  getLiveCollection("work"),
+  getLiveCollection("projects"),
+]);
+cachePage(Astro.response, ["work", "projects"], work.error ?? projects.error);
 
-const processedWork = work.map((item) =>
+const processedWork = (work.entries ?? []).map((item) =>
   processWorkEntry({ id: item.id, data: item.data, body: item.data.body }),
 );
+const projectCount = (projects.entries ?? []).length;
 ---
 
-<PageLayout title={WORK.TITLE} description={WORK.DESCRIPTION}>
-  <Container>
-    <div class="space-y-2">
-      <Nav breadCrumbsItems={[{ href: "/work", label: "Work" }]} />
+<MarginPage
+  title={WORK.TITLE}
+  description={WORK.DESCRIPTION}
+  breadcrumbs={[{ href: "/work", label: "Work" }]}
+>
+  <Row>
+    <div class="m-article">
+      <h1 class="m-h1">{WORK.TITLE}</h1>
+      <p class="m-lede">{WORK.DESCRIPTION}</p>
+      <WorkTimeline processedWork={processedWork} class="mt-4" />
     </div>
-    <div class="my-12 space-y-12">
-      <h1 class="text-3xl font-semibold font-serif text-flexoki-ink dark:text-flexoki-base-50 hover:opacity-70 transition-opacity">
-        Work
-      </h1>
-      <WorkTimeline processedWork={processedWork} />
-    </div>
-  </Container>
-</PageLayout>
+  </Row>
+
+  <Row label="more" as="section" aria-labelledby="work-more">
+    <SectionHead id="work-more" title="Also" />
+    <ul class="m-list">
+      <ListRow href="/cv" title="Curriculum vitae" value="/cv" />
+      <ListRow
+        href="/projects"
+        title={PROJECTS.TITLE}
+        value={projectCount ? String(projectCount) : undefined}
+      />
+    </ul>
+  </Row>
+</MarginPage>

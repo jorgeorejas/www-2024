@@ -1,4 +1,4 @@
-import ical from "node-ical";
+import ical, { type VEvent } from "node-ical";
 
 export interface CalendarEvent {
   id: string;
@@ -176,7 +176,7 @@ export async function fetchCalendarEvents(
       // Only process VEVENT types
       if (!event || event.type !== "VEVENT") continue;
 
-      const vevent = event as any;
+      const vevent = event as VEvent;
 
       // Handle recurring events
       if (vevent.rrule) {
@@ -202,7 +202,7 @@ export async function fetchCalendarEvents(
               url: extractMeetingUrl(
                 getStringValue(vevent.description),
                 vevent.url,
-                getStringValue((vevent as any)["x-google-conference"])
+                getStringValue((vevent as unknown as Record<string, string | undefined>)["x-google-conference"])
               ),
               isAllDay,
             });
@@ -230,7 +230,7 @@ export async function fetchCalendarEvents(
             url: extractMeetingUrl(
               getStringValue(vevent.description),
               vevent.url,
-              getStringValue((vevent as any)["x-google-conference"])
+              getStringValue((vevent as unknown as Record<string, string | undefined>)["x-google-conference"])
             ),
             isAllDay,
           });

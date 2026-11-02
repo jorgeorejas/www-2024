@@ -1,34 +1,56 @@
 ---
-import ArrowCard from "@components/ArrowCard.astro";
-import Container from "@components/Container.astro";
-import Nav from "@components/Nav.astro";
+import Legend from "@components/margin/Legend.astro";
+import ListRow from "@components/margin/ListRow.astro";
+import MarginPage from "@components/margin/MarginPage.astro";
+import Row from "@components/margin/Row.astro";
 import { PROJECTS } from "@consts";
-import PageLayout from "@layouts/PageLayout.astro";
 import { cachePage } from "@lib/cache-headers";
+import { formatYear, isNew } from "@lib/utils";
 import { getLiveCollection } from "astro:content";
 
+// Projects from Notion, newest first (drafts only show locally)
 const { entries: projects = [], error } = await getLiveCollection("projects");
 cachePage(Astro.response, ["projects"], error);
+
+// The key under the list only names the markers it actually shows
+const hasPick = projects.some((p) => p.data.pick);
+const hasNew = projects.some((p) => isNew(p.data.date));
+const legend =
+  hasPick && hasNew
+    ? "◆ my pick · NEW last 60 days"
+    : hasPick
+      ? "◆ my pick"
+      : hasNew
+        ? "NEW last 60 days"
+        : undefined;
 ---
 
-<PageLayout title={PROJECTS.TITLE} description={PROJECTS.DESCRIPTION}>
-  <Container>
-    <div class="space-y-2">
-      <Nav breadCrumbsItems={[{ href: "/projects", label: "Projects" }]} />
-    </div>
-    <div class="space-y-12 my-12">
-      <h1 class="text-3xl font-semibold text-flexoki-ink dark:text-flexoki-base-50 font-serif">
-        Projects
-      </h1>
-      <ul class="flex flex-col gap-4">
-        {
-          projects.map((project) => (
-            <li>
-              <ArrowCard entry={project} collection="projects" />
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-  </Container>
-</PageLayout>
+<MarginPage
+  title={PROJECTS.TITLE}
+  description={PROJECTS.DESCRIPTION}
+  breadcrumbs={[{ href: "/projects", label: "Projects" }]}
+>
+  <Row label="projects">
+    <header class="grid gap-3">
+      <h1 class="m-h1">{PROJECTS.TITLE}</h1>
+      <p class="m-lede">{PROJECTS.DESCRIPTION}</p>
+    </header>
+    <ul class="m-list mt-11">
+      {
+        projects.map((project) => (
+          <ListRow
+            href={`/projects/${project.id}`}
+            title={project.data.title}
+            titleCorrection={project.data.titleCorrection}
+            value={formatYear(project.data.date)}
+            description={project.data.description}
+            pick={project.data.pick}
+            isNew={isNew(project.data.date)}
+            note={project.data.note}
+          />
+        ))
+      }
+    </ul>
+    {legend && <Legend text={legend} />}
+  </Row>
+</MarginPage>

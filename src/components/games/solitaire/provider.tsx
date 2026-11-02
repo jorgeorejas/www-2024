@@ -5,7 +5,7 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import type { GameState, Options, MoveHint, Suit } from "./types.js";
+import type { Card, GameState, Options, MoveHint, Suit } from "./types.js";
 import {
   newGame,
   tick,
@@ -38,7 +38,7 @@ interface DragState {
     fromColumn?: number;
     cardIndex?: number;
     count?: number;
-    card?: any;
+    card?: Card;
     suit?: Suit;
   };
 }
@@ -467,7 +467,7 @@ export function useGameStats() {
       D: gameState.foundations.D.length,
       C: gameState.foundations.C.length,
       total: Object.values(gameState.foundations).reduce(
-        (sum: number, pile: any) => sum + pile.length,
+        (sum: number, pile: Card[]) => sum + pile.length,
         0,
       ),
     },

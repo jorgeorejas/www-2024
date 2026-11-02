@@ -1,0 +1,26 @@
+---
+/* Section title (serif) with an optional "See all" link on the right */
+type Props = {
+  title?: string;
+  href?: string;
+  linkLabel?: string;
+  as?: "h1" | "h2" | "h3";
+  id?: string;
+  class?: string;
+};
+
+const { title, href, linkLabel, as: Heading = "h2", id, class: className } = Astro.props;
+---
+
+<div class:list={["m-sec-h", className]}>
+  <Heading id={id}>
+    {title}<slot name="title" />
+  </Heading>
+  {
+    href && linkLabel && (
+      <a class="m-all" href={href}>
+        {linkLabel}
+      </a>
+    )
+  }
+</div>

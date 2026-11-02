@@ -155,3 +155,35 @@ export function formatEducationDate(date: Date | string): string {
   }
   return date.toLocaleDateString("en-EN", { month: "short", year: "numeric" });
 }
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** True when `date` is at most `days` days old (the Margin "NEW" marker) */
+export function isNew(date: Date | undefined, days = 60): boolean {
+  if (!date || Number.isNaN(date.valueOf())) return false;
+  return Date.now() - date.valueOf() <= days * DAY_MS;
+}
+
+const pad2 = (n: number) => String(n).padStart(2, "0");
+
+/** yy.mm.dd, e.g. 26.10.21 (UTC, Notion dates are date-only) */
+export function formatDot(date: Date): string {
+  return `${String(date.getUTCFullYear()).slice(2)}.${pad2(date.getUTCMonth() + 1)}.${pad2(date.getUTCDate())}`;
+}
+
+/** Four-digit year, e.g. 2026 (UTC) */
+export function formatYear(date: Date): string {
+  return String(date.getUTCFullYear());
+}
+
+/**
+ * Length of a period in years and months, e.g. "10 mo", "2 yr 3 mo".
+ * `end` defaults to now ("Present" counts as now).
+ */
+export function formatDuration(start: Date, end?: Date | string): string {
+  const until = end instanceof Date ? end : new Date();
+  const months = Math.max(1, Math.round((until.valueOf() - start.valueOf()) / (DAY_MS * 30.44)));
+  const years = Math.floor(months / 12);
+  const rest = months % 12;
+  return [years ? `${years} yr` : "", rest ? `${rest} mo` : ""].filter(Boolean).join(" ");
+}

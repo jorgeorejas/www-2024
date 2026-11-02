@@ -1,35 +1,42 @@
 ---
-import Container from "@components/Container.astro";
-import Nav from "@components/Nav.astro";
-import PageLayout from "@layouts/PageLayout.astro";
+import MarginNote from "@components/margin/MarginNote.astro";
+import MarginPage from "@components/margin/MarginPage.astro";
+import Row from "@components/margin/Row.astro";
+import { navKeyFor } from "@components/margin/nav";
 
 Astro.response.status = 404;
 Astro.response.headers.set("Cache-Control", "public, max-age=0, s-maxage=300");
 
-const inCocina = Astro.url.pathname.startsWith("/cocina");
+// Pages that rewrite to /404 (e.g. a missing recipe) keep their original path here
+const path = Astro.originPathname;
+const inCocina = path.startsWith("/cocina");
 ---
 
-<PageLayout
+<MarginPage
   title={inCocina ? "No encontrada" : "Not found"}
   description={inCocina ? "Esta receta no existe." : "This page doesn't exist."}
   lang={inCocina ? "es" : "en"}
+  current={navKeyFor(path)}
 >
-  <Container>
-    <Nav lang={inCocina ? "es" : "en"} />
-    <div class="my-16 space-y-4">
-      <p class="font-handwritten text-2xl text-blue-800 -rotate-2">404</p>
-      <h1 class="font-serif text-4xl text-flexoki-ink">
+  <Row>
+    <MarginNote slot="margin" text="404" class="text-[40px]" />
+    <header class="grid gap-6">
+      <h1 class="m-h1">
         {inCocina ? "Esta receta no existe" : "This page doesn't exist"}
       </h1>
       <p>
         {
           inCocina ? (
-            <a class="underline underline-offset-4" href="/cocina">Ver todas las recetas</a>
+            <a class="m-all" href="/cocina">
+              Ver todas las recetas
+            </a>
           ) : (
-            <a class="underline underline-offset-4" href="/">Go to the home page</a>
+            <a class="m-all" href="/">
+              Go to the home page
+            </a>
           )
         }
       </p>
-    </div>
-  </Container>
-</PageLayout>
+    </header>
+  </Row>
+</MarginPage>

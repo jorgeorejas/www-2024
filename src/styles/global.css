@@ -17,7 +17,26 @@
     Caveat Variable, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", "Courier New", monospace;
 
+  /* Legacy accent. The Margin design does not use it (see "Margin" below). */
   --color-international-orange: #ff4f00;
+
+  /* Margin design tokens (all Flexoki):
+     signal = orange-500 (current markers, NEW, ◆, vertical labels),
+     signal-ink = orange-600 (small accent text, footnote refs),
+     pen = blue-600 (hand notes, corrections, signature, pen underline),
+     rule / rule-soft = base-150 / base-100, mute = base-500, mute-ink = base-600 */
+  --color-signal: #cb6120;
+  --color-signal-ink: #bc5215;
+  --color-pen: #205ea6;
+  --color-rule: #dad8ce;
+  --color-rule-soft: #e6e4d9;
+  --color-mute: #878580;
+  --color-mute-ink: #6f6e69;
+  --color-ink-soft: #403e3c;
+
+  /* Margin layout breakpoint: `mg:` = margin column visible (>= 761px),
+     `max-mg:` = collapsed single column (<= 760px) */
+  --breakpoint-mg: 47.5625rem;
 
   --spacing-full: 100%;
 
@@ -187,6 +206,11 @@
   }
 }
 
+/*
+  Classic element rules. Pages rendered with the Margin layout (body.margin-ui,
+  see components/margin/) opt out of them: `:not(:where(.margin-ui *))` keeps
+  the original specificity and only skips elements inside a Margin page.
+*/
 @layer utilities {
   html {
     overflow-y: scroll;
@@ -210,21 +234,21 @@
     @apply text-flexoki-base-800 dark:text-flexoki-base-100;
   }
 
-  header {
+  header:not(:where(.margin-ui *)) {
     @apply fixed top-0 left-0 right-0 z-50 py-5;
     @apply bg-flexoki-paper/75 dark:bg-flexoki-ink/75;
     @apply backdrop-blur-xs saturate-200;
   }
 
-  main {
+  main:not(:where(.margin-ui *)) {
     @apply flex-1 py-32;
   }
 
-  footer {
+  footer:not(:where(.margin-ui *)) {
     @apply py-5 text-sm;
   }
 
-  article {
+  article:not(:where(.margin-ui *)) {
     @apply max-w-full prose dark:prose-invert prose-img:mx-auto prose-img:my-auto;
     @apply prose-headings:font-serif prose-headings:font-semibold prose-p:font-mono;
     @apply prose-headings:text-flexoki-ink dark:prose-headings:text-flexoki-base-50;
@@ -233,24 +257,25 @@
 }
 
 @layer utilities {
-  article a {
+  article:not(:where(.margin-ui *)) a {
     @apply font-mono text-current underline underline-offset-2;
     @apply decoration-flexoki-base-300 dark:decoration-flexoki-base-700;
     @apply transition-colors duration-300 ease-in-out;
   }
-  article a:hover {
+  article:not(:where(.margin-ui *)) a:hover {
     @apply text-flexoki-ink dark:text-flexoki-base-50;
     @apply decoration-flexoki-base-500;
   }
 }
 
 ::selection {
-  @apply text-flexoki-ink bg-international-orange/80;
+  color: var(--color-flexoki-ink);
+  background-color: color-mix(in srgb, var(--color-signal) 28%, transparent);
 }
 
 /* Keyboard navigation focus styles */
 *:focus-visible {
-  outline: 2px solid var(--color-international-orange);
+  outline: 2px solid var(--color-signal);
   outline-offset: 2px;
   border-radius: 2px;
 }
@@ -311,42 +336,1042 @@
 
 /* Blocks that only come from Notion bodies (see lib/notion/markdown.ts) */
 @layer components {
-  article .notion-columns {
+  :is(article, .m-prose) .notion-columns {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
     gap: 1rem;
     margin-block: 1.5rem;
   }
-  article .notion-column > :first-child {
+  :is(article, .m-prose) .notion-column > :first-child {
     margin-top: 0;
   }
-  article .notion-column img {
+  :is(article, .m-prose) .notion-column img {
     margin: 0;
   }
-  article aside.callout {
+  :is(article, .m-prose) aside.callout {
     @apply my-6 px-4 py-3 bg-flexoki-base-50 border-l-2 border-flexoki-base-300;
   }
-  article aside.callout > :first-child {
+  :is(article, .m-prose) aside.callout > :first-child {
     margin-top: 0;
   }
-  article aside.callout > :last-child {
+  :is(article, .m-prose) aside.callout > :last-child {
     margin-bottom: 0;
   }
-  article details {
+  :is(article, .m-prose) details {
     @apply my-4 border-l border-flexoki-base-200 pl-4;
   }
-  article details summary {
+  :is(article, .m-prose) details summary {
     @apply cursor-pointer font-serif text-lg text-flexoki-ink;
   }
-  article figure figcaption {
+  :is(article, .m-prose) figure figcaption {
     @apply text-center text-sm text-flexoki-base-500;
   }
-  article video,
-  article .video iframe {
+  :is(article, .m-prose) video,
+  :is(article, .m-prose) .video iframe {
     @apply w-full my-6;
   }
-  article .video iframe {
+  :is(article, .m-prose) .video iframe {
     aspect-ratio: 16 / 9;
     height: auto;
+  }
+}
+
+/* ==========================================================================
+   MARGIN design system
+   Layout: a left margin column (nav, vertical section labels, hand notes),
+   a measuring ruler, and the content column. Components live in
+   src/components/margin/. Everything is light-only and Flexoki.
+   ========================================================================== */
+
+:root {
+  --m-mw: 190px; /* margin column */
+  --m-gap: 56px; /* gap between margin and content (the ruler lives here) */
+  --m-col: 728px; /* content column */
+  --m-lane: 30px; /* lane for vertical labels, next to the content */
+  --m-pen-underline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 8' preserveAspectRatio='none'%3E%3Cpath d='M1 5.5C18 3 30 6.8 48 4.6S82 2.8 98 5.2 112 4 119 3.6' fill='none' stroke='%23205ea6' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+/* Paper grain: a very light warm noise over the paper (fixed, behind <main>) */
+@utility paper-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35  0 0 0 0 .3  0 0 0 0 .22  0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.11'/%3E%3C/svg%3E");
+}
+
+/* Pen underline: hand-drawn blue squiggle (use on hover) */
+@utility pen-underline {
+  background-image: var(--m-pen-underline);
+  background-size: 100% 7px;
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  padding-bottom: 3px;
+}
+
+@layer components {
+  /* ---------- page grid ---------- */
+  .m-main {
+    flex: 1 0 auto;
+    padding: 56px 20px 72px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--color-ink-soft);
+  }
+  .m {
+    position: relative;
+    display: grid;
+    gap: 72px;
+    max-width: calc(var(--m-mw) + var(--m-gap) + var(--m-col));
+    margin: 0 auto;
+  }
+  /* the ruler between margin and content: short tick every 8px, long every 40px */
+  .m::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(var(--m-mw) + 21px);
+    width: 14px;
+    pointer-events: none;
+    background-image:
+      repeating-linear-gradient(to bottom, var(--color-flexoki-base-400) 0 1px, transparent 1px 40px),
+      repeating-linear-gradient(to bottom, var(--color-flexoki-base-200) 0 1px, transparent 1px 8px);
+    background-size: 14px 100%, 7px 100%;
+    background-repeat: no-repeat;
+    background-position: right top, right top;
+  }
+  .m-row {
+    display: grid;
+    grid-template-columns: var(--m-mw) minmax(0, 1fr);
+    column-gap: var(--m-gap);
+    align-items: start;
+  }
+  .m-mar {
+    display: grid;
+    gap: 14px;
+    justify-items: end;
+    text-align: right;
+    padding-top: 6px;
+    min-width: 0;
+  }
+  .m-col {
+    min-width: 0;
+    max-width: var(--m-col);
+  }
+
+  /* ---------- head: name, role, nav, crumbs ---------- */
+  .m-head {
+    display: grid;
+    gap: 6px;
+  }
+  .m-name {
+    justify-self: start;
+    margin: 0;
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 1.05;
+    color: var(--color-flexoki-ink);
+  }
+  .m-name a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .m-role {
+    margin: 0;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    color: var(--color-ink-soft);
+  }
+  .m-crumbs {
+    margin-top: 18px;
+    font-size: 12px;
+    color: var(--color-mute);
+    min-width: 0;
+  }
+  .m-crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 0.5em;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .m-crumbs li {
+    display: inline-flex;
+    gap: 0.5em;
+    min-width: 0;
+  }
+  .m-crumbs li + li::before {
+    content: "/";
+    color: var(--color-flexoki-base-300);
+  }
+  .m-crumbs a {
+    color: inherit;
+    transition: color 0.15s;
+  }
+  .m-crumbs a:hover {
+    color: var(--color-flexoki-ink);
+  }
+  .m-crumbs [aria-current] {
+    color: var(--color-ink-soft);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 40ch;
+  }
+
+  /* ---------- numbered nav ---------- */
+  .m-nav ul {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .m-nav-i {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 3px 0;
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: nowrap;
+    color: var(--color-ink-soft);
+    transition: color 0.15s;
+  }
+  .m-nav-i:hover {
+    color: var(--color-flexoki-ink);
+  }
+  .m-nav-n {
+    color: var(--color-mute);
+    font-variant-numeric: tabular-nums;
+  }
+  .m-nav-x {
+    color: var(--color-mute);
+  }
+  .m-nav-i[aria-current] {
+    color: var(--color-flexoki-ink);
+  }
+  .m-nav-i[aria-current] .m-nav-n {
+    color: var(--color-signal);
+  }
+  .m-nav--side ul {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1px;
+  }
+  .m-nav--side .m-nav-i {
+    flex-direction: row-reverse;
+  }
+  .m-nav--row {
+    display: none;
+  }
+
+  /* ---------- section heads ---------- */
+  .m-sec-h {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+  .m-sec-h > :is(h1, h2, h3) {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: 26px;
+    line-height: 1.1;
+    color: var(--color-flexoki-ink);
+    text-wrap: balance;
+  }
+  .m-all {
+    font-size: 12.5px;
+    color: var(--color-ink-soft);
+    padding-bottom: 3px;
+    transition: color 0.15s;
+  }
+  .m-all:hover {
+    color: var(--color-flexoki-ink);
+    background-image: var(--m-pen-underline);
+    background-size: 100% 7px;
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+  }
+
+  /* ---------- page titles (reading views, indexes) ---------- */
+  .m-h1 {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: clamp(34px, 5.4vw, 44px);
+    line-height: 1.04;
+    color: var(--color-flexoki-ink);
+    text-wrap: balance;
+  }
+  .m-lede {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--color-ink-soft);
+  }
+  .m-date {
+    margin: 0;
+    font-size: 12.5px;
+    color: var(--color-mute);
+  }
+  .m-eyebrow {
+    margin: 0;
+    font-family: var(--font-handwritten);
+    font-weight: 700;
+    font-size: 21px;
+    line-height: 1;
+    color: var(--color-pen);
+  }
+
+  /* ---------- vertical section labels: ↱ above, letters stacked ---------- */
+  .m-vert {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.32;
+    color: var(--color-signal);
+    text-transform: uppercase;
+  }
+  .m-vert-up {
+    display: block;
+    margin: 0 0 4px 9px;
+    color: var(--color-signal);
+  }
+
+  /* ---------- hand notes (Caveat, pen blue) ---------- */
+  .hn {
+    font-family: var(--font-handwritten);
+    font-weight: 500;
+    font-size: 21px;
+    line-height: 1.02;
+    color: var(--color-pen);
+  }
+  .hn-h {
+    display: block;
+    font-weight: 700;
+  }
+  .m-note :where(p, ul, ol) {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .m-note :where(ul, ol) {
+    display: grid;
+    gap: 2px;
+    margin-top: 4px;
+  }
+  .m-note a {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+  /* placement="margin": in the flow of the margin column */
+  .m-note--margin {
+    margin-top: 6px;
+    transform: rotate(-3deg);
+  }
+  /* any element that carries an attached note */
+  .m-anchor {
+    position: relative;
+  }
+  /* placement="item": at the item's height, outside the vertical-label lane */
+  .m-note--item {
+    position: absolute;
+    right: calc(100% + var(--m-gap) + var(--m-lane));
+    top: 50%;
+    width: calc(var(--m-mw) - var(--m-lane));
+    text-align: right;
+    transform: translateY(-50%) rotate(-3deg);
+  }
+  /* placement="beside": top-aligned, right against the ruler (work roles) */
+  .m-note--beside {
+    position: absolute;
+    right: calc(100% + 44px);
+    top: -0.1em;
+    width: max-content;
+    max-width: var(--m-mw);
+    text-align: right;
+    line-height: 1;
+    transform: rotate(-3deg);
+  }
+  .m-note small {
+    display: block;
+    margin-top: 2px;
+    font-size: 16px;
+    opacity: 0.75;
+  }
+
+  /* ---------- list rows: TITLE ____ value ---------- */
+  .m-list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .m-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    padding: 9px 42px 9px 16px;
+    border-left: 1px solid var(--color-rule);
+    color: inherit;
+    transition: background-color 0.3s ease;
+  }
+  .m-card:hover {
+    background-color: var(--color-flexoki-base-100);
+  }
+  .m-card-t {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: baseline;
+    gap: 10px;
+    min-width: 0;
+  }
+  .m-card-title {
+    flex: 0 1 auto;
+    min-width: 0;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 13.5px;
+    line-height: 1.4;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--color-flexoki-ink);
+    overflow-wrap: anywhere;
+  }
+  .m-card:hover .m-card-text,
+  .m-card:focus-visible .m-card-text {
+    background-image: var(--m-pen-underline);
+    background-size: 100% 7px;
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    padding-bottom: 3px;
+  }
+  .m-lead {
+    flex: 1 1 24px;
+    min-width: 24px;
+    border-bottom: 1.5px solid var(--color-ink-soft);
+    transform: translateY(-5px);
+  }
+  .m-val {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--color-flexoki-ink);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .m-card-d {
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--color-ink-soft);
+  }
+  .m-arrow {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translate(-5px, -50%);
+    opacity: 0.35;
+    transition:
+      transform 0.3s,
+      opacity 0.3s;
+  }
+  .m-card:hover .m-arrow,
+  .m-card:focus-visible .m-arrow {
+    transform: translate(0, -50%);
+    opacity: 1;
+  }
+
+  /* ---------- markers: ◆ pick, NEW, legend ---------- */
+  .m-pick {
+    margin-right: 0.45em;
+    font-family: var(--font-mono);
+    font-size: 0.78em;
+    color: var(--color-signal);
+  }
+  .m-new {
+    margin-right: 0.7em;
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    color: var(--color-signal);
+    vertical-align: 0.18em;
+  }
+  .m-legend {
+    margin: 16px 0 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-mute);
+  }
+
+  /* ---------- title corrections (struck text, pen correction above) ---------- */
+  .m-corr {
+    position: relative;
+    display: inline-block;
+  }
+  .m-corr s {
+    text-decoration-color: var(--color-pen);
+    text-decoration-thickness: 2px;
+  }
+  .m-corr-new {
+    position: absolute;
+    left: 34%;
+    bottom: 74%;
+    font-family: var(--font-handwritten);
+    font-weight: 700;
+    font-size: 1.05em;
+    line-height: 1;
+    letter-spacing: 0;
+    text-transform: none;
+    white-space: nowrap;
+    color: var(--color-pen);
+    transform: rotate(-6deg);
+  }
+  .m-card-title .m-corr-new {
+    font-size: 1.45em;
+  }
+  /* a correction on a page title: pen above the first line, wrapping on phones */
+  .m-h1 .m-corr-new {
+    left: 0.5em;
+    bottom: calc(100% - 0.27em);
+    width: max-content;
+    max-width: calc(100vw - 56px);
+    font-size: 0.9em;
+    white-space: normal;
+  }
+
+  /* ---------- "more" list: serif titles over a rule (More writing, Other projects) ---------- */
+  .m-more-list {
+    display: grid;
+    margin: -10px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .m-more-i {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--color-rule);
+    color: var(--color-flexoki-ink);
+    transition: color 0.15s;
+  }
+  .m-more-i:has(.m-corr) {
+    padding-top: 30px;
+  }
+  .m-more-i:hover {
+    color: var(--color-signal-ink);
+  }
+  .m-more-t {
+    min-width: 0;
+    font-family: var(--font-serif);
+    font-size: 20px;
+    line-height: 1.2;
+  }
+  .m-more-i:hover .m-more-t,
+  .m-more-i:focus-visible .m-more-t {
+    background-image: var(--m-pen-underline);
+    background-size: 100% 7px;
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    padding-bottom: 3px;
+  }
+  .m-more-s {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-mute);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- facts grid: ruled cells of small caps labels and values ---------- */
+  .m-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1px;
+    margin: 0;
+    padding: 1px;
+  }
+  /* each cell draws its own rules, so a half-empty last row stays blank paper */
+  .m-meta > div {
+    min-width: 0;
+    padding: 8px 11px;
+    outline: 1px solid var(--color-rule);
+  }
+  .m-meta dt {
+    font-size: 10.5px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--color-mute);
+  }
+  .m-meta dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+    font-size: 13.5px;
+    color: var(--color-flexoki-ink);
+  }
+  .m-meta a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--color-flexoki-base-300);
+    text-underline-offset: 3px;
+    transition:
+      text-decoration-color 0.2s,
+      color 0.15s;
+  }
+  .m-meta a:hover {
+    text-decoration-color: var(--color-flexoki-base-600);
+  }
+  .m-meta-x {
+    margin-left: 0.3em;
+    font-size: 0.85em;
+    color: var(--color-mute);
+  }
+
+  /* ---------- now playing, one line ---------- */
+  .np-mini {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 8px;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--color-mute-ink);
+    min-width: 0;
+  }
+  .np-dot {
+    align-self: center;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-signal);
+    animation: m-np-pulse 1.6s ease-in-out infinite;
+  }
+  .np-mini.is-paused .np-dot {
+    background: var(--color-flexoki-base-300);
+    animation: none;
+  }
+  .np-l {
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-mute);
+  }
+  .np-sep {
+    color: var(--color-mute);
+  }
+  .np-track {
+    min-width: 0;
+    color: var(--color-flexoki-ink);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 3px;
+    transition: text-decoration-color 0.2s;
+  }
+  .np-track:hover {
+    text-decoration-color: var(--color-flexoki-base-400);
+  }
+  .np-a {
+    color: var(--color-mute-ink);
+  }
+
+  /* ---------- footer ---------- */
+  .m-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px;
+    padding-top: 22px;
+    border-top: 1px solid var(--color-rule);
+    font-size: 12px;
+    color: var(--color-mute);
+  }
+  .m-social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .m-social a {
+    color: inherit;
+    transition: color 0.15s;
+  }
+  .m-social a:hover {
+    color: var(--color-flexoki-ink);
+  }
+  .m-social .is-cap {
+    text-transform: capitalize;
+  }
+
+  /* ---------- reading views ---------- */
+  .m-article {
+    display: grid;
+    gap: 20px;
+    min-width: 0;
+  }
+  .m-prose {
+    position: relative;
+    max-width: 68ch;
+    font-family: var(--font-mono);
+    font-size: 14.5px;
+    line-height: 1.85;
+    color: var(--color-ink-soft);
+    overflow-wrap: break-word;
+  }
+  .m-prose > :first-child {
+    margin-top: 0;
+  }
+  .m-prose :where(p, ul, ol, blockquote, pre, table, figure, hr, details, .video, video) {
+    margin: 1em 0 0;
+  }
+  .m-prose :where(h1, h2, h3, h4) {
+    margin: 1.6em 0 0;
+    font-family: var(--font-serif);
+    font-weight: 400;
+    line-height: 1.15;
+    color: var(--color-flexoki-ink);
+    text-wrap: balance;
+  }
+  .m-prose :where(h1, h2) {
+    font-size: 30px;
+  }
+  .m-prose h3 {
+    font-size: 25px;
+  }
+  .m-prose h4 {
+    font-size: 20px;
+  }
+  .m-prose :where(h1, h2, h3, h4) + * {
+    margin-top: 0.6em;
+  }
+  .m-prose a {
+    color: var(--color-flexoki-ink);
+    text-decoration: underline;
+    text-decoration-color: var(--color-flexoki-base-300);
+    text-underline-offset: 3px;
+    transition: text-decoration-color 0.2s;
+  }
+  .m-prose a:hover {
+    text-decoration-color: var(--color-flexoki-base-600);
+  }
+  .m-prose :where(strong, b) {
+    font-weight: 600;
+    color: var(--color-flexoki-ink);
+  }
+  .m-prose ul {
+    padding-left: 1.2em;
+    list-style: disc;
+  }
+  .m-prose ol {
+    padding-left: 1.6em;
+    list-style: decimal;
+  }
+  .m-prose li + li,
+  .m-prose li > :where(ul, ol) {
+    margin-top: 0.35em;
+  }
+  .m-prose li::marker {
+    color: var(--color-mute);
+  }
+  .m-prose li > p {
+    margin: 0;
+  }
+  .m-prose blockquote {
+    padding-left: 1em;
+    border-left: 2px solid var(--color-flexoki-base-300);
+    font-style: italic;
+    color: var(--color-mute-ink);
+  }
+  .m-prose :not(pre) > code {
+    padding: 0.1em 0.35em;
+    background: var(--color-flexoki-base-50);
+    font-size: 0.92em;
+    color: var(--color-flexoki-ink);
+  }
+  .m-prose pre {
+    padding: 14px 16px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .m-prose img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 1.6em auto 0;
+    border-radius: 2px;
+  }
+  .m-prose hr {
+    margin: 2.4em 0 0;
+    border: 0;
+    border-top: 1px solid var(--color-rule);
+  }
+  .m-prose table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .m-prose :where(th, td) {
+    padding: 6px 10px 6px 0;
+    border-bottom: 1px solid var(--color-rule);
+    text-align: left;
+    vertical-align: top;
+  }
+  .m-prose th {
+    font-weight: 600;
+    color: var(--color-flexoki-ink);
+  }
+  /* Notion to-do lists: the checkbox is the marker */
+  .m-prose .contains-task-list {
+    padding-left: 0;
+    list-style: none;
+  }
+  .m-prose .task-list-item::marker {
+    content: none;
+  }
+  .m-prose input[type="checkbox"] {
+    margin-right: 0.5em;
+    accent-color: var(--color-signal);
+  }
+  /* corrections ~~x~~(y) from lib/remark-correction.mjs */
+  .m-prose .correction-from {
+    text-decoration-color: var(--color-pen);
+    text-decoration-thickness: 2px;
+  }
+  .m-prose .correction-to {
+    font-family: var(--font-handwritten);
+    font-weight: 700;
+    font-size: 1.3em;
+    line-height: 1;
+    color: var(--color-pen);
+  }
+  /* footnotes (remark-gfm) */
+  .m-prose sup {
+    line-height: 0;
+  }
+  .m-prose sup a[data-footnote-ref] {
+    margin-left: 1px;
+    font-size: 0.78em;
+    color: var(--color-signal-ink);
+    text-decoration: none;
+  }
+  .m-prose .footnotes {
+    margin-top: 2.2em;
+    padding-top: 14px;
+    border-top: 1px solid var(--color-rule);
+    font-style: italic;
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: var(--color-mute-ink);
+  }
+  .m-prose .footnotes > h2 {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .m-prose .footnotes ol {
+    margin: 0;
+    padding-left: 1.6em;
+    display: grid;
+    gap: 5px;
+  }
+  .m-prose .footnotes li + li {
+    margin-top: 0;
+  }
+  .m-prose .footnotes li::marker {
+    font-style: normal;
+    color: var(--color-signal-ink);
+  }
+  .m-prose .footnotes a {
+    color: var(--color-signal-ink);
+    text-decoration: none;
+  }
+  /* hand note dropped inside prose: in the margin on desktop */
+  .m-prose > .hn {
+    position: absolute;
+    right: calc(100% + var(--m-gap));
+    width: var(--m-mw);
+    margin-top: -1.8em;
+    text-align: right;
+    transform: rotate(-3deg);
+  }
+
+  /* recipe bodies (optional helpers) */
+  .m-ingr li {
+    display: flex;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px dashed var(--color-rule);
+  }
+  .m-qty {
+    min-width: 6.5ch;
+    font-family: var(--font-mono);
+    font-weight: 400;
+    color: var(--color-flexoki-ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .m-steps {
+    display: grid;
+    gap: 0.8em;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: m-step;
+  }
+  .m-steps > li {
+    position: relative;
+    padding-left: 2.6em;
+    counter-increment: m-step;
+  }
+  .m-steps > li::before {
+    content: counter(m-step, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 0.2em;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-signal-ink);
+  }
+  .m-tips {
+    display: grid;
+    gap: 0.4em;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .m-tips > li {
+    position: relative;
+    padding-left: 1.1em;
+  }
+  .m-tips > li::before {
+    content: "–";
+    position: absolute;
+    left: 0;
+    color: var(--color-mute);
+  }
+
+  /* ---------- collapsed layout (phones, narrow windows) ---------- */
+  @media (max-width: 760px) {
+    .m-main {
+      padding: 32px 16px 56px;
+    }
+    .m {
+      gap: 48px;
+    }
+    .m::before {
+      display: none;
+    }
+    .m-row {
+      grid-template-columns: minmax(0, 1fr);
+      column-gap: 0;
+      row-gap: 12px;
+    }
+    .m-mar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-items: start;
+      gap: 8px 16px;
+      padding-top: 0;
+      text-align: left;
+    }
+    .m-mar:not(:has(*)),
+    .m-r-head > .m-mar {
+      display: none;
+    }
+    .m-nav--row {
+      display: block;
+      margin-top: 10px;
+      max-width: 100%;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .m-nav--row ul {
+      gap: 14px;
+    }
+    .m-vert {
+      flex-direction: row;
+      gap: 0.55em;
+    }
+    .m-vert-up {
+      display: none;
+    }
+    .m-note--margin {
+      transform: rotate(-2deg);
+    }
+    .m-note--item,
+    .m-note--beside {
+      position: static;
+      display: block;
+      width: auto;
+      max-width: none;
+      margin: 0 0 6px 4px;
+      text-align: left;
+      transform: rotate(-2deg);
+    }
+    .m-note--beside small {
+      display: inline;
+      margin-left: 6px;
+      font-size: 15px;
+    }
+    .m-prose > .hn {
+      position: static;
+      display: block;
+      width: max-content;
+      max-width: 260px;
+      margin: 1em 0 0;
+      text-align: left;
+    }
+    .m-crumbs [aria-current] {
+      max-width: 24ch;
+    }
+    /* a margin note sits right above the title: leave room for the pen */
+    .m-h1:has(.m-corr) {
+      padding-top: 0.8em;
+    }
+    /* long list-row corrections wrap instead of pushing the page sideways */
+    .m-card-title .m-corr-new {
+      left: 0.5em;
+      width: max-content;
+      max-width: calc(100vw - 96px);
+      white-space: normal;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .margin-ui *,
+    .margin-ui *::before,
+    .margin-ui *::after {
+      animation: none !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@keyframes m-np-pulse {
+  50% {
+    opacity: 0.35;
   }
 }

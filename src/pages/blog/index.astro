@@ -1,62 +1,72 @@
 ---
-import ArrowCard from "@components/ArrowCard.astro";
-import Container from "@components/Container.astro";
-import Nav from "@components/Nav.astro";
+import Legend from "@components/margin/Legend.astro";
+import ListRow from "@components/margin/ListRow.astro";
+import MarginPage from "@components/margin/MarginPage.astro";
+import Row from "@components/margin/Row.astro";
 import { BLOG } from "@consts";
-import PageLayout from "@layouts/PageLayout.astro";
 import { cachePage } from "@lib/cache-headers";
+import { formatYear, isNew } from "@lib/utils";
 import { getLiveCollection } from "astro:content";
 
 // Published posts from Notion, newest first (drafts only show locally)
-const { entries: data = [], error } = await getLiveCollection("blog");
+const { entries: posts = [], error } = await getLiveCollection("blog");
 cachePage(Astro.response, ["blog"], error);
 
-type Acc = {
-  [year: string]: typeof data;
-};
+// One group per year, newest first (posts already come sorted)
+const years = new Map<string, typeof posts>();
+for (const post of posts) {
+  const year = formatYear(post.data.date);
+  years.set(year, [...(years.get(year) ?? []), post]);
+}
 
-const posts = data.reduce((acc: Acc, post) => {
-  const date = post.data.date;
-  const monthYear = `${date.toLocaleString("default", { month: "long" })} ${date.getFullYear()}`;
-  if (!acc[monthYear]) {
-    acc[monthYear] = [];
-  }
-  acc[monthYear].push(post);
-  return acc;
-}, {});
-
-const monthYears = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a));
+// The key under a list only names the markers that list actually shows
+function legendFor(items: typeof posts): string | undefined {
+  const pick = items.some((p) => p.data.pick);
+  const fresh = items.some((p) => isNew(p.data.date));
+  if (pick && fresh) return "◆ my pick · NEW last 60 days";
+  if (pick) return "◆ my pick";
+  if (fresh) return "NEW last 60 days";
+  return undefined;
+}
 ---
 
-<PageLayout title={BLOG.TITLE} description={BLOG.DESCRIPTION}>
-  <Container>
-    <div class="space-y-2">
-      <Nav breadCrumbsItems={[{ href: "/blog", label: "Blog" }]} />
-    </div>
-    <div class="space-y-12 my-12">
-      <h1 class="text-3xl font-semibold text-flexoki-ink dark:text-flexoki-base-50 font-serif">
-        Blog
-      </h1>
-      <div class="space-y-8">
-        {
-          monthYears.map((year) => (
-            <section class="space-y-6">
-              <h2 class="text-xl font-semibold text-flexoki-ink dark:text-flexoki-base-50 font-serif">
-                {year}
-              </h2>
-              <div>
-                <ul class="flex flex-col gap-4">
-                  {posts[year].map((post) => (
-                    <li>
-                      <ArrowCard entry={post} collection="blog" dateFormat="day" />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </section>
-          ))
-        }
-      </div>
-    </div>
-  </Container>
-</PageLayout>
+<MarginPage
+  title={BLOG.TITLE}
+  description={BLOG.DESCRIPTION}
+  breadcrumbs={[{ href: "/blog", label: "Blog" }]}
+>
+  <Row>
+    <header class="grid gap-3">
+      <h1 class="m-h1">{BLOG.TITLE}</h1>
+      <p class="m-lede">{BLOG.DESCRIPTION}</p>
+    </header>
+  </Row>
+
+  {
+    [...years].map(([year, items]) => {
+      const legend = legendFor(items);
+      return (
+        <Row as="section" label={year} aria-labelledby={`year-${year}`}>
+          <h2 id={`year-${year}`} class="sr-only">
+            {year}
+          </h2>
+          <ul class="m-list">
+            {items.map((post) => (
+              <ListRow
+                href={`/blog/${post.id}`}
+                title={post.data.title}
+                titleCorrection={post.data.titleCorrection}
+                date={post.data.date}
+                description={post.data.description}
+                pick={post.data.pick}
+                isNew={isNew(post.data.date)}
+                note={post.data.note}
+              />
+            ))}
+          </ul>
+          {legend && <Legend text={legend} />}
+        </Row>
+      );
+    })
+  }
+</MarginPage>

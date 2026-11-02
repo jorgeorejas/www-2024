@@ -1,8 +1,13 @@
 ---
+import MarginPage from "@components/margin/MarginPage.astro";
+import Row from "@components/margin/Row.astro";
+
 // Only allow this page in development mode
 if (import.meta.env.PROD) {
   return Astro.redirect("/");
 }
+
+type TokenData = { refresh_token?: string } & Record<string, unknown>;
 
 const CLIENT_ID = import.meta.env.SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = import.meta.env.SPOTIFY_CLIENT_SECRET;
@@ -11,8 +16,8 @@ const REDIRECT_URI = import.meta.env.SPOTIFY_REDIRECT_URI || `${Astro.url.origin
 const SCOPES = "user-read-currently-playing user-read-playback-state user-read-recently-played";
 
 let authorizationUrl = "";
-let tokenData = null;
-let error = null;
+let tokenData: TokenData | null = null;
+let error: string | null = null;
 
 // Check if we have a code in the URL (callback from Spotify)
 const code = Astro.url.searchParams.get("code");
@@ -46,161 +51,131 @@ if (code) {
   // Generate authorization URL
   authorizationUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(SCOPES)}`;
 }
+
+const button =
+  "inline-block border border-flexoki-ink bg-flexoki-ink px-3 py-1.5 text-[13px] text-flexoki-paper transition-colors hover:bg-transparent hover:text-flexoki-ink";
+const box = "border-l border-rule pl-4 py-1 grid gap-2 text-[13px]";
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Spotify Authorization</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      max-width: 800px;
-      margin: 50px auto;
-      padding: 20px;
-      line-height: 1.6;
-    }
-    .button {
-      background: #1DB954;
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      font-size: 16px;
-      border-radius: 24px;
-      cursor: pointer;
-      font-weight: bold;
-      text-decoration: none;
-      display: inline-block;
-    }
-    .button:hover {
-      background: #1ed760;
-    }
-    pre {
-      background: #f4f4f4;
-      padding: 15px;
-      border-radius: 5px;
-      overflow-x: auto;
-      font-size: 12px;
-    }
-    .success {
-      background: #d4edda;
-      border: 1px solid #c3e6cb;
-      color: #155724;
-      padding: 15px;
-      border-radius: 5px;
-      margin: 20px 0;
-    }
-    .error {
-      background: #f8d7da;
-      border: 1px solid #f5c6cb;
-      color: #721c24;
-      padding: 15px;
-      border-radius: 5px;
-      margin: 20px 0;
-    }
-    .info {
-      background: #d1ecf1;
-      border: 1px solid #bee5eb;
-      color: #0c5460;
-      padding: 15px;
-      border-radius: 5px;
-      margin: 20px 0;
-    }
-    .token-box {
-      background: #fff3cd;
-      border: 2px solid #ffc107;
-      padding: 15px;
-      border-radius: 5px;
-      margin: 20px 0;
-    }
-    .copy-btn {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    .copy-btn:hover {
-      background: #0056b3;
-    }
-  </style>
-</head>
-<body>
-  <h1>🎵 Spotify Authorization</h1>
+<MarginPage
+  title="Spotify authorization"
+  description="Development-only page to get a Spotify refresh token for the now playing widget."
+  current={null}
+  breadcrumbs={[{ href: "/spotify-auth", label: "Spotify authorization" }]}
+>
+  <Row>
+    <div class="grid gap-8">
+      <h1 class="m-h1">Spotify authorization</h1>
 
-  {!code && !tokenData && (
-    <div>
-      <div class="info">
-        <p><strong>Client ID:</strong> {CLIENT_ID}</p>
-        <p><strong>Redirect URI:</strong> {REDIRECT_URI}</p>
-        <p><strong>Scopes:</strong> user-read-currently-playing, user-read-playback-state, user-read-recently-played</p>
-      </div>
+      {
+        !code && !tokenData && (
+          <>
+            <dl class={box}>
+              <div>
+                <dt class="text-mute">Client ID</dt>
+                <dd class="break-all">{CLIENT_ID}</dd>
+              </div>
+              <div>
+                <dt class="text-mute">Redirect URI</dt>
+                <dd class="break-all">{REDIRECT_URI}</dd>
+              </div>
+              <div>
+                <dt class="text-mute">Scopes</dt>
+                <dd>user-read-currently-playing, user-read-playback-state, user-read-recently-played</dd>
+              </div>
+            </dl>
 
-      <p>Click the button below to authorize this application with your Spotify account:</p>
+            <p>Click the button below to authorize this application with your Spotify account:</p>
 
-      <a href={authorizationUrl} class="button">
-        🎧 Login with Spotify
-      </a>
-    </div>
-  )}
-
-  {error && (
-    <div class="error">
-      <h2>❌ Error</h2>
-      <p>{error}</p>
-      <a href="/spotify-auth" class="button">Try Again</a>
-    </div>
-  )}
-
-  {tokenData && (
-    <div>
-      <div class="success">
-        <h2>✅ Success!</h2>
-        <p>You've successfully authorized the application.</p>
-      </div>
-
-      <div class="token-box">
-        <h3>📋 Your Refresh Token:</h3>
-        <pre id="refresh-token">{tokenData.refresh_token}</pre>
-        <button class="copy-btn" onclick="copyToken()">Copy to Clipboard</button>
-      </div>
-
-      <div class="info">
-        <h3>Next Steps:</h3>
-        <ol>
-          <li>Copy the refresh token above</li>
-          <li>Open your <code>.env</code> file</li>
-          <li>Update the line: <code>SPOTIFY_REFRESH_TOKEN=your_token_here</code></li>
-          <li>Save the file</li>
-          <li>Restart your dev server</li>
-        </ol>
-      </div>
-
-      <details style="margin-top: 20px;">
-        <summary style="cursor: pointer; font-weight: bold;">Full Response (for debugging)</summary>
-        <pre>{JSON.stringify(tokenData, null, 2)}</pre>
-      </details>
-    </div>
-  )}
-
-  <script>
-    function copyToken() {
-      const element = document.getElementById("refresh-token");
-      const token = element?.textContent;
-      if (!token) {
-        alert("❌ Failed to copy. Please select and copy manually.");
-        return;
+            <p>
+              <a href={authorizationUrl} class={button}>
+                Login with Spotify
+              </a>
+            </p>
+          </>
+        )
       }
-      navigator.clipboard.writeText(token).then(() => {
-        alert("✅ Token copied to clipboard!");
-      }).catch(() => {
-        alert("❌ Failed to copy. Please select and copy manually.");
-      });
+
+      {
+        error && (
+          <div class="grid gap-4 border-l-2 border-flexoki-red-600 pl-4" role="alert">
+            <h2 class="font-serif text-[26px] leading-tight text-flexoki-ink">Error</h2>
+            <p class="text-flexoki-red-600">{error}</p>
+            <p>
+              <a href="/spotify-auth" class={button}>
+                Try Again
+              </a>
+            </p>
+          </div>
+        )
+      }
+
+      {
+        tokenData && (
+          <>
+            <div class="grid gap-2 border-l-2 border-flexoki-green-600 pl-4">
+              <h2 class="font-serif text-[26px] leading-tight text-flexoki-ink">Success!</h2>
+              <p>You've successfully authorized the application.</p>
+            </div>
+
+            <div class="grid gap-3">
+              <h3 class="font-serif text-xl text-flexoki-ink">Your Refresh Token:</h3>
+              <pre
+                id="refresh-token"
+                class="overflow-x-auto whitespace-pre-wrap break-all border border-rule bg-flexoki-base-50 p-4 text-xs"
+              >{tokenData.refresh_token}</pre>
+              <p>
+                <button type="button" id="copy-token" class={button}>
+                  Copy to Clipboard
+                </button>
+                <span id="copy-status" class="ml-3 text-[12px] text-mute" role="status" aria-live="polite"></span>
+              </p>
+            </div>
+
+            <div class="m-prose">
+              <h3>Next Steps:</h3>
+              <ol>
+                <li>Copy the refresh token above</li>
+                <li>
+                  Open your <code>.env</code> file
+                </li>
+                <li>
+                  Update the line: <code>SPOTIFY_REFRESH_TOKEN=your_token_here</code>
+                </li>
+                <li>Save the file</li>
+                <li>Restart your dev server</li>
+              </ol>
+            </div>
+
+            <details class="text-[13px]">
+              <summary class="cursor-pointer font-semibold text-flexoki-ink">Full Response (for debugging)</summary>
+              <pre class="mt-3 overflow-x-auto border border-rule bg-flexoki-base-50 p-4 text-xs">{JSON.stringify(tokenData, null, 2)}</pre>
+            </details>
+          </>
+        )
+      }
+    </div>
+  </Row>
+</MarginPage>
+
+<script>
+  // A module script: wire the button here instead of an inline onclick
+  const button = document.getElementById("copy-token");
+  const status = document.getElementById("copy-status");
+  button?.addEventListener("click", async () => {
+    const token = document.getElementById("refresh-token")?.textContent?.trim();
+    const say = (text: string) => {
+      if (status) status.textContent = text;
+    };
+    if (!token) {
+      say("Failed to copy. Please select and copy manually.");
+      return;
     }
-  </script>
-</body>
-</html>
+    try {
+      await navigator.clipboard.writeText(token);
+      say("Token copied to clipboard!");
+    } catch {
+      say("Failed to copy. Please select and copy manually.");
+    }
+  });
+</script>

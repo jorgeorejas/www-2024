@@ -1,6 +1,20 @@
 ---
-import { formatWorkDate } from "@lib/utils";
-import AnimatedArrow from "./AnimatedArrow.astro";
+/*
+ * Work timeline, Margin "notas" style: no line, no dots. Roles sit flush
+ * with the content column (against the ruler) and each role's dates are a
+ * pen note in the margin at the role's height ("2026 – now" + duration).
+ * On phones the note goes inline above the role title. The mono dates stay
+ * in the markup for screen readers (the note is aria-hidden).
+ */
+import MarginNote from "@components/margin/MarginNote.astro";
+import { formatDuration, formatYear } from "@lib/utils";
+
+type Position = {
+  title: string;
+  startDate: Date;
+  endDate: Date | string;
+  description: string;
+};
 
 interface Props {
   processedWork: Array<{
@@ -9,56 +23,160 @@ interface Props {
     description: string;
     startDate: Date | string;
     endDate: Date | string;
-    positions: Array<{
-      title: string;
-      startDate: Date;
-      endDate: Date | string;
-      description: string;
-    }>;
+    positions: Position[];
   }>;
+  /** Heading level for company names; role titles use the next level */
+  headingLevel?: 2 | 3;
+  /** Show the company name above its roles (off on the company page) */
+  showCompany?: boolean;
+  /** Link each company name to its page (/work/[slug]) */
+  linkCompanies?: boolean;
+  class?: string;
 }
 
-const { processedWork } = Astro.props;
+const {
+  processedWork,
+  headingLevel = 2,
+  showCompany = true,
+  linkCompanies = true,
+  class: className,
+} = Astro.props;
+
+const CompanyHeading = `h${headingLevel}` as "h2" | "h3";
+const RoleHeading = (showCompany ? `h${headingLevel + 1}` : `h${headingLevel}`) as "h2" | "h3" | "h4";
+
+const ended = (date: Date | string): date is Date => date instanceof Date;
+
+const monthYear = (date: Date) =>
+  date.toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
+
+const isoMonth = (date: Date) => date.toISOString().slice(0, 7);
+
+/** "2024 – 2025", "2026 – now", or a single year when it starts and ends the same year */
+function noteYears(position: Position) {
+  const start = formatYear(position.startDate);
+  if (!ended(position.endDate)) return `${start} – now`;
+  const end = formatYear(position.endDate);
+  return start === end ? start : `${start} – ${end}`;
+}
 ---
 
-<div class="space-y-4">
+<div class:list={["wtl", className]}>
   {
-    processedWork.map((job, i) => (
-      <div class="space-y-3">
-        <div class="text-sm text-black/50 dark:text-white/50 print:text-black">
-          {formatWorkDate(job.endDate)}
-        </div>
-        <a
-          href={`/work/${job.slug}`}
-          class="relative group block border-l border-black/15 dark:border-white/20 pl-4 pr-10 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-colors duration-300 ease-in-out print:border-black print:pr-0"
-        >
-          <div class="font-bold font-serif relative inline-block">
-            {job.name}
-            <span class="absolute left-0 bottom-0 w-full h-[1px] bg-blue-800 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-in-out print:hidden" />
-          </div>
-          <div class="mt-2 space-y-3">
-            {job.positions.map((position, i) => (
-              <div class="space-y-2">
-                {i > 0 && (
-                  <p class="text-sm text-black/50 dark:text-white/50 print:text-black">
-                    {formatWorkDate(position.endDate)}
-                  </p>
-                )}
-                <div class="border-l border-black/15 dark:border-white/20 pl-4 space-y-2 print:border-black">
-                  <p class="font-medium font-serif">{position.title}</p>
-                  <div class="text-sm text-black/60 dark:text-white/60 print:text-black">
-                    {position.description}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <AnimatedArrow size="sm" />
-        </a>
-        <div class="text-sm text-black/50 dark:text-white/50 print:text-black">
-          {i === processedWork.length - 1 && formatWorkDate(job.startDate)}
-        </div>
-      </div>
+    processedWork.map((job) => (
+      <section class="wtl-co">
+        {showCompany && (
+          <CompanyHeading class="wtl-co-n">
+            {linkCompanies ? (
+              <a href={`/work/${job.slug}`}>
+                {/* no whitespace before the arrow, so the underline stops at the name */}
+                {job.name}<span class="wtl-co-x" aria-hidden="true">↗</span>
+              </a>
+            ) : (
+              job.name
+            )}
+          </CompanyHeading>
+        )}
+        <ol class="wtl-roles">
+          {job.positions.map((position) => {
+            const duration = formatDuration(position.startDate, position.endDate);
+            return (
+              <li class="wtl-role m-anchor">
+                <MarginNote placement="beside" as="span" aria-hidden="true">
+                  {noteYears(position)}
+                  <small>{duration}</small>
+                </MarginNote>
+                <RoleHeading class="wtl-role-t">{position.title}</RoleHeading>
+                <p class="sr-only">
+                  <time datetime={isoMonth(position.startDate)}>{monthYear(position.startDate)}</time>
+                  {" – "}
+                  {ended(position.endDate) ? (
+                    <time datetime={isoMonth(position.endDate)}>{monthYear(position.endDate)}</time>
+                  ) : (
+                    "Present"
+                  )}
+                  {` · ${duration}`}
+                </p>
+                {position.description && <p class="wtl-role-d">{position.description}</p>}
+              </li>
+            );
+          })}
+        </ol>
+      </section>
     ))
   }
 </div>
+
+<style>
+  .wtl {
+    display: grid;
+    gap: 40px;
+  }
+  .wtl-co-n {
+    margin: 0 0 14px;
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: 26px;
+    line-height: 1.1;
+    color: var(--color-flexoki-ink);
+    text-wrap: balance;
+  }
+  .wtl-co-n a {
+    color: inherit;
+    text-decoration: none;
+    text-underline-offset: 5px;
+    text-decoration-thickness: 1px;
+  }
+  .wtl-co-n a:hover {
+    text-decoration-line: underline;
+  }
+  /* small arrow on the baseline; inline-block keeps the link underline off it */
+  .wtl-co-x {
+    display: inline-block;
+    margin-left: 0.3em;
+    font-family: var(--font-mono);
+    font-size: 0.42em;
+    vertical-align: baseline;
+    text-decoration: none;
+    color: var(--color-mute-ink);
+    transition: color 0.15s;
+  }
+  .wtl-co-n a:hover .wtl-co-x {
+    color: var(--color-signal-ink);
+  }
+  .wtl-roles {
+    display: grid;
+    gap: 26px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .wtl-role-t {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 14.5px;
+    line-height: 1.5;
+    color: var(--color-flexoki-ink);
+  }
+  .wtl-role-d {
+    max-width: 68ch;
+    margin: 6px 0 0;
+    font-size: 14.5px;
+    line-height: 1.85;
+    color: var(--color-ink-soft);
+  }
+  /* outside a Margin page (no margin column) the note just sits above the role */
+  :global(body:not(.margin-ui)) .wtl :global(.m-note--beside) {
+    position: static;
+    display: block;
+    width: auto;
+    margin: 0 0 4px;
+    text-align: left;
+    transform: rotate(-2deg);
+  }
+  :global(body:not(.margin-ui)) .wtl :global(.m-note--beside small) {
+    display: inline;
+    margin-left: 6px;
+  }
+</style>

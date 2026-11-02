@@ -1,79 +1,111 @@
 ---
-import Container from "@components/Container.astro";
-import Nav from "@components/Nav.astro";
-import PageLayout from "@layouts/PageLayout.astro";
+import ListRow from "@components/margin/ListRow.astro";
+import MarginPage from "@components/margin/MarginPage.astro";
+import Row from "@components/margin/Row.astro";
+import SectionHead from "@components/margin/SectionHead.astro";
+import WorkTimeline from "@components/WorkTimeline.astro";
 import { cachePage, isNotFound, notionUnavailable } from "@lib/cache-headers";
-import { dateRange, getWorkDateRange } from "@lib/utils";
-import { getLiveEntry } from "astro:content";
+import { formatDuration, formatYear, processWorkEntry } from "@lib/utils";
+import { getLiveCollection, getLiveEntry } from "astro:content";
 
 const slug = Astro.params.slug ?? "";
+// The other companies (for "More work") load alongside the entry; live
+// collections report failures in `error` instead of rejecting
+const allWork = getLiveCollection("work");
 const { entry: work, error } = await getLiveEntry("work", { id: slug });
 if (error && !isNotFound(error)) return notionUnavailable(error);
 if (!work) return Astro.rewrite("/404");
-cachePage(Astro.response, ["work", `work:${work.id}`]);
+const all = await allWork;
+cachePage(Astro.response, ["work", `work:${work.id}`], all.error);
 
+const company = processWorkEntry({ id: work.id, data: work.data, body: work.data.body });
+const others = (all.entries ?? [])
+  .filter((entry) => entry.id !== work.id)
+  .map((entry) => processWorkEntry({ id: entry.id, data: entry.data, body: entry.data.body }));
 
-// Derive the overall date range from roles
-const { startDate, endDate } = getWorkDateRange(work.data.roles);
+const monthYear = (date: Date) =>
+  date.toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
+
+// Overall period across the company's roles, e.g. "Jan 2025 – Present · 1 yr 10 mo"
+const { startDate, endDate } = company;
+const start = startDate instanceof Date ? startDate : undefined;
+const period = start
+  ? [
+      `${monthYear(start)} – ${endDate instanceof Date ? monthYear(endDate) : "Present"}`,
+      formatDuration(start, endDate),
+    ].join(" · ")
+  : undefined;
+
+/** "2022 – 2024" or "2025 – now" for the list of other companies */
+function years(job: (typeof others)[number]) {
+  if (!(job.startDate instanceof Date)) return undefined;
+  const from = formatYear(job.startDate);
+  if (!(job.endDate instanceof Date)) return `${from} – now`;
+  const to = formatYear(job.endDate);
+  return from === to ? from : `${from} – ${to}`;
+}
+
+// Company website, shown as its bare host name
+let site: { href: string; host: string } | undefined;
+if (company.website) {
+  try {
+    site = { href: company.website, host: new URL(company.website).hostname.replace(/^www\./, "") };
+  } catch {
+    site = undefined;
+  }
+}
 ---
 
-<PageLayout
-  title={`${work.data.company} - Work Experience`}
-  description={`Work experience at ${work.data.company}`}
+<MarginPage
+  title={`${company.name} - Work Experience`}
+  description={`Work experience at ${company.name}`}
+  breadcrumbs={[
+    { href: "/work", label: "Work" },
+    { href: `/work/${work.id}`, label: company.name },
+  ]}
 >
-  <Container>
-    <div class="space-y-2">
-      <Nav
-        breadCrumbsItems={[
-          { href: "/work", label: "Work" },
-          { href: `/work/${work.id}`, label: work.data.company },
-        ]}
-      />
-    </div>
-    <div class="space-y-4 my-10">
-      <div class="flex items-center gap-1.5">
-        <div class="font-base text-sm">
-          {dateRange(startDate, endDate)}
-        </div>
-      </div>
+  <Row>
+    <article class="m-article">
+      <h1 class="m-h1">{company.name}</h1>
+      {period && <p class="m-date">{period}</p>}
+      {
+        work.rendered?.html && (
+          <div class="m-prose">
+            <Fragment set:html={work.rendered.html} />
+          </div>
+        )
+      }
+      <section class="mt-6" aria-labelledby="positions">
+        <SectionHead id="positions" title="Positions" />
+        <WorkTimeline processedWork={[company]} showCompany={false} headingLevel={3} />
+      </section>
+      {
+        site && (
+          <p class="mt-2">
+            <a class="m-all" href={site.href} target="_blank" rel="noopener noreferrer">
+              Visit {site.host} ↗
+            </a>
+          </p>
+        )
+      }
+    </article>
+  </Row>
 
-      <div class="text-2xl font-semibold font-serif text-black dark:text-white">
-        {work.data.company}
-      </div>
-
-      <div class="prose prose-neutral dark:prose-invert max-w-none">
-        <Fragment set:html={work.rendered?.html} />
-      </div>
-
-      <div class="space-y-4">
-        <h3 class="text-lg font-semibold font-serif">Positions</h3>
-        <div class="space-y-3">
-          {
-            work.data.roles.map((position, i) => (
-                <div class="space-y-2">
-                  <div class="text-sm text-black/50 dark:text-white/50">
-                    {position.dateEnd === "Present"
-                      ? "Present"
-                      : position.dateEnd.toLocaleDateString("es-ES")}
-                  </div>
-                  <div class="border-l border-black/15 dark:border-white/20 pl-4 space-y-2">
-                    <div class="font-medium font-serif">{position.title}</div>
-                    {position.description && (
-                      <div class="text-sm opacity-60">
-                        {position.description}
-                      </div>
-                    )}
-                  </div>
-                  {i === work.data.roles.length - 1 && (
-                    <div class="text-sm text-black/50 dark:text-white/50">
-                      {position.dateStart.toLocaleDateString("es-ES")}
-                    </div>
-                  )}
-                </div>
-              ))
-          }
-        </div>
-      </div>
-    </div>
-  </Container>
-</PageLayout>
+  {
+    others.length > 0 && (
+      <Row label="more" as="section" aria-labelledby="work-more">
+        <SectionHead id="work-more" title="More work" href="/work" linkLabel="See all work" />
+        <ul class="m-list">
+          {others.map((job) => (
+            <ListRow
+              href={`/work/${job.slug}`}
+              title={job.name}
+              value={years(job)}
+              description={job.positions.map((position) => position.title).join(" · ")}
+            />
+          ))}
+        </ul>
+      </Row>
+    )
+  }
+</MarginPage>

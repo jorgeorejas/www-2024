@@ -1,12 +1,15 @@
 ---
-import Container from "@components/Container.astro";
-import Correction from "@components/Correction.astro";
 import FormattedDate from "@components/FormattedDate.astro";
-import Link from "@components/Link.astro";
-import Nav from "@components/Nav.astro";
-import PageLayout from "@layouts/PageLayout.astro";
+import { AnimatedSignature } from "@components/AnimatedSignature";
+import ListRow from "@components/margin/ListRow.astro";
+import MarginNote from "@components/margin/MarginNote.astro";
+import MarginPage from "@components/margin/MarginPage.astro";
+import Row from "@components/margin/Row.astro";
+import SectionHead from "@components/margin/SectionHead.astro";
 import { cachePage, isNotFound, notionUnavailable } from "@lib/cache-headers";
+import { imageSrcset } from "@lib/notion/images";
 import { generateProjectSchema, generateBreadcrumbSchema } from "@lib/seo-utils";
+import { formatYear, isNew } from "@lib/utils";
 import { getLiveCollection, getLiveEntry } from "astro:content";
 
 const slug = Astro.params.slug ?? "";
@@ -26,116 +29,199 @@ cachePage(Astro.response, ["projects", `projects:${project.id}`, "blog"], projec
 const previous = allProjects.find((p) => p.id === project.data.previous);
 const next = allProjects.find((p) => p.id === project.data.next);
 const articles = posts.filter((p) => project.data.articles.includes(p.id));
+const others = allProjects.filter((p) => p.id !== project.id).slice(0, 3);
+
+const { demoURL, repoURL, image } = project.data;
+
+/** "example.com/path" for a link, without protocol, www or trailing slash */
+function shortUrl(url: string, withPath = true): string {
+  try {
+    const u = new URL(url);
+    const host = u.host.replace(/^www\./, "");
+    return withPath ? `${host}${u.pathname}`.replace(/\/$/, "") : host;
+  } catch {
+    return url;
+  }
+}
+
+const crumbs = [
+  { href: "/projects", label: "Projects" },
+  { href: `/projects/${project.id}`, label: project.data.title },
+];
 
 // Generate structured data for SEO
 const projectSchema = generateProjectSchema(project, Astro.site!.toString());
 const breadcrumbSchema = generateBreadcrumbSchema(
-  [
-    { href: "/", label: "Home" },
-    { href: "/projects", label: "Projects" },
-    { href: `/projects/${project.id}`, label: project.data.title },
-  ],
-  Astro.site!.toString()
+  [{ href: "/", label: "Home" }, ...crumbs],
+  Astro.site!.toString(),
 );
 ---
 
-<PageLayout
+<MarginPage
   title={project.data.title}
   description={project.data.description}
   structuredData={[projectSchema, breadcrumbSchema]}
+  breadcrumbs={crumbs}
 >
-  <Container>
-    <div class="space-y-2">
-      <Nav
-        breadCrumbsItems={[
-          { href: "/projects", label: "Projects" },
-          { href: `/projects/${project.id}`, label: project.data.title },
-        ]}
-      />
-    </div>
-    <div class="space-y-4 my-10">
-      <div class="flex items-center gap-1.5">
-        <div class="font-base text-sm">
-          <FormattedDate date={project.data.date} />
-        </div>
-        &bull;
-        <div class="font-base text-sm">
-          {project.data.readingTime}
-        </div>
-      </div>
-      {
-        project.data.titleCorrection ? (
-          <Correction
-            text={project.data.titleCorrection}
-            textClass="text-2xl -top-6"
-          >
-            <div class="text-2xl font-semibold font-serif text-flexoki-ink dark:text-flexoki-base-50">
-              {project.data.title}
-            </div>
-          </Correction>
-        ) : (
-          <div class="text-2xl font-semibold font-serif text-flexoki-ink dark:text-flexoki-base-50">
-            {project.data.title}
-          </div>
-        )
-      }
-      {
-        (project.data.demoURL || project.data.repoURL) && (
-          <nav class=" flex gap-1">
-            {project.data.demoURL && (
-              <Link href={project.data.demoURL} external>
-                visit
-              </Link>
-            )}
-            {project.data.demoURL && project.data.repoURL && <span>/</span>}
-            {project.data.repoURL && (
-              <Link href={project.data.repoURL} external>
-                repo
-              </Link>
-            )}
-          </nav>
-        )
-      }
-    </div>
-    <article>
-      <Fragment set:html={project.rendered?.html} />
-    </article>
+  <Row>
+    <MarginNote slot="margin" text={project.data.note} />
+    <article class="m-article">
+      <header class="grid gap-3">
+        <h1 class="m-h1">
+          {
+            project.data.titleCorrection ? (
+              <span class="m-corr">
+                <s>{project.data.title}</s>
+                <span class="m-corr-new">{project.data.titleCorrection}</span>
+              </span>
+            ) : (
+              project.data.title
+            )
+          }
+        </h1>
+        {project.data.description && <p class="m-lede">{project.data.description}</p>}
+      </header>
 
-    {
-      (previous || next || articles.length > 0) && (
-        <aside class="mt-12 space-y-6 border-t border-flexoki-base-200 pt-6">
-          {articles.length > 0 && (
-            <div class="space-y-2">
-              <h2 class="text-lg font-semibold font-serif">Written about it</h2>
-              <ul class="flex flex-col gap-1">
-                {articles.map((post) => (
-                  <li>
-                    <a class="underline decoration-flexoki-base-300 underline-offset-4 hover:decoration-current" href={`/blog/${post.id}`}>
-                      {post.data.title}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+      {
+        image && (
+          <figure class="m-0">
+            <img
+              class="block w-full h-auto rounded-[2px]"
+              src={image}
+              srcset={imageSrcset(image)}
+              sizes="(max-width: 760px) 100vw, 728px"
+              alt={project.data.title}
+              loading="eager"
+              decoding="async"
+            />
+          </figure>
+        )
+      }
+
+      <dl class="m-meta">
+        <div>
+          <dt>Date</dt>
+          <dd><FormattedDate date={project.data.date} /></dd>
+        </div>
+        {
+          project.data.readingTime && (
+            <div>
+              <dt>Reading time</dt>
+              <dd>{project.data.readingTime}</dd>
             </div>
-          )}
-          {(previous || next) && (
-            <nav class="flex flex-wrap justify-between gap-4 text-sm">
-              {previous && (
-                <a class="group" href={`/projects/${previous.id}`}>
-                  <span class="block text-flexoki-base-500">Previous version</span>
-                  <span class="font-serif text-base group-hover:underline">← {previous.data.titleCorrection ?? previous.data.title}</span>
+          )
+        }
+        {
+          demoURL && (
+            <div>
+              <dt>Demo</dt>
+              <dd>
+                <a href={demoURL} target="_blank" rel="noopener noreferrer">
+                  {shortUrl(demoURL, false)}
+                  <span class="m-meta-x" aria-hidden="true">↗</span>
                 </a>
-              )}
-              {next && (
-                <a class="group text-right ml-auto" href={`/projects/${next.id}`}>
-                  <span class="block text-flexoki-base-500">Next version</span>
-                  <span class="font-serif text-base group-hover:underline">{next.data.titleCorrection ?? next.data.title} →</span>
+              </dd>
+            </div>
+          )
+        }
+        {
+          repoURL && (
+            <div>
+              <dt>Repo</dt>
+              <dd>
+                <a href={repoURL} target="_blank" rel="noopener noreferrer">
+                  {shortUrl(repoURL)}
+                  <span class="m-meta-x" aria-hidden="true">↗</span>
                 </a>
-              )}
-            </nav>
-          )}
-        </aside>
-      )
-    }
-  </Container>
-</PageLayout>
+              </dd>
+            </div>
+          )
+        }
+        {
+          previous && (
+            <div>
+              <dt>Previous version</dt>
+              <dd>
+                <a href={`/projects/${previous.id}`}>← {previous.data.titleCorrection ?? previous.data.title}</a>
+              </dd>
+            </div>
+          )
+        }
+        {
+          next && (
+            <div>
+              <dt>Next version</dt>
+              <dd>
+                <a href={`/projects/${next.id}`}>{next.data.titleCorrection ?? next.data.title} →</a>
+              </dd>
+            </div>
+          )
+        }
+      </dl>
+
+      <div class="m-prose">
+        <Fragment set:html={project.rendered?.html} />
+      </div>
+
+      {
+        demoURL && (
+          <p class="m-0">
+            <a class="m-all" href={demoURL} target="_blank" rel="noopener noreferrer">
+              Visit {shortUrl(demoURL, false)} ↗
+            </a>
+          </p>
+        )
+      }
+
+      <AnimatedSignature client:visible tone="pen" className="w-33 mt-6" />
+    </article>
+  </Row>
+
+  {
+    articles.length > 0 && (
+      <Row as="aside" label="writing" aria-labelledby="written-about-it">
+        <SectionHead id="written-about-it" title="Written about it" />
+        <ul class="m-list">
+          {articles.map((post) => (
+            <ListRow
+              href={`/blog/${post.id}`}
+              title={post.data.title}
+              titleCorrection={post.data.titleCorrection}
+              date={post.data.date}
+              description={post.data.description}
+              pick={post.data.pick}
+              isNew={isNew(post.data.date)}
+            />
+          ))}
+        </ul>
+      </Row>
+    )
+  }
+
+  {
+    others.length > 0 && (
+      <Row as="aside" label="more" aria-labelledby="other-projects">
+        <SectionHead id="other-projects" title="Other projects" href="/projects" linkLabel="See all projects" />
+        <ul class="m-more-list">
+          {others.map((p) => (
+            <li>
+              <a class="m-more-i" href={`/projects/${p.id}`}>
+                <span class="m-more-t">
+                  {p.data.titleCorrection ? (
+                    <span class="m-corr">
+                      <s>{p.data.title}</s>
+                      <span class="m-corr-new">{p.data.titleCorrection}</span>
+                    </span>
+                  ) : (
+                    p.data.title
+                  )}
+                </span>
+                <span class="m-more-s">{formatYear(p.data.date)}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </Row>
+    )
+  }
+</MarginPage>

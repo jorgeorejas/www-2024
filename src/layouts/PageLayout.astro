@@ -1,6 +1,8 @@
 ---
 import Head from "@components/Head.astro";
 import Footer from "@components/Footer.astro";
+import MarginFooter from "@components/margin/MarginFooter.astro";
+import Row from "@components/margin/Row.astro";
 import { SITE } from "@consts";
 import SpeedInsights from "@vercel/speed-insights/astro";
 import "@fontsource-variable/caveat";
@@ -17,6 +19,13 @@ type Props = {
   structuredData?: Record<string, unknown> | Record<string, unknown>[];
   /** Page language; the site is English, a few pages (e.g. /wishlist) are Spanish */
   lang?: "en" | "es";
+  /**
+   * "classic": the original single-column layout (Container + Nav).
+   * "margin": the Margin design grid. Use MarginPage instead of setting this by hand.
+   */
+  variant?: "classic" | "margin";
+  /** Margin only: show the now-playing line in the footer (home shows it under the bio) */
+  footerNowPlaying?: boolean;
 };
 
 const {
@@ -29,7 +38,10 @@ const {
   author,
   structuredData,
   lang = "en",
+  variant = "classic",
+  footerNowPlaying = true,
 } = Astro.props;
+const margin = variant === "margin";
 ---
 
 <!doctype html>
@@ -47,22 +59,31 @@ const {
       locale={lang === "es" ? "es_ES" : undefined}
     />
   </head>
-  <body class="relative">
+  <body class:list={["relative", { "margin-ui": margin }]}>
     <a
       href="#main-content"
-      class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-international-orange focus:text-white focus:rounded-md focus:font-semibold"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-flexoki-ink focus:text-flexoki-paper focus:font-semibold"
     >
       {lang === "es" ? "Saltar al contenido" : "Skip to main content"}
     </a>
     <SpeedInsights />
-    <div
-      class="fixed inset-0 pointer-events-none opacity-[0.015] dark:opacity-[0.025]"
-      style="background-image: url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22300%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%224%22 /%3E%3C/filter%3E%3Crect width=%22300%22 height=%22300%22 filter=%22url(%23noise)%22/%3E%3C/svg%3E');"
-    >
-    </div>
-    <main id="main-content" class="relative antialiased">
-      <slot />
-      <Footer lang={lang} />
-    </main>
+    <div class="paper-grain fixed inset-0 pointer-events-none" aria-hidden="true"></div>
+    {
+      margin ? (
+        <main id="main-content" class="m-main relative">
+          <div class="m">
+            <slot />
+            <Row>
+              <MarginFooter lang={lang} nowPlaying={footerNowPlaying} />
+            </Row>
+          </div>
+        </main>
+      ) : (
+        <main id="main-content" class="relative antialiased">
+          <slot />
+          <Footer lang={lang} />
+        </main>
+      )
+    }
   </body>
 </html>

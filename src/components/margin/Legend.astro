@@ -1,0 +1,11 @@
+---
+/* Key for the markers under a list, e.g. "◆ my pick · NEW last 60 days" */
+type Props = {
+  text?: string;
+  class?: string;
+};
+
+const { text = "◆ my pick · NEW last 60 days", class: className } = Astro.props;
+---
+
+<p class:list={["m-legend", className]}>{text}</p>
