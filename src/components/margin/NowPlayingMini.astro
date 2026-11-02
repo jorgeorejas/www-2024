@@ -1,0 +1,9 @@
+---
+/* "● NOW PLAYING · Track — Artist": SpotifyNowPlaying's one-line variant */
+import SpotifyNowPlaying from "@components/SpotifyNowPlaying.astro";
+
+type Props = { class?: string };
+const { class: className } = Astro.props;
+---
+
+<SpotifyNowPlaying variant="mini" class={className} />

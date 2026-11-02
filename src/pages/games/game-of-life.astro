@@ -1,30 +1,29 @@
 ---
-import Container from "@components/Container.astro";
-import Nav from "@components/Nav.astro";
-import PageLayout from "@layouts/PageLayout.astro";
 import GameOfLifeComponent from "@components/games/GameOfLife.tsx";
+import MarginPage from "@components/margin/MarginPage.astro";
+import Row from "@components/margin/Row.astro";
 ---
 
-<PageLayout 
-  title="Conway's Game of Life" 
+<MarginPage
+  title="Conway's Game of Life"
   description="A mesmerizing cellular automaton where simple rules create complex, beautiful patterns."
+  breadcrumbs={[
+    { href: "/games", label: "Games" },
+    { href: "/games/game-of-life", label: "Conway's Game of Life" },
+  ]}
 >
-  <Container>
-    <div class="space-y-2">
-      <Nav
-        breadCrumbsItems={[
-          { href: "/games", label: "Games" },
-          { href: "/games/game-of-life", label: "Conway's Game of Life" },
-        ]}
-      />
-    </div>
-    
-    <div class="my-10">
-      <div class="text-2xl font-semibold font-serif text-flexoki-ink dark:text-flexoki-base-50 mb-8">
-        Conway's Game of Life
-      </div>
-      
+  <Row>
+    <h1 class="m-h1 mb-10">Conway's Game of Life</h1>
+    <div class="gol-shell">
       <GameOfLifeComponent client:only="react" />
     </div>
-  </Container>
-</PageLayout>
+  </Row>
+</MarginPage>
+
+<style>
+  /* The 64×64 board is wider than a phone column: scroll the board, not the page */
+  .gol-shell :global([data-testid="gol-grid"]) {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+</style>

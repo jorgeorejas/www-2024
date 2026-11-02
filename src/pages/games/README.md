@@ -69,55 +69,27 @@ Create a new Astro page in `src/pages/games/`:
 ```astro
 ---
 // src/pages/games/your-game.astro
-import Container from "@components/Container.astro";
-import Nav from "@components/Nav.astro";
-import PageLayout from "@layouts/PageLayout.astro";
+import MarginPage from "@components/margin/MarginPage.astro";
+import Row from "@components/margin/Row.astro";
 import YourGameComponent from "@components/games/YourGame.tsx";
 ---
 
-<PageLayout 
-  title="Your Game" 
+<MarginPage
+  title="Your Game"
   description="Description of your game for SEO."
+  breadcrumbs={[
+    { href: "/games", label: "Games" },
+    { href: "/games/your-game", label: "Your Game" },
+  ]}
 >
-  <Container>
-    <div class="space-y-2">
-      <Nav
-        breadCrumbsItems={[
-          { href: "/games", label: "Games" },
-          { href: "/games/your-game", label: "Your Game" },
-        ]}
-      />
+  <Row>
+    <h1 class="m-h1 mb-10">Your Game</h1>
+    <div class="m-prose mb-8">
+      <p>Game description and how to play.</p>
     </div>
-    
-    <div class="space-y-4 my-10">
-      <div class="flex items-center gap-1.5">
-        <div class="font-base text-sm">Easy</div>
-        &bull;
-        <div class="font-base text-sm">Category</div>
-      </div>
-      <div class="text-2xl font-semibold font-serif text-black dark:text-white">
-        Your Game
-      </div>
-    </div>
-    
-    <article class="space-y-6">
-      <section>
-        <p>Game description and backstory here.</p>
-      </section>
-
-      <section>
-        <h4 class="font-semibold mb-3">How to Play</h4>
-        <ul class="space-y-1 text-sm">
-          <li><strong>Instructions</strong> here</li>
-        </ul>
-      </section>
-
-      <section class="py-8">
-        <YourGameComponent client:idle />
-      </section>
-    </article>
-  </Container>
-</PageLayout>
+    <YourGameComponent client:only="react" />
+  </Row>
+</MarginPage>
 ```
 
 ### 3. Add to Games Listing

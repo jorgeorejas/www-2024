@@ -1,9 +1,10 @@
 ---
-import AnimatedArrow from "@components/AnimatedArrow.astro";
-import Container from "@components/Container.astro";
-import Nav from "@components/Nav.astro";
 import { WISHLIST } from "@consts";
-import PageLayout from "@layouts/PageLayout.astro";
+import { squareSelector } from "@components/margin/classes";
+import Legend from "@components/margin/Legend.astro";
+import MarginPage from "@components/margin/MarginPage.astro";
+import Markers from "@components/margin/Markers.astro";
+import Row from "@components/margin/Row.astro";
 import { cachePage } from "@lib/cache-headers";
 import { getLiveCollection } from "astro:content";
 
@@ -42,10 +43,17 @@ const priceRanges = distinct(items.map((i) => priceRangeOf(i.data.fields))).sort
   (a, b) => rangeFloor(a) - rangeFloor(b),
 );
 
+// Every filter from production stays: category, price range and owned state.
+// `label` only names the group for screen readers.
 const filterGroups = [
-  { name: "category", options: categories.map((c) => ({ id: c, label: c })) },
+  {
+    name: "category",
+    label: CATEGORY,
+    options: categories.map((c) => ({ id: c, label: c })),
+  },
   {
     name: "price",
+    label: "Precio",
     options: priceRanges.map((r) => ({
       id: r,
       label: rangeLabel(r)!,
@@ -53,6 +61,7 @@ const filterGroups = [
   },
   {
     name: "owned",
+    label: STATUS,
     options: [
       { id: "no", label: "Lo quiero" },
       { id: "yes", label: "Ya lo tengo" },
@@ -60,205 +69,217 @@ const filterGroups = [
   },
 ].filter((group) => group.options.length > 0);
 
-const buttonClass =
-  "px-2 py-0.5 border border-flexoki-base-200 aria-pressed:bg-flexoki-ink aria-pressed:text-flexoki-paper aria-pressed:border-flexoki-ink hover:border-flexoki-base-500 transition-colors";
-
 // Titles come in as "Brand · Product"; split so the product never gets cut
 const entries = items.map(({ id, data }) => {
   const [brand, ...rest] = data.title.split(" · ");
+  const range = priceRangeOf(data.fields);
+  const category = categoryOf(data.fields);
   return {
     id,
     brand: rest.length ? brand : undefined,
     name: rest.length ? rest.join(" · ") : data.title,
     url: data.url,
     image: data.image,
-    range: priceRangeOf(data.fields),
-    category: categoryOf(data.fields),
+    range,
+    category,
     owned: !!data.fields[STATUS]?.includes(OWNED),
-    meta: [rangeLabel(priceRangeOf(data.fields)), categoryOf(data.fields)]
-      .filter(Boolean)
-      .join(" · "),
+    price: rangeLabel(range),
+    meta: [rangeLabel(range), category].filter(Boolean).join(" · "),
   };
 });
+
+const hasOwned = entries.some((item) => item.owned);
 
 const countLabel = (n: number) => `${n} ${n === 1 ? "cosa" : "cosas"}`;
 
 const linkProps = (url?: string) =>
   url ? { href: url, target: "_blank", rel: "noopener noreferrer" } : {};
 
-// Shared by both views so grid and list read the same
-const brandClass =
-  "text-[0.68rem] uppercase tracking-[0.08em] text-flexoki-base-500 truncate";
-const nameClass =
-  "font-serif text-lg leading-tight text-flexoki-ink dark:text-flexoki-base-50 truncate";
-const metaClass = "text-xs text-flexoki-base-500 truncate";
-const ownedName = "line-through decoration-blue-800 decoration-[1.5px]";
-
-const underline =
-  "absolute left-0 -bottom-px w-full h-px bg-blue-800 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-in-out";
+// Read by screen readers in place of the ◆ on owned items
+const OWNED_LABEL = "ya lo tengo";
 ---
 
-<PageLayout title={WISHLIST.TITLE} description={WISHLIST.DESCRIPTION} lang="es">
-  <Container>
-    <div class="space-y-2">
-      <Nav lang="es" breadCrumbsItems={[{ href: "/wishlist", label: WISHLIST.TITLE }]} />
-    </div>
-    <div class="space-y-8 my-12">
-      <div class="space-y-4">
-        <h1 class="text-3xl font-semibold text-flexoki-ink dark:text-flexoki-base-50 font-serif">
-          {WISHLIST.TITLE}
-        </h1>
-        <p>{WISHLIST.DESCRIPTION}</p>
-      </div>
+<MarginPage
+  title={WISHLIST.TITLE}
+  description={WISHLIST.DESCRIPTION}
+  lang="es"
+  current={null}
+  breadcrumbs={[{ href: "/wishlist", label: WISHLIST.TITLE }]}
+>
+  <Row>
+    <header class="grid gap-2.5">
+      <h1 class="m-h1">{WISHLIST.TITLE}</h1>
+      <p class="m-lede">{WISHLIST.DESCRIPTION}</p>
+    </header>
+  </Row>
 
-      {
-        filterGroups.length > 0 && (
-          <div class="space-y-2 text-sm" id="wishlist-filters">
-            {filterGroups.map((group) => (
-              <div class="flex flex-wrap gap-2" data-group={group.name}>
+  {
+    filterGroups.length > 0 && (
+      <Row label="filtros" as="section" aria-label="Filtros">
+        <div class="space-y-2 text-sm" id="wishlist-filters">
+          {filterGroups.map((group) => (
+            <div
+              class="flex flex-wrap gap-2"
+              data-group={group.name}
+              role="group"
+              aria-label={group.label}
+            >
+              <button type="button" data-value="" aria-pressed="true" class={squareSelector}>
+                Todo
+              </button>
+              {group.options.map((option) => (
                 <button
                   type="button"
-                  data-value=""
-                  aria-pressed="true"
-                  class={buttonClass}
+                  data-value={option.id}
+                  aria-pressed="false"
+                  class={squareSelector}
                 >
-                  Todo
+                  {option.label}
                 </button>
-                {group.options.map((option) => (
-                  <button
-                    type="button"
-                    data-value={option.id}
-                    aria-pressed="false"
-                    class={buttonClass}
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
-            ))}
-          </div>
-        )
-      }
-
-      {
-        error ? (
-          <p class="text-flexoki-base-500">
-            Ahora mismo no se puede cargar la lista. Prueba de nuevo en un minuto.
-          </p>
-        ) : entries.length === 0 ? (
-          <p class="text-flexoki-base-500">Todavía no hay nada por aquí.</p>
-        ) : (
-          <div class="space-y-6">
-            <div class="flex items-center justify-between gap-4 text-sm">
-              <span class="text-flexoki-base-500" id="wishlist-count">
-                {countLabel(entries.length)}
-              </span>
-              <div class="flex gap-2" id="wishlist-view">
-                <button type="button" data-view="grid" aria-pressed="true" class={buttonClass}>
-                  Cuadrícula
-                </button>
-                <button type="button" data-view="list" aria-pressed="false" class={buttonClass}>
-                  Lista
-                </button>
-              </div>
+              ))}
             </div>
+          ))}
+        </div>
+      </Row>
+    )
+  }
 
-            <ul class="grid grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-8" data-list="grid">
-              {entries.map((item) => {
-                const Tag = item.url ? "a" : "div";
-                return (
-                  <li
-                    data-category={item.category ?? ""}
-                    data-price={item.range ?? ""}
-                    data-owned={item.owned ? "yes" : "no"}
-                  >
-                    <Tag {...linkProps(item.url)} class="group flex flex-col gap-2.5">
-                      <div class="relative aspect-square overflow-hidden bg-flexoki-base-50">
-                        {item.image && (
-                          <img
-                            src={item.image}
-                            alt=""
-                            loading="lazy"
-                            decoding="async"
-                            class="size-full object-contain p-[12%] mix-blend-multiply group-hover:scale-[1.04] transition-transform duration-500 ease-out"
-                          />
-                        )}
-                        {item.owned && (
-                          <span class="absolute top-1.5 right-2.5 font-handwritten text-lg text-blue-800 -rotate-6">
-                            lo tengo
-                          </span>
-                        )}
-                      </div>
-                      <div class="relative flex flex-col gap-0.5 min-w-0 pr-8">
-                        {item.brand && <span class={brandClass}>{item.brand}</span>}
-                        <span class={nameClass}>
-                          <span class:list={["relative", item.owned && ownedName]}>
-                            {item.name}
-                            <span class={underline} />
-                          </span>
-                        </span>
-                        {item.meta && <span class={metaClass}>{item.meta}</span>}
-                        {item.url && <AnimatedArrow />}
-                      </div>
-                    </Tag>
-                  </li>
-                );
-              })}
-            </ul>
-
-            <ul class="flex flex-col border-t border-flexoki-base-200" data-list="list" hidden>
-              {entries.map((item) => {
-                const Tag = item.url ? "a" : "div";
-                return (
-                  <li
-                    data-category={item.category ?? ""}
-                    data-price={item.range ?? ""}
-                    data-owned={item.owned ? "yes" : "no"}
-                  >
-                    <Tag
-                      {...linkProps(item.url)}
-                      class="relative group flex items-center gap-3.5 py-2.5 pl-1.5 pr-10 border-b border-flexoki-base-200 hover:bg-flexoki-base-50 transition-colors duration-300 ease-in-out"
-                    >
-                      <div class="relative shrink-0 size-14 bg-flexoki-base-50">
-                        {item.image && (
-                          <img
-                            src={item.image}
-                            alt=""
-                            width="56"
-                            height="56"
-                            loading="lazy"
-                            decoding="async"
-                            class="size-full object-contain p-1.5 mix-blend-multiply"
-                          />
-                        )}
-                        {item.owned && (
-                          <span class="absolute -bottom-1 -right-3 font-handwritten text-sm leading-none text-blue-800 -rotate-6 whitespace-nowrap">
-                            lo tengo
-                          </span>
-                        )}
-                      </div>
-                      <div class="flex flex-col gap-0.5 min-w-0 flex-1">
-                        {item.brand && <span class={brandClass}>{item.brand}</span>}
-                        <span class={nameClass}>
-                          <span class:list={["relative", item.owned && ownedName]}>
-                            {item.name}
-                            <span class={underline} />
-                          </span>
-                        </span>
-                        {item.meta && <span class={metaClass}>{item.meta}</span>}
-                      </div>
-                      {item.url && <AnimatedArrow />}
-                    </Tag>
-                  </li>
-                );
-              })}
-            </ul>
+  <Row label="lista" as="section" aria-label={WISHLIST.TITLE}>
+    {
+      error ? (
+        <p class="text-mute">
+          Ahora mismo no se puede cargar la lista. Prueba de nuevo en un minuto.
+        </p>
+      ) : entries.length === 0 ? (
+        <p class="text-mute">Todavía no hay nada por aquí.</p>
+      ) : (
+        <div class="space-y-7">
+          <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm">
+            <span class="text-mute" id="wishlist-count" aria-live="polite">
+              {countLabel(entries.length)}
+            </span>
+            <div class="flex gap-2" id="wishlist-view" role="group" aria-label="Vista">
+              <button type="button" data-view="grid" aria-pressed="true" class={squareSelector}>
+                Cuadrícula
+              </button>
+              <button type="button" data-view="list" aria-pressed="false" class={squareSelector}>
+                Lista
+              </button>
+            </div>
           </div>
-        )
-      }
-    </div>
-  </Container>
-</PageLayout>
+
+          <ul
+            class="grid grid-cols-2 gap-x-3.5 gap-y-6 mg:grid-cols-3 mg:gap-x-5 mg:gap-y-8"
+            data-list="grid"
+          >
+            {entries.map((item) => {
+              const Tag = item.url ? "a" : "div";
+              return (
+                <li
+                  data-category={item.category ?? ""}
+                  data-price={item.range ?? ""}
+                  data-owned={item.owned ? "yes" : "no"}
+                >
+                  <Tag {...linkProps(item.url)} class="group grid content-start gap-2.5">
+                    <span class="grid aspect-square place-items-center overflow-hidden bg-flexoki-base-50">
+                      {item.image && (
+                        <img
+                          src={item.image}
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                          class="size-full object-contain p-[12%] mix-blend-multiply transition-transform duration-500 ease-out group-hover:scale-105"
+                        />
+                      )}
+                    </span>
+                    <span class="grid min-w-0 gap-[3px]">
+                      {item.brand && (
+                        <span class="truncate text-[10.5px] uppercase tracking-[0.08em] text-mute">
+                          {item.brand}
+                        </span>
+                      )}
+                      <span class="line-clamp-2 font-serif text-lg leading-[1.15] text-flexoki-ink">
+                        <Markers pick={item.owned} pickLabel={OWNED_LABEL} />
+                        <span
+                          class:list={[
+                            "box-decoration-clone bg-size-[100%_6px] bg-bottom-left bg-no-repeat",
+                            item.url &&
+                              "group-hover:bg-(image:--m-pen-underline) group-focus-visible:bg-(image:--m-pen-underline)",
+                          ]}
+                        >
+                          {item.name}
+                        </span>
+                      </span>
+                      {item.meta && <span class="text-xs text-mute">{item.meta}</span>}
+                    </span>
+                  </Tag>
+                </li>
+              );
+            })}
+          </ul>
+
+          <ul class="m-list grid-cols-1" data-list="list" hidden>
+            {entries.map((item) => {
+              const Tag = item.url ? "a" : "div";
+              const sub = [item.brand, item.category].filter(Boolean).join(" · ");
+              return (
+                <li
+                  data-category={item.category ?? ""}
+                  data-price={item.range ?? ""}
+                  data-owned={item.owned ? "yes" : "no"}
+                >
+                  <Tag
+                    {...linkProps(item.url)}
+                    class:list={[
+                      "m-card flex-row items-center gap-3 mg:gap-3.5",
+                      !item.url && "hover:bg-transparent pr-4",
+                    ]}
+                  >
+                    <span class="size-12 shrink-0 bg-flexoki-base-50 mg:size-14">
+                      {item.image && (
+                        <img
+                          src={item.image}
+                          alt=""
+                          width="56"
+                          height="56"
+                          loading="lazy"
+                          decoding="async"
+                          class="size-full object-contain p-1.5 mix-blend-multiply"
+                        />
+                      )}
+                    </span>
+                    <span class="flex min-w-0 flex-1 flex-col gap-1">
+                      <span class="m-card-t">
+                        <span class="m-card-title wrap-anywhere">
+                          <Markers pick={item.owned} pickLabel={OWNED_LABEL} />
+                          <span class="m-card-text">{item.name}</span>
+                        </span>
+                        {item.price && (
+                          <>
+                            <span class="m-lead" aria-hidden="true" />
+                            <span class="m-val">{item.price}</span>
+                          </>
+                        )}
+                      </span>
+                      {sub && <span class="m-card-d text-mute">{sub}</span>}
+                    </span>
+                    {item.url && (
+                      <span class="m-arrow" aria-hidden="true">
+                        →
+                      </span>
+                    )}
+                  </Tag>
+                </li>
+              );
+            })}
+          </ul>
+
+          {hasOwned && <Legend text={`◆ ${OWNED_LABEL}`} />}
+        </div>
+      )
+    }
+  </Row>
+</MarginPage>
 
 <script>
   const groups = [...document.querySelectorAll("#wishlist-filters [data-group]")]

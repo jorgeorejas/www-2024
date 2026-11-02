@@ -1,0 +1,31 @@
+---
+/*
+ * One row of the Margin grid: the margin column on the left (slot "margin",
+ * plus an optional vertical section label) and the content column.
+ * Rows must be direct children of MarginPage's default slot.
+ */
+import type { HTMLAttributes } from "astro/types";
+import SectionLabel from "./SectionLabel.astro";
+
+type Props = HTMLAttributes<"div"> & {
+  /** Vertical section label shown at the top of the margin (e.g. "writing") */
+  label?: string;
+  /** Element for the row */
+  as?: "div" | "section" | "aside";
+  /** Extra classes for the margin and content columns */
+  marginClass?: string;
+  colClass?: string;
+};
+
+const { label, as: Tag = "div", class: className, marginClass, colClass, ...rest } = Astro.props;
+---
+
+<Tag class:list={["m-row", className]} {...rest}>
+  <div class:list={["m-mar", marginClass]}>
+    {label && <SectionLabel label={label} />}
+    <slot name="margin" />
+  </div>
+  <div class:list={["m-col", colClass]}>
+    <slot />
+  </div>
+</Tag>

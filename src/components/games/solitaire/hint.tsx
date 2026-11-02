@@ -34,13 +34,15 @@ export default function Hint() {
       case "TABLEAU→FOUNDATION":
         return `⬆️ Move the top card from column ${hint.from! + 1} to its foundation`;
 
-      case "TABLEAU→TABLEAU":
+      case "TABLEAU→TABLEAU": {
         const cardText = hint.count === 1 ? "card" : `${hint.count} cards`;
         return `↔️ Move ${cardText} from column ${hint.from! + 1} to column ${hint.to! + 1}`;
+      }
 
-      case "FOUNDATION→TABLEAU":
+      case "FOUNDATION→TABLEAU": {
         const suitSymbol = getSuitSymbol(hint.suit!);
         return `⬇️ Move the top ${suitSymbol} foundation card to column ${hint.to! + 1}`;
+      }
 
       default:
         return "❓ Unknown move suggestion";

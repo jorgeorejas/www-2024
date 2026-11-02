@@ -1,0 +1,27 @@
+---
+/* "Home / Blog / Title" in mono. The last item is the current page. */
+type Props = {
+  items: { href: string; label: string }[];
+  homeLabel?: string;
+  class?: string;
+};
+
+const { items, homeLabel = "Home", class: className } = Astro.props;
+const all = [{ href: "/", label: homeLabel }, ...items];
+---
+
+<nav class:list={["m-crumbs", className]} aria-label="Breadcrumb">
+  <ol>
+    {
+      all.map((item, i) => (
+        <li>
+          {i === all.length - 1 ? (
+            <span aria-current="page">{item.label}</span>
+          ) : (
+            <a href={item.href}>{item.label}</a>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</nav>

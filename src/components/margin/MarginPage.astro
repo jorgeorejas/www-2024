@@ -1,0 +1,61 @@
+---
+/*
+ * A page in the Margin design. Wraps PageLayout (document shell: Head, skip
+ * link, grain, footer) and renders the head row: side nav in the margin,
+ * name + role (+ the phone nav row) + optional breadcrumbs in the content
+ * column, then the "intro" slot. The default slot takes Rows.
+ */
+import { SITE, SITE_ES } from "@consts";
+import PageLayout from "@layouts/PageLayout.astro";
+import Crumbs from "./Crumbs.astro";
+import Row from "./Row.astro";
+import SideNav from "./SideNav.astro";
+import type { NavKey } from "./nav";
+
+type Props = {
+  // Document (forwarded to PageLayout)
+  title: string;
+  description: string;
+  ogImage?: string;
+  type?: "website" | "article" | "profile";
+  publishedTime?: Date;
+  modifiedTime?: Date;
+  author?: string;
+  structuredData?: Record<string, unknown> | Record<string, unknown>[];
+  lang?: "en" | "es";
+  // Margin
+  /** Nav section marked as current; defaults to the one matching the URL, null for none */
+  current?: NavKey | null;
+  /** Breadcrumb items after "Home"; the last one is the current page */
+  breadcrumbs?: { href: string; label: string }[];
+  /** Show the now-playing line in the footer (false on home, where it sits under the bio) */
+  footerNowPlaying?: boolean;
+  /** Render the name as the page's <h1> (home); other pages have their own title */
+  nameAsHeading?: boolean;
+};
+
+const {
+  current,
+  breadcrumbs,
+  footerNowPlaying = true,
+  nameAsHeading = false,
+  lang = "en",
+  ...layout
+} = Astro.props;
+const es = lang === "es";
+const Name = nameAsHeading ? "h1" : "p";
+---
+
+<PageLayout {...layout} lang={lang} variant="margin" footerNowPlaying={footerNowPlaying}>
+  <Row class="m-r-head">
+    <SideNav slot="margin" variant="side" current={current} />
+    <div class="m-head">
+      <Name class="m-name"><a href="/">{SITE.NAME}</a></Name>
+      <p class="m-role">{es ? SITE_ES.POSITION : SITE.POSITION}</p>
+      <SideNav variant="row" current={current} />
+      {breadcrumbs && <Crumbs items={breadcrumbs} homeLabel={es ? "Inicio" : "Home"} />}
+    </div>
+    <slot name="intro" />
+  </Row>
+  <slot />
+</PageLayout>

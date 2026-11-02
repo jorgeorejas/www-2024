@@ -67,6 +67,10 @@ export type BlogPost = {
   draft: boolean;
   /** Slugs of related projects */
   projects: string[];
+  /** Jorge's pick (◆): optional checkbox "Destacado", false when the column is missing */
+  pick: boolean;
+  /** Hand note shown in the margin: optional text "Nota al margen" */
+  note?: string;
   editedAt: Date;
 };
 
@@ -87,6 +91,8 @@ export async function blogPosts() {
         date: p.date("Fecha") ?? new Date(page.created_time),
         draft: !p.checkbox("Publicado"),
         projects: p.relation("Proyectos").flatMap((id) => projectSlug.get(id) ?? []),
+        pick: p.checkbox("Destacado"),
+        note: p.text("Nota al margen"),
         editedAt: new Date(page.last_edited_time),
       };
       return { id: slugOf(page), page, data };
@@ -114,6 +120,10 @@ export type Project = {
   next?: string;
   /** Slugs of blog posts about this project */
   articles: string[];
+  /** Jorge's pick (◆): optional checkbox "Destacado", false when the column is missing */
+  pick: boolean;
+  /** Hand note shown in the margin: optional text "Nota al margen" */
+  note?: string;
   editedAt: Date;
 };
 
@@ -142,6 +152,8 @@ export async function projects() {
         previous: first(p.relation("Versión anterior"), slugs),
         next: first(p.relation("Versión siguiente"), slugs),
         articles: p.relation("Artículos").flatMap((id) => postSlugs.get(id) ?? []),
+        pick: p.checkbox("Destacado"),
+        note: p.text("Nota al margen"),
         editedAt: new Date(page.last_edited_time),
       };
       return { id: slugOf(page), page, data };
@@ -298,7 +310,12 @@ export type Recipe = {
   description?: string;
   date: Date;
   draft: boolean;
+  /** "Destacada": the favourite recipe */
   featured: boolean;
+  /** Same as featured, named like blog posts and projects (◆) */
+  pick: boolean;
+  /** Hand note shown in the margin: optional text "Nota al margen" */
+  note?: string;
   servings?: number;
   prepMinutes?: number;
   cookMinutes?: number;
@@ -337,6 +354,8 @@ export async function recipes() {
         date: p.date("Fecha") ?? new Date(page.created_time),
         draft: !p.checkbox("Publicado"),
         featured: p.checkbox("Destacada"),
+        pick: p.checkbox("Destacada"),
+        note: p.text("Nota al margen"),
         servings: p.number("Raciones"),
         prepMinutes: p.number("Preparación (min)"),
         cookMinutes: p.number("Cocción (min)"),

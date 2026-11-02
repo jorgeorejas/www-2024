@@ -1,71 +1,20 @@
 ---
-import Link from "@components/Link.astro";
+/*
+ * Footer for pages still on the classic layout (Container + Nav). It shows
+ * the same thing as the Margin footer (socials, email, llms files and the
+ * one-line now playing), so every page ends the same way. Margin pages get
+ * MarginFooter straight from PageLayout.
+ */
 import Container from "@components/Container.astro";
-import SpotifyNowPlaying from "@components/SpotifyNowPlaying.astro";
-import { SITE, SOCIALS } from "@consts";
+import MarginFooter from "@components/margin/MarginFooter.astro";
 
 type Props = { lang?: "en" | "es" };
 const { lang = "en" } = Astro.props;
-const es = lang === "es";
 ---
 
 <Container>
-  <div class="space-y-16 pt-16">
-    <hr class="border-black/15 dark:border-white/20" />
-
-    <section class="space-y-4">
-      <SpotifyNowPlaying />
-      <h5 class="font-semibold text-black dark:text-white font-serif">
-        {es ? "Hablamos" : "Let's Connect"}
-      </h5>
-      <article>
-        <p>
-          {
-            es
-              ? "Si quieres comentarme algo o simplemente saludar, escríbeme por redes o por email. También puedes usar llms.txt y llms-full.txt para pasarle mi información a tu IA."
-              : "If you want to get in touch with me about something or just to say hi, reach out on social media or send me an email. You can also use the information from llms.txt and llms-full.txt to connect my information to your AI."
-          }
-        </p>
-      </article>
-      <ul class="flex flex-wrap gap-2">
-        {
-          SOCIALS.map((SOCIAL) => (
-            <li class="flex gap-x-2 text-nowrap">
-              <Link
-                href={SOCIAL.HREF}
-                external
-                aria-label={`${SITE.NAME} ${es ? "en" : "on"} ${SOCIAL.NAME}`}
-              >
-                {SOCIAL.NAME}
-              </Link>
-              {"/"}
-            </li>
-          ))
-        }
-        <li class="flex gap-x-2 text-nowrap">
-          <Link href={`mailto:${SITE.EMAIL}`} aria-label={`${es ? "Escribir a" : "Email"} ${SITE.NAME}`}>
-            {SITE.EMAIL}
-          </Link>
-          {"/"}
-        </li>
-        <li class="flex gap-x-2 text-nowrap">
-          <Link
-            href="/llms.txt"
-            aria-label={es ? "llms.txt: información básica para IAs" : "llms.txt - Basic information for LLMs"}
-          >
-            llms.txt
-          </Link>
-          {"/"}
-        </li>
-        <li class="line-clamp-1">
-          <Link
-            href="/llms-full.txt"
-            aria-label={es ? "llms-full.txt: información ampliada para IAs" : "llms-full.txt - Extended information for LLMs"}
-          >
-            llms-full.txt
-          </Link>
-        </li>
-      </ul>
-    </section>
+  {/* margin-ui opts the footer out of the classic `footer` element rule (py-5 text-sm) */}
+  <div class="margin-ui pt-16">
+    <MarginFooter lang={lang} />
   </div>
 </Container>

@@ -1,11 +1,14 @@
 ---
-import Container from "@components/Container.astro";
-import Nav from "@components/Nav.astro";
 import RecipeCard from "@components/cocina/RecipeCard.astro";
+import Legend from "@components/margin/Legend.astro";
+import MarginNote from "@components/margin/MarginNote.astro";
+import MarginPage from "@components/margin/MarginPage.astro";
+import Row from "@components/margin/Row.astro";
+import { squareSelector } from "@components/margin/classes";
 import { COCINA } from "@consts";
-import PageLayout from "@layouts/PageLayout.astro";
 import { cachePage } from "@lib/cache-headers";
 import { formatMinutes, imageSrcset, servingsLabel, totalMinutes } from "@lib/cocina";
+import { isNew } from "@lib/utils";
 import { getLiveCollection } from "astro:content";
 
 // Recipes and their tags, live from the Notion "Recetas" and "Etiquetas" databases
@@ -22,98 +25,127 @@ const featured = recipes.find((r) => r.data.featured && !r.data.draft) ?? recipe
 const used = new Set(recipes.flatMap((r) => r.data.tags.map((t) => t.slug)));
 const tagOptions = tags.filter((t) => used.has(t.id));
 
-const chip =
-  "px-2 py-0.5 border border-flexoki-base-200 text-sm aria-pressed:bg-flexoki-ink aria-pressed:text-flexoki-paper aria-pressed:border-flexoki-ink hover:border-flexoki-base-500 transition-colors";
+// Key for the markers, only for the ones that actually appear in the grid
+const legend = [
+  recipes.some((r) => r.data.pick) && "◆ la favorita",
+  recipes.some((r) => isNew(r.data.date)) && "NUEVA últimos 60 días",
+]
+  .filter(Boolean)
+  .join(" · ");
 ---
 
-<PageLayout title={COCINA.TITLE} description={COCINA.DESCRIPTION} lang="es">
-  <Container>
-    <Nav lang="es" breadCrumbsItems={[{ href: "/cocina", label: "Cocina" }]} />
-
-    <div class="relative my-12 space-y-3">
-      <span class="absolute -top-7 left-40 sm:left-64 font-handwritten text-2xl text-blue-800 -rotate-6 whitespace-nowrap">
-        recetas de casa
-      </span>
-      <h1 class="font-serif text-4xl sm:text-5xl text-flexoki-ink">{COCINA.TITLE}</h1>
-      <p class="max-w-prose">{COCINA.DESCRIPTION}</p>
-    </div>
+<MarginPage
+  title={COCINA.TITLE}
+  description={COCINA.DESCRIPTION}
+  lang="es"
+  breadcrumbs={[{ href: "/cocina", label: "Cocina" }]}
+>
+  <Row>
+    <header class="mb-[30px] grid gap-2.5">
+      <p class="m-eyebrow">recetas de casa</p>
+      <h1 class="m-h1">{COCINA.TITLE}</h1>
+      <p class="m-lede">{COCINA.DESCRIPTION}</p>
+    </header>
 
     {
       featured && (
-        <a href={`/cocina/${featured.id}`} class="group grid sm:grid-cols-5 gap-5 items-center mb-16">
-          <div class="sm:col-span-3 aspect-[4/3] overflow-hidden bg-flexoki-base-100">
-            {featured.data.image && (
-              <img
-                src={featured.data.image}
-                srcset={imageSrcset(featured.data.image)}
-                sizes="(min-width: 640px) 460px, 100vw"
-                alt=""
-                class="size-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
-              />
-            )}
-          </div>
-          <div class="sm:col-span-2 space-y-2">
-            <span class="font-handwritten text-xl text-blue-800 inline-block -rotate-3">la favorita</span>
-            <h2 class="font-serif text-3xl leading-tight text-flexoki-ink group-hover:underline decoration-1 underline-offset-4">
-              {featured.data.title}
-            </h2>
-            {featured.data.description && <p>{featured.data.description}</p>}
-            <p class="text-xs text-flexoki-base-500">
-              {[
-                formatMinutes(totalMinutes(featured.data)),
-                featured.data.servings && servingsLabel(featured.data.servings),
-                featured.data.difficulty?.toLowerCase(),
-              ]
-                .filter(Boolean)
-                .join(" · ")}
-            </p>
-          </div>
-        </a>
+        <div class="m-anchor">
+          <MarginNote placement="item" text={featured.data.note} />
+          <a
+            href={`/cocina/${featured.id}`}
+            class="group grid items-center gap-[22px] border-l border-rule p-3.5 transition-colors duration-300 hover:bg-flexoki-base-100 mg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]"
+          >
+            <span class="block aspect-square overflow-hidden bg-flexoki-base-50">
+              {featured.data.image && (
+                <img
+                  src={featured.data.image}
+                  srcset={imageSrcset(featured.data.image)}
+                  sizes="(min-width: 761px) 330px, 100vw"
+                  alt=""
+                  fetchpriority="high"
+                  class="size-full object-cover motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-out motion-safe:group-hover:scale-[1.03]"
+                />
+              )}
+            </span>
+            <span class="grid gap-1.5">
+              <span class="font-handwritten text-[22px] leading-none font-bold text-signal-ink">la favorita</span>
+              <h2 class="m-0 font-serif text-[clamp(26px,4vw,36px)] leading-[1.04] font-normal text-flexoki-ink text-balance">
+                <span class="group-hover:pen-underline group-focus-visible:pen-underline">{featured.data.title}</span>
+              </h2>
+              {featured.data.description && (
+                <span class="text-[14px] leading-[1.7] text-ink-soft">{featured.data.description}</span>
+              )}
+              <span class="font-mono text-[11.5px] text-mute">
+                {[
+                  formatMinutes(totalMinutes(featured.data)),
+                  featured.data.servings && servingsLabel(featured.data.servings),
+                  featured.data.difficulty?.toLowerCase(),
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </span>
+            </span>
+          </a>
+        </div>
+      )
+    }
+  </Row>
+
+  <Row label="recetas" as="section" aria-labelledby="todas">
+    <div class="m-sec-h mb-5">
+      <h2 id="todas">
+        Todas las recetas <span id="recipe-count" class="font-mono text-[12.5px] text-mute">({recipes.length})</span>
+      </h2>
+      <label
+        class="flex items-center gap-2 border-b border-flexoki-base-300 text-[12.5px] text-ink-soft transition-colors focus-within:border-flexoki-ink"
+      >
+        <span class="sr-only">Buscar receta</span>
+        <svg viewBox="0 0 24 24" class="size-3.5 fill-none stroke-current stroke-2" aria-hidden="true"
+          ><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg
+        >
+        <input
+          id="recipe-search"
+          type="search"
+          placeholder="Buscar…"
+          class="w-40 bg-transparent py-1 font-mono outline-none placeholder:text-mute"
+        />
+      </label>
+    </div>
+
+    {
+      tagOptions.length > 0 && (
+        <div id="recipe-tags" class="mb-8 flex flex-wrap gap-2" role="group" aria-label="Filtrar por etiqueta">
+          <button type="button" class:list={[squareSelector, "text-sm"]} data-tag="" aria-pressed="true">
+            Todas
+          </button>
+          {tagOptions.map((tag) => (
+            <button type="button" class:list={[squareSelector, "text-sm"]} data-tag={tag.id} aria-pressed="false">
+              {tag.data.emoji && <span aria-hidden="true">{tag.data.emoji} </span>}
+              {tag.data.name}
+            </button>
+          ))}
+        </div>
       )
     }
 
-    <section class="space-y-6" aria-labelledby="todas">
-      <div class="flex flex-wrap items-end justify-between gap-4">
-        <h2 id="todas" class="font-serif text-2xl text-flexoki-ink">
-          Todas las recetas <span id="recipe-count" class="text-base text-flexoki-base-500">({recipes.length})</span>
-        </h2>
-        <label class="flex items-center gap-2 text-sm border-b border-flexoki-base-300 focus-within:border-flexoki-ink">
-          <span class="sr-only">Buscar receta</span>
-          <svg viewBox="0 0 24 24" class="size-4 fill-none stroke-current stroke-2" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
-          <input id="recipe-search" type="search" placeholder="Buscar…" class="bg-transparent py-1 outline-none w-40" />
-        </label>
-      </div>
-
+    <ul id="recipe-grid" class="m-0 grid list-none grid-cols-2 gap-x-3.5 gap-y-6 p-0 lg:grid-cols-3 lg:gap-x-[22px] lg:gap-y-8">
       {
-        tagOptions.length > 0 && (
-          <div id="recipe-tags" class="flex flex-wrap gap-2" role="group" aria-label="Filtrar por etiqueta">
-            <button type="button" class={chip} data-tag="" aria-pressed="true">Todas</button>
-            {tagOptions.map((tag) => (
-              <button type="button" class={chip} data-tag={tag.id} aria-pressed="false">
-                {tag.data.emoji && <span aria-hidden="true">{tag.data.emoji} </span>}
-                {tag.data.name}
-              </button>
-            ))}
-          </div>
-        )
+        recipes.map((recipe) => (
+          <li>
+            <RecipeCard recipe={recipe} />
+          </li>
+        ))
       }
-
-      <ul id="recipe-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-10">
-        {
-          recipes.map((recipe) => (
-            <li>
-              <RecipeCard recipe={recipe} />
-            </li>
-          ))
-        }
-      </ul>
-      <p id="recipe-empty" class="text-flexoki-base-500" hidden>Ninguna receta coincide. Prueba con otra palabra.</p>
-    </section>
-  </Container>
-</PageLayout>
+    </ul>
+    <p id="recipe-empty" class="py-[18px] font-mono text-xs text-mute" hidden>
+      Ninguna receta coincide. Prueba con otra palabra.
+    </p>
+    {legend && <Legend text={legend} class="mt-8" />}
+  </Row>
+</MarginPage>
 
 <script>
-  // Search box + tag chips, both client-side over the cards already on the page
+  // Search box + tag selectors, both client-side over the cards already on the page
   const search = document.getElementById("recipe-search") as HTMLInputElement | null;
   const chips = [...document.querySelectorAll<HTMLButtonElement>("#recipe-tags [data-tag]")];
   const items = [...document.querySelectorAll<HTMLLIElement>("#recipe-grid > li")];
@@ -121,8 +153,7 @@ const chip =
   const empty = document.getElementById("recipe-empty");
   let tag = "";
 
-  const normalize = (value: string) =>
-    value.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  const normalize = (value: string) => value.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
   const update = () => {
     const query = normalize(search?.value ?? "");

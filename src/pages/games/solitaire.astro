@@ -1,26 +1,30 @@
 ---
-import Container from "@components/Container.astro";
 import SolitaireGame from "@components/games/solitaire";
-import Nav from "@components/Nav.astro";
-import PageLayout from "@layouts/PageLayout.astro";
+import MarginPage from "@components/margin/MarginPage.astro";
+import Row from "@components/margin/Row.astro";
 ---
 
-<PageLayout
+<MarginPage
   title="Klondike Solitaire"
   description="Classic Klondike Solitaire with Easy (1 card) and Hard (3 cards) difficulty modes."
+  breadcrumbs={[
+    { href: "/games", label: "Games" },
+    { href: "/games/solitaire", label: "Solitaire" },
+  ]}
 >
-  <Container>
-    <div class="space-y-2">
-      <Nav
-        breadCrumbsItems={[
-          { href: "/games", label: "Games" },
-          { href: "/games/solitaire", label: "Solitaire" },
-        ]}
-      />
+  <Row>
+    {/* The game renders its own <h1>; it is restyled below to match .m-h1 */}
+    <div class="solitaire-shell">
+      <SolitaireGame client:only="react" />
     </div>
+  </Row>
+</MarginPage>
 
-    <div class="my-10">
-      <SolitaireGame client:load />
-    </div>
-  </Container>
-</PageLayout>
+<style>
+  .solitaire-shell :global(h1) {
+    margin-bottom: 0.25em;
+    font-weight: 400;
+    font-size: clamp(34px, 5.4vw, 44px);
+    line-height: 1.04;
+  }
+</style>

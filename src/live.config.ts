@@ -105,6 +105,13 @@ const withBody = async (entry: Listed<Record<string, unknown>>) => {
 
 type BodyExtras = { markdown: string; readingTime: string };
 
+/*
+ * Entry data types come from the fetchers in lib/notion/collections.ts.
+ * Margin design fields: blog posts and projects carry `pick` (checkbox
+ * "Destacado") and `note` (text "Nota al margen"); recipes carry `featured`
+ * and `pick` ("Destacada") and `note`. Missing columns give false/undefined.
+ */
+
 const blog = defineLiveCollection({
   loader: notionLoader<Awaited<ReturnType<typeof blogPosts>>[number]["data"], BodyExtras>({
     name: "blog",

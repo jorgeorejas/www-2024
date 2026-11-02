@@ -1,0 +1,28 @@
+---
+/*
+ * The home "now" notes: the body of the Bloques text block with slug "now",
+ * written by hand in the margin. Renders nothing if the block doesn't exist.
+ */
+import { getLiveEntry } from "astro:content";
+import MarginNote from "./MarginNote.astro";
+
+type Props = {
+  slug?: string;
+  /** Use the block's Notion title as the note's bold first line */
+  showTitle?: boolean;
+  placement?: "margin" | "item" | "beside";
+  class?: string;
+};
+
+const { slug = "now", showTitle = false, placement = "margin", class: className } = Astro.props;
+const { entry } = await getLiveEntry("blocks", { id: slug });
+const html = entry?.rendered?.html?.trim();
+---
+
+{
+  html && (
+    <MarginNote placement={placement} heading={showTitle ? entry?.data.title : undefined} class={className}>
+      <Fragment set:html={html} />
+    </MarginNote>
+  )
+}

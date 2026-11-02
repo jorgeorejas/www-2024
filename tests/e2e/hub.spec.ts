@@ -6,9 +6,9 @@ test.describe("Games hub /games", () => {
     await gotoGame(page, GAME_URLS.hub);
   });
 
-  test("renders all 3 game cards with correct routes", async ({ page }) => {
+  test("renders all 7 game cards with correct routes", async ({ page }) => {
     const cards = page.getByTestId("game-card");
-    await expect(cards).toHaveCount(3);
+    await expect(cards).toHaveCount(7);
 
     await expect(page.locator("[data-game=\"solitaire\"]")).toContainText(
       "Klondike Solitaire",

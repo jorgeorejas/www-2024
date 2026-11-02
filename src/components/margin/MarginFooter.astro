@@ -1,0 +1,53 @@
+---
+/* Margin footer: socials, email and llms files in mono, plus the now-playing line */
+import { SITE, SOCIALS } from "@consts";
+import NowPlayingMini from "./NowPlayingMini.astro";
+
+type Props = {
+  lang?: "en" | "es";
+  /** The home page shows now playing under the bio instead */
+  nowPlaying?: boolean;
+};
+
+const { lang = "en", nowPlaying = true } = Astro.props;
+const es = lang === "es";
+---
+
+<footer class="m-foot">
+  <ul class="m-social">
+    {
+      SOCIALS.map((social) => (
+        <li>
+          <a
+            class="is-cap"
+            href={social.HREF}
+            target="_blank"
+            rel="noopener noreferrer me"
+            aria-label={`${SITE.NAME} ${es ? "en" : "on"} ${social.NAME}`}
+          >
+            {social.NAME}
+          </a>
+        </li>
+      ))
+    }
+    <li>
+      <a href={`mailto:${SITE.EMAIL}`} aria-label={`${es ? "Escribir a" : "Email"} ${SITE.NAME}`}>
+        {SITE.EMAIL}
+      </a>
+    </li>
+    <li>
+      <a href="/llms.txt" aria-label={es ? "llms.txt: información básica para IAs" : "llms.txt - Basic information for LLMs"}>
+        llms.txt
+      </a>
+    </li>
+    <li>
+      <a
+        href="/llms-full.txt"
+        aria-label={es ? "llms-full.txt: información ampliada para IAs" : "llms-full.txt - Extended information for LLMs"}
+      >
+        llms-full.txt
+      </a>
+    </li>
+  </ul>
+  {nowPlaying && <NowPlayingMini />}
+</footer>

@@ -116,7 +116,14 @@ This is the single source of truth for site configuration.
 - **Tailwind CSS 4** with `@tailwindcss/typography` for prose content
 - Custom fonts: Instrument Serif (serif), Caveat (handwritten for corrections), Ioskeley Mono (code/monospace) — open-source Berkeley Mono lookalike, served from `public/fonts/IoskeleyMono`
 - Global styles in `src/styles/global.css`
-- Dark mode support via Tailwind's dark mode utilities
+- Light only (dark mode code is kept but disabled)
+
+### Margin design system
+The redesign is called **Margin**: a left margin column (numbered side nav, vertical section labels with a drawn ↱, handwritten notes), a thin measuring ruler, and a content column (max 728px). Below 760px it collapses to one column (nav becomes a scrolling row, labels go horizontal, notes go inline above their item).
+- Components: `src/components/margin/` — `MarginPage` (page shell, wraps `PageLayout` with `variant="margin"`), `Row` (margin slot + content), `SideNav`, `SectionLabel`, `SectionHead`, `ListRow` (TITLE ____ value rows), `Markers` (◆ pick / NEW), `Legend`, `MarginNote`, `NowNote`, `Crumbs`, `NowPlayingMini`, `MarginFooter`; `classes.ts` has the square selector buttons used on /wishlist.
+- CSS: the `Margin` block at the end of `global.css` (`.m-*` classes, `.hn` hand notes, `.m-prose` for reading views incl. footnotes and corrections) plus tokens `signal` (Flexoki orange-500), `signal-ink` (orange-600), `pen` (blue-600), `rule`, `mute`, and the `mg:` breakpoint. Flexoki colours only; don't use `international-orange` in Margin pages.
+- Classic element rules (`header`, `main`, `article` prose…) skip Margin pages (`body.margin-ui`), so pages not yet migrated keep working with `Container` + `Nav`.
+- Margin notes and picks are content from Notion ("Nota al margen", "Destacado"/"Destacada"), never copy in code.
 
 ### Code Style
 - ESLint configured for Astro and TypeScript

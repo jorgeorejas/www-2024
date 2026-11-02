@@ -36,7 +36,7 @@ export function remarkCorrection() {
               // Create inline correction
               const correctionNode = {
                 type: "html",
-                value: `<span class="line-through decoration-blue-800">${escapeHtml(originalText)}</span> <span class="font-handwritten font-bold text-blue-800 text-xl">${escapeHtml(correctionText)}</span>`,
+                value: `<span class="correction-from line-through decoration-flexoki-blue-600">${escapeHtml(originalText)}</span> <span class="correction-to font-handwritten font-bold text-flexoki-blue-600 text-xl">${escapeHtml(correctionText)}</span>`,
               };
 
               // Replace the delete node with our correction node

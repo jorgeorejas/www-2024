@@ -4,13 +4,18 @@ import { getLiveEntry } from "astro:content";
 interface Props {
   slug: string;
   class?: string;
+  /**
+   * Wrapper element. "none" renders the block's HTML without one, so several
+   * blocks can share a single container (e.g. the home bio inside one .m-prose).
+   */
+  as?: "article" | "div" | "none";
 }
 
-const { slug, class: className = "" } = Astro.props as Props;
+const { slug, class: className = "", as: Tag = "article" } = Astro.props as Props;
 
 // A text block from the "Bloques" database in Notion
 const { entry } = await getLiveEntry("blocks", { id: slug });
 const html = entry?.rendered?.html;
 ---
 
-{html ? <article class={className} set:html={html} /> : null}
+{html ? Tag === "none" ? <Fragment set:html={html} /> : <Tag class={className} set:html={html} /> : null}

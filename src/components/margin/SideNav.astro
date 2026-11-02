@@ -1,0 +1,52 @@
+---
+import { NAV_ITEMS, navKeyFor, type NavKey } from "./nav";
+
+type Props = {
+  /** Section to mark as current; defaults to the one matching the URL */
+  current?: NavKey | null;
+  /** "side": the column in the margin; "row": the scrolling row shown on phones */
+  variant?: "side" | "row";
+  class?: string;
+};
+
+const { current, variant = "side", class: className } = Astro.props;
+const active = current === undefined ? navKeyFor(Astro.url.pathname) : current;
+const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
+---
+
+<nav class:list={["m-nav", `m-nav--${variant}`, className]} aria-label="Site">
+  <ul>
+    {
+      NAV_ITEMS.map((item) => (
+        <li>
+          <a
+            class="m-nav-i"
+            href={item.href}
+            aria-current={item.key === active ? (path === item.href ? "page" : "true") : undefined}
+          >
+            <span class="m-nav-n">{item.n}</span>
+            <span class="m-nav-l">{item.label}</span>
+            {item.outward && (
+              <span class="m-nav-x" aria-hidden="true">
+                ↗
+              </span>
+            )}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<script>
+  // On phones the row nav scrolls sideways: bring the current section into view.
+  function revealCurrent() {
+    for (const nav of document.querySelectorAll<HTMLElement>(".m-nav--row")) {
+      const current = nav.querySelector<HTMLElement>("[aria-current]");
+      if (!current || nav.scrollWidth <= nav.clientWidth) continue;
+      const overflow = current.getBoundingClientRect().right - nav.getBoundingClientRect().right;
+      if (overflow > 0) nav.scrollLeft += overflow + 16;
+    }
+  }
+  document.addEventListener("astro:page-load", revealCurrent);
+</script>

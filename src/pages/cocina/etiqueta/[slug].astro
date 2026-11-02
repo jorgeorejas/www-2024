@@ -1,9 +1,10 @@
 ---
-import Container from "@components/Container.astro";
-import Nav from "@components/Nav.astro";
 import RecipeCard from "@components/cocina/RecipeCard.astro";
-import PageLayout from "@layouts/PageLayout.astro";
+import Legend from "@components/margin/Legend.astro";
+import MarginPage from "@components/margin/MarginPage.astro";
+import Row from "@components/margin/Row.astro";
 import { cachePage, isNotFound, notionUnavailable } from "@lib/cache-headers";
+import { isNew } from "@lib/utils";
 import { getLiveCollection, getLiveEntry } from "astro:content";
 
 const slug = Astro.params.slug ?? "";
@@ -18,38 +19,50 @@ cachePage(Astro.response, ["recipes"]);
 
 const tagged = recipes.filter((r) => r.data.tags.some((t) => t.slug === slug));
 const title = `Recetas: ${tag.data.name}`;
+const legend = [
+  tagged.some((r) => r.data.pick) && "◆ la favorita",
+  tagged.some((r) => isNew(r.data.date)) && "NUEVA últimos 60 días",
+]
+  .filter(Boolean)
+  .join(" · ");
 ---
 
-<PageLayout title={title} description={tag.data.description ?? title} lang="es">
-  <Container>
-    <Nav
-      lang="es"
-      breadCrumbsItems={[
-        { href: "/cocina", label: "Cocina" },
-        { href: `/cocina/etiqueta/${slug}`, label: tag.data.name },
-      ]}
-    />
-    <div class="my-12 space-y-3">
-      {tag.data.emoji && <p class="text-5xl" aria-hidden="true">{tag.data.emoji}</p>}
-      <h1 class="font-serif text-4xl text-flexoki-ink">{tag.data.name}</h1>
-      {tag.data.description && <p class="max-w-prose">{tag.data.description}</p>}
-      <p class="text-sm text-flexoki-base-500">
-        {tagged.length} {tagged.length === 1 ? "receta" : "recetas"} · <a class="underline underline-offset-4" href="/cocina">ver todas</a>
+<MarginPage
+  title={title}
+  description={tag.data.description ?? title}
+  lang="es"
+  breadcrumbs={[
+    { href: "/cocina", label: "Cocina" },
+    { href: `/cocina/etiqueta/${slug}`, label: tag.data.name },
+  ]}
+>
+  <Row>
+    <header class="grid gap-2.5">
+      {tag.data.emoji && <p class="m-0 text-[40px] leading-none" aria-hidden="true">{tag.data.emoji}</p>}
+      <h1 class="m-h1">{tag.data.name}</h1>
+      {tag.data.description && <p class="m-lede">{tag.data.description}</p>}
+      <p class="m-date">
+        {tagged.length}
+        {tagged.length === 1 ? "receta" : "recetas"} ·
+        <a class="m-all" href="/cocina">ver todas</a>
       </p>
-    </div>
+    </header>
+  </Row>
 
+  <Row label="recetas">
     {
       tagged.length ? (
-        <ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-10">
+        <ul class="m-0 grid list-none grid-cols-2 gap-x-3.5 gap-y-6 p-0 lg:grid-cols-3 lg:gap-x-[22px] lg:gap-y-8">
           {tagged.map((recipe) => (
             <li>
-              <RecipeCard recipe={recipe} />
+              <RecipeCard recipe={recipe} headingLevel="h2" />
             </li>
           ))}
         </ul>
       ) : (
-        <p>Todavía no hay recetas con esta etiqueta.</p>
+        <p class="font-mono text-xs text-mute">Todavía no hay recetas con esta etiqueta.</p>
       )
     }
-  </Container>
-</PageLayout>
+    {legend && <Legend text={legend} class="mt-8" />}
+  </Row>
+</MarginPage>

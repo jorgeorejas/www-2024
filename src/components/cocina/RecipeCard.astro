@@ -1,61 +1,77 @@
 ---
+/*
+ * A recipe in the Cocina photo grid (Margin design): 3:4 photo, serif title
+ * with the ◆ / NUEVA markers, description, and "time — tags" in mono.
+ * The data attributes drive the search and tag filters on /cocina.
+ * Self-contained (Tailwind only) so it also works outside Margin pages.
+ */
+import Markers from "@components/margin/Markers.astro";
+import { formatMinutes, imageSrcset, totalMinutes } from "@lib/cocina";
 import type { Recipe } from "@lib/notion/collections";
-import { formatMinutes, imageSrcset, servingsLabel, totalMinutes } from "@lib/cocina";
+import { isNew } from "@lib/utils";
 
 type Props = {
   recipe: { id: string; data: Recipe };
+  /** "small": smaller title, no description */
   size?: "small" | "default";
+  /** Heading level of the title; h2 when the grid has no section heading above it */
+  headingLevel?: "h2" | "h3";
 };
 
-const { recipe, size = "default" } = Astro.props;
+const { recipe, size = "default", headingLevel: Heading = "h3" } = Astro.props;
 const { data } = recipe;
-const time = formatMinutes(totalMinutes(data));
-const meta = [time, data.servings && servingsLabel(data.servings), data.difficulty?.toLowerCase()]
+const meta = [formatMinutes(totalMinutes(data)), data.tags.map((t) => t.name).join(" · ")]
   .filter(Boolean)
-  .join(" · ");
+  .join(" — ");
+const sizes = size === "small" ? "(min-width: 640px) 240px, 50vw" : "(min-width: 1024px) 230px, (min-width: 761px) 33vw, 50vw";
 ---
 
 <a
   href={`/cocina/${recipe.id}`}
-  class="group flex flex-col gap-3"
+  class="group grid content-start gap-2.5 text-left"
   data-recipe
   data-title={data.title.toLowerCase()}
   data-tags={data.tags.map((t) => t.slug).join(" ")}
 >
-  <div class="relative aspect-[4/3] overflow-hidden bg-flexoki-base-100">
+  <span class="relative block aspect-[3/4] overflow-hidden bg-flexoki-base-50">
     {
       data.image ? (
         <img
           src={data.image}
           srcset={imageSrcset(data.image)}
-          sizes={size === "small" ? "(min-width: 640px) 240px, 100vw" : "(min-width: 640px) 360px, 100vw"}
+          sizes={sizes}
           alt=""
           loading="lazy"
           decoding="async"
-          class="size-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+          class="size-full object-cover motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-out motion-safe:group-hover:scale-[1.04]"
         />
       ) : (
-        <div class="size-full pattern-dots text-flexoki-base-300" />
+        <span class="block size-full pattern-dots text-flexoki-base-300" />
       )
     }
     {
       data.draft && (
-        <span class="absolute top-2 left-2 bg-flexoki-paper px-1.5 text-xs">borrador</span>
+        <span class="absolute top-2 left-2 bg-flexoki-paper px-1.5 font-mono text-[10.5px] uppercase tracking-[0.08em] text-mute-ink">
+          borrador
+        </span>
       )
     }
-  </div>
-  <div class="flex flex-col gap-1">
-    <h3
+  </span>
+  <span class="grid min-w-0 gap-[3px]">
+    <Heading
       class:list={[
-        "font-serif leading-tight text-flexoki-ink",
-        size === "small" ? "text-lg" : "text-xl",
+        "m-0 font-serif font-normal leading-[1.1] text-flexoki-ink text-balance",
+        size === "small" ? "text-lg" : "text-[21px]",
       ]}
     >
-      <span class="bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_1px] bg-left-bottom bg-no-repeat transition-[background-size] duration-300 group-hover:bg-[length:100%_1px]">
-        {data.title}
-      </span>
-    </h3>
-    {size === "default" && data.description && <p class="text-sm text-flexoki-base-600">{data.description}</p>}
-    {meta && <p class="text-xs text-flexoki-base-500">{meta}</p>}
-  </div>
+      <Markers pick={data.pick} isNew={isNew(data.date)} pickLabel="la favorita" newLabel="NUEVA" />
+      <span class="group-hover:pen-underline group-focus-visible:pen-underline">{data.title}</span>
+    </Heading>
+    {
+      size === "default" && data.description && (
+        <span class="font-mono text-[13px] leading-[1.65] text-ink-soft">{data.description}</span>
+      )
+    }
+    {meta && <span class="font-mono text-[11px] leading-normal text-mute">{meta}</span>}
+  </span>
 </a>
