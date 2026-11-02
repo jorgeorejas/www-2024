@@ -103,13 +103,14 @@ This is a mistake̶ correction in the text.
 - **Accessibility concerns**: Ensure corrections don't obscure meaning
 - **Excessive corrections**: Too many corrections reduce readability
 
-## Comparison with Astro Component
+## Comparison with title corrections
 
-### Astro Component (`Correction.astro`)
+### Title corrections (`.m-corr`)
+- **Source**: the Notion column "Corrección del título"
 - **Position**: Correction appears **above** the strikethrough
 - **Rotation**: Text is rotated `-6deg` for handwritten effect
-- **Use case**: Titles, headings, and standalone text
-- **Layout**: Flexbox column with absolute positioning
+- **Use case**: List rows (`ListRow`) and page titles
+- **Layout**: inline-block wrapper, the pen text absolutely positioned
 
 ### Markdown Annotation
 - **Position**: Correction appears **inline to the right**

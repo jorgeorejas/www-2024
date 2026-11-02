@@ -7,5 +7,5 @@
       "@*": ["./src/*"]
     }
   },
-  "exclude": ["worktree"]
+  "exclude": ["worktree", "dist", "artifacts"]
 }

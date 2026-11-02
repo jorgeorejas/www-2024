@@ -98,7 +98,7 @@ const {
 
 <!-- Structured Data (JSON-LD) -->
 {structuredData && (
-  <script type="application/ld+json" set:html={
+  <script is:inline type="application/ld+json" set:html={
     JSON.stringify(Array.isArray(structuredData) ? structuredData : [structuredData])
   } />
 )}

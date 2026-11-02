@@ -9,7 +9,7 @@ const escapeHtml = (value) =>
 
 export function remarkCorrection() {
   return (tree) => {
-    visit(tree, "paragraph", (node, index, parent) => {
+    visit(tree, "paragraph", (node) => {
       if (node.children) {
         for (let i = 0; i < node.children.length - 1; i++) {
           const currentNode = node.children[i];
