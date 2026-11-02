@@ -21,6 +21,11 @@ export default defineConfig({
     video: "retain-on-failure",
   },
   projects: [
+    // Plain functions (Notion → page pipeline), no browser
+    {
+      name: "unit",
+      testDir: "./tests/unit",
+    },
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 800 } },
