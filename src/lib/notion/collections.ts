@@ -1,3 +1,4 @@
+import { marginNotes } from "./annotations";
 import { cached, cachedBody } from "./cache";
 import { getBlockTree, queryDatabase, type NotionPage } from "./client";
 import { DATABASES } from "./databases";
@@ -42,11 +43,26 @@ const startOfToday = () => {
 
 export type Body = { markdown: string; html: string; text: string };
 
+/** Short hash for cache keys */
+function hash(text: string) {
+  let h = 2166136261;
+  for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 16777619);
+  return (h >>> 0).toString(36);
+}
+
 async function pageBody(page: NotionPage, skipBlockId?: string): Promise<Body> {
-  return cachedBody(`body:${page.id}:${page.last_edited_time}:${skipBlockId ?? ""}`, async () => {
-    const blocks = await getBlockTree(page.id);
+  const edited = `${page.id}:${page.last_edited_time}`;
+  const blocks = await cachedBody(`tree:${edited}`, () => getBlockTree(page.id));
+  // Comments don't bump the page's edit time, so notes are read on their own
+  // (one request per highlighted block, none on most pages) and keyed in
+  const notes = await cached(`notes:${page.id}`, () => marginNotes(blocks), 60_000);
+  const notesKey = hash([...notes].flat().join("\u0000"));
+
+  return cachedBody(`body:${edited}:${skipBlockId ?? ""}:${notesKey}`, async () => {
+    // The plain Markdown (llms.txt, .md routes) leaves the margin notes out
     const markdown = blocksToMarkdown(blocks, { skipBlockId });
-    return { markdown, html: await renderMarkdown(markdown), text: blocksToPlainText(blocks) };
+    const annotated = notes.size ? blocksToMarkdown(blocks, { skipBlockId, notes }) : markdown;
+    return { markdown, html: await renderMarkdown(annotated), text: blocksToPlainText(blocks) };
   });
 }
 

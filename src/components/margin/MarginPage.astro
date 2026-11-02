@@ -59,3 +59,9 @@ const Name = nameAsHeading ? "h1" : "p";
   </Row>
   <slot />
 </PageLayout>
+
+<script>
+  // Notion highlights and comments drawn over the prose (no-op without them)
+  import { annotate } from "@lib/annotate";
+  document.addEventListener("astro:page-load", annotate);
+</script>
