@@ -898,14 +898,15 @@
 
   /* ---------- facts grid: ruled cells of small caps labels and values ---------- */
   .m-meta {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 1px;
     margin: 0;
     padding: 1px;
   }
-  /* each cell draws its own rules, so a half-empty last row stays blank paper */
+  /* cells wrap and the ones left on the last row stretch to the full width */
   .m-meta > div {
+    flex: 1 1 150px;
     min-width: 0;
     padding: 8px 11px;
     outline: 1px solid var(--color-rule);
@@ -938,6 +939,27 @@
     margin-left: 0.3em;
     font-size: 0.85em;
     color: var(--color-mute);
+  }
+  /* architect's pen (src/lib/sketch-rules.ts) redraws the rules by hand;
+     the flat outline above is only the no-JS fallback */
+  .m-meta[data-sketch] {
+    position: relative;
+  }
+  @media (scripting: enabled) {
+    .m-meta[data-sketch] > div {
+      outline-color: transparent;
+    }
+  }
+  .m-meta .sketch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    fill: none;
+    stroke: var(--color-flexoki-base-600);
+    stroke-linecap: round;
   }
 
   /* ---------- now playing, one line ---------- */
