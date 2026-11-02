@@ -49,7 +49,7 @@ All content lives in Notion, under the hub page **jorgeorejas.com** (tabs: Inici
 - One fetcher per database in `src/lib/notion/collections.ts`; property names are the Spanish Notion column names (Título, Slug, Descripción, Fecha, Publicado…). Rename a column in Notion → rename it there.
 - Database ids: `src/lib/notion/databases.ts` (not secret). Collections: blog, projects, work (Empresas + Puestos), education, blocks, recipes, recipeTags, sections, settings, wishlist.
 - Page bodies: Notion blocks → Markdown (`src/lib/notion/markdown.ts`) → the same remark pipeline as `astro.config.mjs` (`src/lib/notion/render.ts`), so the correction syntax still works.
-- Drafts: "Publicado" unchecked → only visible in `pnpm dev`.
+- Drafts: "Publicado" unchecked → visible in `pnpm dev`, and in production with `?preview=true` on any URL (`src/lib/preview.ts`: the middleware marks the request, sends `no-store` + `noindex`, and internal links keep the param while browsing; set `PREVIEW_SECRET` to require a secret instead of `true`). Every Notion database has a "Web" formula column that links to the page: the plain URL when published, the preview URL when not.
 - "Ajustes" (name, email, socials) and "Secciones" (page titles/descriptions, home blocks and order) are applied by `src/middleware.ts` over the defaults in `src/consts.ts`.
 - Images hosted by Notion expire, so they go through `/api/notion-image/[...path]` (resized WebP via sharp, no EXIF).
 

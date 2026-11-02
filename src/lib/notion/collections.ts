@@ -13,13 +13,12 @@ import {
   stepsToMarkdown,
 } from "./recipe";
 import { renderMarkdown } from "./render";
+import { showDrafts } from "../preview";
 
 /*
  * One fetcher per Notion database. Property names are the Spanish ones used
  * in Notion; if you rename a column there, rename it here too.
  */
-
-const isDev = import.meta.env.DEV;
 
 const pages = (name: keyof typeof DATABASES) =>
   cached(`db:${name}`, () => queryDatabase(DATABASES[name]));
@@ -29,8 +28,8 @@ const slugOf = (page: NotionPage) => {
   return p.text("Slug") ?? slugify(p.title());
 };
 
-/** Published, or anything at all when running locally */
-const visible = (page: NotionPage) => isDev || readProperties(page).checkbox("Publicado");
+/** Published, or anything at all locally and in a preview request */
+const visible = (page: NotionPage) => showDrafts() || readProperties(page).checkbox("Publicado");
 
 const startOfToday = () => {
   const today = new Date();
@@ -113,7 +112,7 @@ export async function blogPosts() {
       };
       return { id: slugOf(page), page, data };
     })
-    .filter((entry) => isDev || entry.data.date <= today)
+    .filter((entry) => showDrafts() || entry.data.date <= today)
     .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 }
 

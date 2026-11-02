@@ -1470,3 +1470,40 @@
     opacity: 0.35;
   }
 }
+
+/* ---------- preview badge (?preview=true, src/lib/preview.ts) ---------- */
+.preview-badge {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px 6px 9px;
+  border: 1px solid var(--color-signal);
+  border-radius: 999px;
+  background: var(--color-flexoki-paper);
+  color: var(--color-signal-ink);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 0 1px 0 rgb(16 15 15 / 0.06);
+}
+.preview-badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-signal);
+}
+.preview-badge-x {
+  margin-left: 2px;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--color-mute);
+}
+.preview-badge:hover .preview-badge-x {
+  color: var(--color-signal-ink);
+}

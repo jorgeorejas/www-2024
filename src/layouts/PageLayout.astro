@@ -4,6 +4,7 @@ import Footer from "@components/Footer.astro";
 import MarginFooter from "@components/margin/MarginFooter.astro";
 import Row from "@components/margin/Row.astro";
 import { SITE } from "@consts";
+import { PREVIEW_PARAM } from "@lib/preview";
 import SpeedInsights from "@vercel/speed-insights/astro";
 import "@fontsource-variable/caveat";
 import "../styles/ioskeley-mono.css";
@@ -42,6 +43,12 @@ const {
   footerNowPlaying = true,
 } = Astro.props;
 const margin = variant === "margin";
+
+// ?preview=true (see src/lib/preview.ts): a badge, and a way back out
+const preview = Astro.locals.preview;
+const exit = new URL(Astro.url);
+exit.searchParams.delete(PREVIEW_PARAM);
+const exitHref = exit.pathname + exit.search + exit.hash;
 ---
 
 <!doctype html>
@@ -67,6 +74,37 @@ const margin = variant === "margin";
       {lang === "es" ? "Saltar al contenido" : "Skip to main content"}
     </a>
     <SpeedInsights />
+    {
+      preview && (
+        <>
+          <a class="preview-badge" href={exitHref} data-preview-exit title="Salir de la vista previa">
+            <span class="preview-badge-dot" aria-hidden="true" />
+            Vista previa
+            <span class="preview-badge-x" aria-hidden="true">×</span>
+          </a>
+          <script is:inline>
+            // Internal links keep ?preview, so drafts stay visible while browsing
+            (() => {
+              const value = new URLSearchParams(location.search).get("preview");
+              if (!value) return;
+              const keep = () => {
+                for (const a of document.querySelectorAll("a[href]")) {
+                  const raw = a.getAttribute("href") || "";
+                  if (a.hasAttribute("data-preview-exit") || raw.startsWith("#")) continue;
+                  const url = new URL(raw, location.href);
+                  if (url.origin !== location.origin || url.searchParams.has("preview")) continue;
+                  if (/^\/(api|og|_astro|img|fonts)\//.test(url.pathname)) continue;
+                  url.searchParams.set("preview", value);
+                  a.setAttribute("href", url.pathname + url.search + url.hash);
+                }
+              };
+              keep();
+              document.addEventListener("astro:page-load", keep);
+            })();
+          </script>
+        </>
+      )
+    }
     <div class="paper-grain fixed inset-0 pointer-events-none" aria-hidden="true"></div>
     {
       margin ? (
