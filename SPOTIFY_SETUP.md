@@ -14,6 +14,8 @@ The Spotify grant lives in **Vercel Connect** (connector `spotify/www`, attached
 
 ## Authorizing (once, or whenever Spotify cuts access)
 
+0. Once: in the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard), open the app the connector uses → Settings → Redirect URIs, add `https://connect.vercel.com/callback` and save. Without it Spotify answers "redirect_uri: Not matching configuration".
+
 1. Set the key, any long random string, in Production: `vcp env add SPOTIFY_CONNECT_KEY production`. Env changes need a deploy to apply.
 2. Open `https://www.jorgeorejas.com/api/spotify/connect?key=<the key>`, log in to Spotify and accept. Vercel Connect finishes the OAuth handshake and sends you back to the home page.
 3. Check `https://www.jorgeorejas.com/api/spotify/now-playing` returns a track.
@@ -29,4 +31,4 @@ vcp logs -e production -q 'requestPath:"/api/spotify/now-playing"'
 - `UserAuthorizationRequiredError` / `no_token`: the grant is missing or was revoked. Authorize again (step 2).
 - `Spotify refused the refresh token: 400 invalid_grant`: the fallback env token was revoked. It doesn't matter once Connect works.
 
-Scopes come from the connector: `user-read-currently-playing user-read-playback-state user-read-recently-played` is what the site needs.
+Scopes are asked for in `src/lib/spotify.ts` (the connector has no defaults): `user-read-currently-playing user-read-playback-state user-read-recently-played`.
