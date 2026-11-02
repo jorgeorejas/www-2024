@@ -32,7 +32,7 @@ export const CardZ = z
     const should = c.suit === "H" || c.suit === "D" ? "red" : "black";
     if (c.color !== should)
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "Color/suit mismatch",
       });
   });
@@ -49,7 +49,7 @@ export const OptionsZ = z
   .superRefine((o, ctx) => {
     if (o.drawThrough === "finite" && o.turn === 3 && (o.maxPasses ?? 3) < 1) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "Finite draw requires maxPasses>=1",
       });
     }
@@ -141,7 +141,7 @@ export const GameStateZ = z
       for (let i = 1; i < f.length; i++) {
         if (f[i].suit !== suit || f[i].rank !== f[i - 1].rank + 1) {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: "custom",
             message: `Invalid foundation order for ${suit}`,
           });
           break;
@@ -155,7 +155,7 @@ export const GameStateZ = z
         if (card.faceUp) seenFaceUp = true;
         if (!card.faceUp && seenFaceUp) {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: "custom",
             message: `Face-down after face-up in tableau ${idx}`,
           });
           break;
