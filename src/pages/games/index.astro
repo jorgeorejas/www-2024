@@ -8,60 +8,60 @@ import { isNew } from "@lib/utils";
 
 const staticGames = [
   {
-    title: "Klondike Solitaire",
-    description: "Classic Klondike Solitaire with Easy (1 card) and Hard (3 cards) difficulty modes.",
+    title: "Solitario Klondike",
+    description: "El solitario de toda la vida, con modo fácil (1 carta) y difícil (3 cartas).",
     href: "/games/solitaire",
     date: new Date("2025-08-13"),
-    difficulty: "Easy/Hard",
-    category: "Card Game"
+    difficulty: "Fácil/Difícil",
+    category: "Cartas"
   },
   {
-    title: "Conway's Game of Life",
-    description: "A mesmerizing cellular automaton where simple rules create complex, beautiful patterns.",
+    title: "El juego de la vida de Conway",
+    description: "Un autómata celular hipnótico: con cuatro reglas muy simples salen patrones complejos y preciosos.",
     href: "/games/game-of-life",
     date: new Date("2025-08-13"),
-    difficulty: "Easy",
-    category: "Simulation"
+    difficulty: "Fácil",
+    category: "Simulación"
   },
   {
-    title: "Minesweeper",
-    description: "The classic logic puzzle. Reveal every safe square without detonating a mine.",
+    title: "Buscaminas",
+    description: "El clásico de lógica. Destapa todas las casillas sin pisar ninguna mina.",
     href: "/games/minesweeper",
     date: new Date("2026-04-27"),
-    difficulty: "Easy/Hard",
-    category: "Logic"
+    difficulty: "Fácil/Difícil",
+    category: "Lógica"
   },
   {
     title: "Queens",
-    description: "An infinite, procedurally-generated take on LinkedIn's Queens. Daily puzzle plus unlimited random boards.",
+    description: "Mi versión infinita del Queens de LinkedIn, con tableros que se generan solos. Reto diario y partidas aleatorias sin límite.",
     href: "/games/queens",
     date: new Date("2026-04-28"),
-    difficulty: "Easy/Medium/Hard",
-    category: "Logic"
+    difficulty: "Fácil/Media/Difícil",
+    category: "Lógica"
   },
   {
     title: "Tango",
-    description: "An infinite, procedurally-generated take on LinkedIn's Tango. Balance suns and moons across a 6×6 grid with = and × edge constraints.",
+    description: "Mi versión infinita del Tango de LinkedIn. Reparte soles y lunas en una cuadrícula de 6×6 respetando las marcas = y × entre casillas.",
     href: "/games/tango",
     date: new Date("2026-04-28"),
-    difficulty: "Easy/Medium/Hard",
-    category: "Logic"
+    difficulty: "Fácil/Media/Difícil",
+    category: "Lógica"
   },
   {
     title: "Mini Sudoku",
-    description: "A 6×6 Sudoku with 2×3 boxes — every row, column, and box gets the digits 1–6. Daily puzzle plus unlimited random boards.",
+    description: "Un sudoku de 6×6 con cajas de 2×3: cada fila, columna y caja lleva los números del 1 al 6. Reto diario y partidas aleatorias sin límite.",
     href: "/games/sudoku",
     date: new Date("2026-04-28"),
-    difficulty: "Easy/Medium/Hard",
-    category: "Logic"
+    difficulty: "Fácil/Media/Difícil",
+    category: "Lógica"
   },
   {
     title: "Zip",
-    description: "An infinite, procedurally-generated take on LinkedIn's Zip. Draw one continuous path through every cell, hitting the numbers in order.",
+    description: "Mi versión infinita del Zip de LinkedIn. Dibuja un solo camino que pase por todas las casillas y por los números en orden.",
     href: "/games/zip",
     date: new Date("2026-04-28"),
-    difficulty: "Easy/Medium/Hard",
-    category: "Logic"
+    difficulty: "Fácil/Media/Difícil",
+    category: "Lógica"
   }
 ];
 
@@ -76,17 +76,17 @@ const anyNew = games.some((game) => game.isNew);
 <MarginPage
   title={GAMES.TITLE}
   description={GAMES.DESCRIPTION}
-  breadcrumbs={[{ href: "/games", label: "Games" }]}
+  breadcrumbs={[{ href: "/games", label: GAMES.TITLE }]}
 >
   <Row>
     <header class="grid gap-4">
-      <h1 class="m-h1">Games</h1>
+      <h1 class="m-h1">{GAMES.TITLE}</h1>
       <p class="m-lede max-w-[52ch]">
-        Simple, ad-free games made because grandma was tired of all the games having ads. Just pure fun, no interruptions.
+        Juegos sencillos y sin anuncios. Los hice porque mi abuela estaba harta de que todos los juegos le metieran anuncios. Aquí se viene a jugar y punto.
       </p>
     </header>
   </Row>
-  <Row label="games" as="section" aria-label="All games">
+  <Row label="juegos" as="section" aria-label="Todos los juegos">
     <ul class="m-list">
       {
         games.map((game) => (
@@ -103,6 +103,6 @@ const anyNew = games.some((game) => game.isNew);
         ))
       }
     </ul>
-    {anyNew && <Legend text="NEW last 60 days" />}
+    {anyNew && <Legend text="NUEVO últimos 60 días" />}
   </Row>
 </MarginPage>

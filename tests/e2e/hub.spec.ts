@@ -11,13 +11,13 @@ test.describe("Games hub /games", () => {
     await expect(cards).toHaveCount(7);
 
     await expect(page.locator("[data-game=\"solitaire\"]")).toContainText(
-      "Klondike Solitaire",
+      "Solitario Klondike",
     );
     await expect(page.locator("[data-game=\"game-of-life\"]")).toContainText(
-      "Conway's Game of Life",
+      "El juego de la vida de Conway",
     );
     await expect(page.locator("[data-game=\"minesweeper\"]")).toContainText(
-      "Minesweeper",
+      "Buscaminas",
     );
   });
 

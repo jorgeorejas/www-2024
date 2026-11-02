@@ -5,15 +5,15 @@ import Row from "@components/margin/Row.astro";
 ---
 
 <MarginPage
-  title="Conway's Game of Life"
-  description="A mesmerizing cellular automaton where simple rules create complex, beautiful patterns."
+  title="El juego de la vida de Conway"
+  description="Un autómata celular hipnótico: con cuatro reglas muy simples salen patrones complejos y preciosos."
   breadcrumbs={[
-    { href: "/games", label: "Games" },
-    { href: "/games/game-of-life", label: "Conway's Game of Life" },
+    { href: "/games", label: "Juegos" },
+    { href: "/games/game-of-life", label: "El juego de la vida" },
   ]}
 >
   <Row>
-    <h1 class="m-h1 mb-10">Conway's Game of Life</h1>
+    <h1 class="m-h1 mb-10">El juego de la vida de Conway</h1>
     <div class="gol-shell">
       <GameOfLifeComponent client:only="react" />
     </div>

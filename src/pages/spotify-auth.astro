@@ -42,10 +42,10 @@ if (code) {
       tokenData = await response.json();
     } else {
       const errorData = await response.json();
-      error = errorData.error_description || "Failed to get tokens";
+      error = errorData.error_description || "No se pudieron conseguir los tokens";
     }
   } catch (e) {
-    error = e instanceof Error ? e.message : "An unknown error occurred";
+    error = e instanceof Error ? e.message : "Algo falló y no sé qué";
   }
 } else {
   // Generate authorization URL
@@ -58,14 +58,14 @@ const box = "border-l border-rule pl-4 py-1 grid gap-2 text-[13px]";
 ---
 
 <MarginPage
-  title="Spotify authorization"
-  description="Development-only page to get a Spotify refresh token for the now playing widget."
+  title="Autorizar Spotify"
+  description="Página solo para desarrollo: saca el refresh token de Spotify para el widget de lo que estoy escuchando."
   current={null}
-  breadcrumbs={[{ href: "/spotify-auth", label: "Spotify authorization" }]}
+  breadcrumbs={[{ href: "/spotify-auth", label: "Autorizar Spotify" }]}
 >
   <Row>
     <div class="grid gap-8">
-      <h1 class="m-h1">Spotify authorization</h1>
+      <h1 class="m-h1">Autorizar Spotify</h1>
 
       {
         !code && !tokenData && (
@@ -80,16 +80,16 @@ const box = "border-l border-rule pl-4 py-1 grid gap-2 text-[13px]";
                 <dd class="break-all">{REDIRECT_URI}</dd>
               </div>
               <div>
-                <dt class="text-mute">Scopes</dt>
+                <dt class="text-mute">Permisos</dt>
                 <dd>user-read-currently-playing, user-read-playback-state, user-read-recently-played</dd>
               </div>
             </dl>
 
-            <p>Click the button below to authorize this application with your Spotify account:</p>
+            <p>Dale al botón para autorizar esta aplicación con tu cuenta de Spotify:</p>
 
             <p>
               <a href={authorizationUrl} class={button}>
-                Login with Spotify
+                Entrar con Spotify
               </a>
             </p>
           </>
@@ -103,7 +103,7 @@ const box = "border-l border-rule pl-4 py-1 grid gap-2 text-[13px]";
             <p class="text-flexoki-red-600">{error}</p>
             <p>
               <a href="/spotify-auth" class={button}>
-                Try Again
+                Probar otra vez
               </a>
             </p>
           </div>
@@ -114,41 +114,41 @@ const box = "border-l border-rule pl-4 py-1 grid gap-2 text-[13px]";
         tokenData && (
           <>
             <div class="grid gap-2 border-l-2 border-flexoki-green-600 pl-4">
-              <h2 class="font-serif text-[26px] leading-tight text-flexoki-ink">Success!</h2>
-              <p>You've successfully authorized the application.</p>
+              <h2 class="font-serif text-[26px] leading-tight text-flexoki-ink">¡Listo!</h2>
+              <p>La aplicación ya está autorizada.</p>
             </div>
 
             <div class="grid gap-3">
-              <h3 class="font-serif text-xl text-flexoki-ink">Your Refresh Token:</h3>
+              <h3 class="font-serif text-xl text-flexoki-ink">Tu refresh token:</h3>
               <pre
                 id="refresh-token"
                 class="overflow-x-auto whitespace-pre-wrap break-all border border-rule bg-flexoki-base-50 p-4 text-xs"
               >{tokenData.refresh_token}</pre>
               <p>
                 <button type="button" id="copy-token" class={button}>
-                  Copy to Clipboard
+                  Copiar
                 </button>
                 <span id="copy-status" class="ml-3 text-[12px] text-mute" role="status" aria-live="polite"></span>
               </p>
             </div>
 
             <div class="m-prose">
-              <h3>Next Steps:</h3>
+              <h3>Y ahora:</h3>
               <ol>
-                <li>Copy the refresh token above</li>
+                <li>Copia el refresh token de arriba</li>
                 <li>
-                  Open your <code>.env</code> file
+                  Abre tu <code>.env</code>
                 </li>
                 <li>
-                  Update the line: <code>SPOTIFY_REFRESH_TOKEN=your_token_here</code>
+                  Cambia la línea <code>SPOTIFY_REFRESH_TOKEN=tu_token</code>
                 </li>
-                <li>Save the file</li>
-                <li>Restart your dev server</li>
+                <li>Guarda el archivo</li>
+                <li>Reinicia el servidor de desarrollo</li>
               </ol>
             </div>
 
             <details class="text-[13px]">
-              <summary class="cursor-pointer font-semibold text-flexoki-ink">Full Response (for debugging)</summary>
+              <summary class="cursor-pointer font-semibold text-flexoki-ink">Respuesta completa (para depurar)</summary>
               <pre class="mt-3 overflow-x-auto border border-rule bg-flexoki-base-50 p-4 text-xs">{JSON.stringify(tokenData, null, 2)}</pre>
             </details>
           </>
@@ -168,14 +168,14 @@ const box = "border-l border-rule pl-4 py-1 grid gap-2 text-[13px]";
       if (status) status.textContent = text;
     };
     if (!token) {
-      say("Failed to copy. Please select and copy manually.");
+      say("No pude copiarlo. Selecciónalo y cópialo a mano.");
       return;
     }
     try {
       await navigator.clipboard.writeText(token);
-      say("Token copied to clipboard!");
+      say("Token copiado.");
     } catch {
-      say("Failed to copy. Please select and copy manually.");
+      say("No pude copiarlo. Selecciónalo y cópialo a mano.");
     }
   });
 </script>

@@ -14,7 +14,7 @@ export function Numpad({ disabled, onPick, onClear }: NumpadProps) {
   return (
     <div
       role="dialog"
-      aria-label="Pick a digit"
+      aria-label="Elige un número"
       className="mx-auto mt-3 mb-1 flex w-fit items-center gap-1 border border-flexoki-base-200 dark:border-flexoki-base-800 bg-flexoki-paper dark:bg-flexoki-base-950 p-1 shadow-sm"
       style={{ opacity: disabled ? 0.5 : 1 }}
     >
@@ -25,7 +25,7 @@ export function Numpad({ disabled, onPick, onClear }: NumpadProps) {
           disabled={disabled}
           onClick={() => onPick(d)}
           className="font-serif text-lg w-8 h-8 hover:bg-flexoki-base-100 dark:hover:bg-flexoki-base-900 transition-colors disabled:cursor-not-allowed"
-          aria-label={`Set value ${d}`}
+          aria-label={`Poner un ${d}`}
         >
           {d}
         </button>
@@ -35,7 +35,7 @@ export function Numpad({ disabled, onPick, onClear }: NumpadProps) {
         disabled={disabled}
         onClick={() => onClear()}
         className="text-sm w-8 h-8 hover:bg-flexoki-base-100 dark:hover:bg-flexoki-base-900 transition-colors disabled:cursor-not-allowed"
-        aria-label="Clear cell"
+        aria-label="Vaciar casilla"
       >
         ×
       </button>

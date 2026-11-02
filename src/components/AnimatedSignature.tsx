@@ -683,7 +683,7 @@ export const AnimatedSignature = ({ className, tone = "current", ...props }: Sig
       xmlns="http://www.w3.org/2000/svg"
       viewBox="76.36185455322266 37 401.6381530761719 122.05389404296875"
       className={cn("w-full h-auto", tone === "pen" && "text-pen", className)}
-      aria-label="Signature"
+      aria-label="Firma"
       {...props}
     >
       {paths.map((path, index) => (

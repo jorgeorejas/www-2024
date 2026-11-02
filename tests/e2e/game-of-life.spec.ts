@@ -19,7 +19,7 @@ test.describe("Conway's Game of Life", () => {
     );
     expect(await getCellCount(page)).toBe(64 * 64);
     expect(await getGenerationCount(page)).toBe(0);
-    await expect(page.getByRole("button", { name: "Start" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Empezar" })).toBeVisible();
   });
 
   test("clicking a cell toggles it alive then dead", async ({ page }) => {
@@ -35,16 +35,16 @@ test.describe("Conway's Game of Life", () => {
 
   test("Clear empties grid and resets generation", async ({ page }) => {
     await page.locator("[data-testid=\"gol-cell\"][data-row=\"5\"][data-col=\"5\"]").click();
-    await page.getByRole("button", { name: "Step" }).click();
+    await page.getByRole("button", { name: "Paso" }).click();
     expect(await getGenerationCount(page)).toBe(1);
 
-    await page.getByRole("button", { name: "Clear" }).click();
+    await page.getByRole("button", { name: "Borrar" }).click();
     expect(await getGenerationCount(page)).toBe(0);
     expect(await page.locator("[data-testid=\"gol-cell\"][data-alive=\"1\"]").count()).toBe(0);
   });
 
   test("Random populates some cells", async ({ page }) => {
-    await page.getByRole("button", { name: "Random" }).click();
+    await page.getByRole("button", { name: "Aleatorio" }).click();
     const aliveCount = await page
       .locator("[data-testid=\"gol-cell\"][data-alive=\"1\"]")
       .count();
@@ -53,7 +53,7 @@ test.describe("Conway's Game of Life", () => {
   });
 
   test("Blinker preset oscillates with period 2", async ({ page }) => {
-    await page.getByRole("button", { name: "Blinker" }).click();
+    await page.getByRole("button", { name: "Parpadeador" }).click();
     expect(await getGenerationCount(page)).toBe(0);
 
     const initialAlive = await page
@@ -61,13 +61,13 @@ test.describe("Conway's Game of Life", () => {
       .count();
     expect(initialAlive).toBe(3);
 
-    await page.getByRole("button", { name: "Step" }).click();
+    await page.getByRole("button", { name: "Paso" }).click();
     expect(await getGenerationCount(page)).toBe(1);
     expect(
       await page.locator("[data-testid=\"gol-cell\"][data-alive=\"1\"]").count(),
     ).toBe(3); // blinker still has 3 cells, just rotated
 
-    await page.getByRole("button", { name: "Step" }).click();
+    await page.getByRole("button", { name: "Paso" }).click();
     expect(await getGenerationCount(page)).toBe(2);
     expect(
       await page.locator("[data-testid=\"gol-cell\"][data-alive=\"1\"]").count(),
@@ -79,13 +79,13 @@ test.describe("Conway's Game of Life", () => {
     await page.locator("[data-testid=\"gol-cell\"][data-row=\"20\"][data-col=\"21\"]").click();
     await page.locator("[data-testid=\"gol-cell\"][data-row=\"20\"][data-col=\"22\"]").click();
 
-    await page.getByRole("button", { name: "Start" }).click();
+    await page.getByRole("button", { name: "Empezar" }).click();
     // wait for at least 3 generations to tick at default 100ms cadence
     await expect
       .poll(() => getGenerationCount(page), { timeout: 3_000 })
       .toBeGreaterThanOrEqual(3);
 
-    await page.getByRole("button", { name: "Pause" }).click();
+    await page.getByRole("button", { name: "Pausa" }).click();
     const paused = await getGenerationCount(page);
     await page.waitForTimeout(400);
     const stillPaused = await getGenerationCount(page);
@@ -95,7 +95,7 @@ test.describe("Conway's Game of Life", () => {
   test("cell clicks are no-ops while running", async ({ page }) => {
     // Force a 16x16 grid so all cells fit inside narrow mobile viewports.
     await page.locator("select").first().selectOption("16");
-    await page.getByRole("button", { name: "Start" }).click();
+    await page.getByRole("button", { name: "Empezar" }).click();
     const cell = page.locator(
       "[data-testid=\"gol-cell\"][data-row=\"2\"][data-col=\"2\"]",
     );
@@ -105,7 +105,7 @@ test.describe("Conway's Game of Life", () => {
     // may flip it. Instead, pause and toggle manually — that is gated by the
     // same `if (isRunning) return` guard, so success here implies the guard
     // works.
-    await page.getByRole("button", { name: "Pause" }).click();
+    await page.getByRole("button", { name: "Pausa" }).click();
     expect(["0", "1"]).toContain(before);
   });
 
@@ -132,7 +132,7 @@ test.describe("Conway's Game of Life", () => {
       "snapshot pinned to chromium",
     );
     await page.locator("select").first().selectOption("32");
-    await page.getByRole("button", { name: "Pulsar" }).click();
+    await page.getByRole("button", { name: "Púlsar" }).click();
     await expect(page.getByTestId("gol-grid")).toHaveScreenshot(
       "gol-pulsar-32.png",
     );

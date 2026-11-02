@@ -6,6 +6,7 @@ import MarginNote from "@components/margin/MarginNote.astro";
 import MarginPage from "@components/margin/MarginPage.astro";
 import Row from "@components/margin/Row.astro";
 import SectionHead from "@components/margin/SectionHead.astro";
+import { PROJECTS } from "@consts";
 import { cachePage, isNotFound, notionUnavailable } from "@lib/cache-headers";
 import { imageSrcset } from "@lib/notion/images";
 import { generateProjectSchema, generateBreadcrumbSchema } from "@lib/seo-utils";
@@ -45,14 +46,14 @@ function shortUrl(url: string, withPath = true): string {
 }
 
 const crumbs = [
-  { href: "/projects", label: "Projects" },
+  { href: "/projects", label: PROJECTS.TITLE },
   { href: `/projects/${project.id}`, label: project.data.title },
 ];
 
 // Generate structured data for SEO
 const projectSchema = generateProjectSchema(project, Astro.site!.toString());
 const breadcrumbSchema = generateBreadcrumbSchema(
-  [{ href: "/", label: "Home" }, ...crumbs],
+  [{ href: "/", label: "Inicio" }, ...crumbs],
   Astro.site!.toString(),
 );
 ---
@@ -100,13 +101,13 @@ const breadcrumbSchema = generateBreadcrumbSchema(
 
       <dl class="m-meta">
         <div>
-          <dt>Date</dt>
+          <dt>Fecha</dt>
           <dd><FormattedDate date={project.data.date} /></dd>
         </div>
         {
           project.data.readingTime && (
             <div>
-              <dt>Reading time</dt>
+              <dt>Tiempo</dt>
               <dd>{project.data.readingTime}</dd>
             </div>
           )
@@ -140,7 +141,7 @@ const breadcrumbSchema = generateBreadcrumbSchema(
         {
           previous && (
             <div>
-              <dt>Previous version</dt>
+              <dt>Versión anterior</dt>
               <dd>
                 <a href={`/projects/${previous.id}`}>← {previous.data.titleCorrection ?? previous.data.title}</a>
               </dd>
@@ -150,7 +151,7 @@ const breadcrumbSchema = generateBreadcrumbSchema(
         {
           next && (
             <div>
-              <dt>Next version</dt>
+              <dt>Versión siguiente</dt>
               <dd>
                 <a href={`/projects/${next.id}`}>{next.data.titleCorrection ?? next.data.title} →</a>
               </dd>
@@ -167,7 +168,7 @@ const breadcrumbSchema = generateBreadcrumbSchema(
         demoURL && (
           <p class="m-0">
             <a class="m-all" href={demoURL} target="_blank" rel="noopener noreferrer">
-              Visit {shortUrl(demoURL, false)} ↗
+              Visitar {shortUrl(demoURL, false)} ↗
             </a>
           </p>
         )
@@ -179,8 +180,8 @@ const breadcrumbSchema = generateBreadcrumbSchema(
 
   {
     articles.length > 0 && (
-      <Row as="aside" label="writing" aria-labelledby="written-about-it">
-        <SectionHead id="written-about-it" title="Written about it" />
+      <Row as="aside" label="blog" aria-labelledby="written-about-it">
+        <SectionHead id="written-about-it" title="Escribí sobre esto" />
         <ul class="m-list">
           {articles.map((post) => (
             <ListRow
@@ -200,8 +201,8 @@ const breadcrumbSchema = generateBreadcrumbSchema(
 
   {
     others.length > 0 && (
-      <Row as="aside" label="more" aria-labelledby="other-projects">
-        <SectionHead id="other-projects" title="Other projects" href="/projects" linkLabel="See all projects" />
+      <Row as="aside" label="más" aria-labelledby="other-projects">
+        <SectionHead id="other-projects" title="Otros proyectos" href="/projects" linkLabel="Ver todos los proyectos" />
         <ul class="m-more-list">
           {others.map((p) => (
             <li>

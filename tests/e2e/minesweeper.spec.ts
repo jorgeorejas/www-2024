@@ -133,7 +133,7 @@ test.describe("Minesweeper", () => {
     await msCell(page, 4, 4).click();
     await waitForMinesweeperStatus(page, "playing");
 
-    await page.getByRole("button", { name: "Intermediate" }).click();
+    await page.getByRole("button", { name: "Intermedio" }).click();
     await waitForMinesweeperStatus(page, "idle");
     await expect(page.getByTestId("ms-cell")).toHaveCount(16 * 16);
     await expect(page.getByTestId("ms-timer")).toHaveAttribute(
@@ -142,9 +142,9 @@ test.describe("Minesweeper", () => {
     );
 
     // Rapid swap test for the timer-leak suspicion.
-    await page.getByRole("button", { name: "Beginner" }).click();
-    await page.getByRole("button", { name: "Expert" }).click();
-    await page.getByRole("button", { name: "Beginner" }).click();
+    await page.getByRole("button", { name: "Principiante" }).click();
+    await page.getByRole("button", { name: "Experto" }).click();
+    await page.getByRole("button", { name: "Principiante" }).click();
     await waitForMinesweeperStatus(page, "idle");
     await expect(page.getByTestId("ms-cell")).toHaveCount(81);
     await expect(page.getByTestId("ms-timer")).toHaveAttribute(
@@ -156,7 +156,7 @@ test.describe("Minesweeper", () => {
   test("reset button clears the board", async ({ page }) => {
     await msCell(page, 4, 4).click();
     await waitForMinesweeperStatus(page, "playing");
-    await page.getByRole("button", { name: "Reset game" }).click();
+    await page.getByRole("button", { name: "Reiniciar partida" }).click();
     await waitForMinesweeperStatus(page, "idle");
     await expect(page.getByTestId("ms-mines-remaining")).toHaveAttribute(
       "data-mines-remaining",

@@ -1,6 +1,6 @@
 import { useTango } from "./provider";
 import { formatDuration, useElapsedSeconds } from "../../_shared/timer";
-import type { Difficulty, Mode } from "../../_shared/types";
+import { DIFFICULTY_LABEL, type Difficulty, type Mode } from "../../_shared/types";
 
 const DIFFICULTIES: Difficulty[] = ["easy", "medium", "hard"];
 
@@ -32,8 +32,8 @@ export function Controls() {
         <SegmentedToggle<Mode>
           value={mode}
           options={[
-            { value: "daily", label: "Daily" },
-            { value: "random", label: "Random" },
+            { value: "daily", label: "Diario" },
+            { value: "random", label: "Aleatorio" },
           ]}
           onChange={setMode}
         />
@@ -41,7 +41,7 @@ export function Controls() {
         <div className="ml-auto flex items-center gap-2 text-sm text-flexoki-base-700 dark:text-flexoki-base-300 font-mono tabular-nums">
           <span>{formatDuration(finalElapsed)}</span>
           <span aria-hidden="true">·</span>
-          <span>moves: {active?.moveCount ?? 0}</span>
+          <span>movimientos: {active?.moveCount ?? 0}</span>
         </div>
       </div>
 
@@ -50,14 +50,14 @@ export function Controls() {
           value={difficulty}
           options={DIFFICULTIES.map((d) => ({
             value: d,
-            label: d[0].toUpperCase() + d.slice(1),
+            label: DIFFICULTY_LABEL[d],
           }))}
           onChange={(d) => {
             setDifficulty(d);
             setMode("random");
           }}
           disabled={mode === "daily"}
-          hint={mode === "daily" ? "Difficulty applies to Random puzzles" : undefined}
+          hint={mode === "daily" ? "La dificultad solo cuenta en el modo aleatorio" : undefined}
         />
 
         <div className="ml-auto flex items-center gap-2">
@@ -67,14 +67,14 @@ export function Controls() {
             disabled={!active || active.solvedAt != null}
             className="text-sm px-3 py-1 border border-flexoki-base-200 dark:border-flexoki-base-800 hover:bg-flexoki-base-100 dark:hover:bg-flexoki-base-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Hint
+            Pista
           </button>
           <button
             type="button"
             onClick={() => clear()}
             className="text-sm px-3 py-1 border border-flexoki-base-200 dark:border-flexoki-base-800 hover:bg-flexoki-base-100 dark:hover:bg-flexoki-base-900 transition-colors"
           >
-            Clear
+            Borrar
           </button>
           {mode === "random" && (
             <button
@@ -82,7 +82,7 @@ export function Controls() {
               onClick={() => newRandom()}
               className="text-sm px-3 py-1 border border-flexoki-base-200 dark:border-flexoki-base-800 hover:bg-flexoki-base-100 dark:hover:bg-flexoki-base-900 transition-colors"
             >
-              New puzzle
+              Otro tablero
             </button>
           )}
         </div>

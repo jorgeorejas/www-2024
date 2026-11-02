@@ -5,7 +5,8 @@ import Row from "@components/margin/Row.astro";
 import SectionHead from "@components/margin/SectionHead.astro";
 import WorkTimeline from "@components/WorkTimeline.astro";
 import { cachePage, isNotFound, notionUnavailable } from "@lib/cache-headers";
-import { formatDuration, formatYear, processWorkEntry } from "@lib/utils";
+import { WORK } from "@consts";
+import { PRESENT_LABEL, formatDuration, formatMonthYear, formatYear, processWorkEntry } from "@lib/utils";
 import { getLiveCollection, getLiveEntry } from "astro:content";
 
 const slug = Astro.params.slug ?? "";
@@ -23,24 +24,21 @@ const others = (all.entries ?? [])
   .filter((entry) => entry.id !== work.id)
   .map((entry) => processWorkEntry({ id: entry.id, data: entry.data, body: entry.data.body }));
 
-const monthYear = (date: Date) =>
-  date.toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
-
-// Overall period across the company's roles, e.g. "Jan 2025 – Present · 1 yr 10 mo"
+// Overall period across the company's roles, e.g. "ene 2025 – actualidad · 1 año y 10 meses"
 const { startDate, endDate } = company;
 const start = startDate instanceof Date ? startDate : undefined;
 const period = start
   ? [
-      `${monthYear(start)} – ${endDate instanceof Date ? monthYear(endDate) : "Present"}`,
+      `${formatMonthYear(start)} – ${endDate instanceof Date ? formatMonthYear(endDate) : PRESENT_LABEL}`,
       formatDuration(start, endDate),
     ].join(" · ")
   : undefined;
 
-/** "2022 – 2024" or "2025 – now" for the list of other companies */
+/** "2022 – 2024" or "2025 – hoy" for the list of other companies */
 function years(job: (typeof others)[number]) {
   if (!(job.startDate instanceof Date)) return undefined;
   const from = formatYear(job.startDate);
-  if (!(job.endDate instanceof Date)) return `${from} – now`;
+  if (!(job.endDate instanceof Date)) return `${from} – hoy`;
   const to = formatYear(job.endDate);
   return from === to ? from : `${from} – ${to}`;
 }
@@ -57,10 +55,10 @@ if (company.website) {
 ---
 
 <MarginPage
-  title={`${company.name} - Work Experience`}
-  description={`Work experience at ${company.name}`}
+  title={`Mi etapa en ${company.name}`}
+  description={`Los puestos que tuve en ${company.name} y lo que hice en cada uno.`}
   breadcrumbs={[
-    { href: "/work", label: "Work" },
+    { href: "/work", label: WORK.TITLE },
     { href: `/work/${work.id}`, label: company.name },
   ]}
 >
@@ -76,14 +74,14 @@ if (company.website) {
         )
       }
       <section class="mt-6" aria-labelledby="positions">
-        <SectionHead id="positions" title="Positions" />
+        <SectionHead id="positions" title="Puestos" />
         <WorkTimeline processedWork={[company]} showCompany={false} headingLevel={3} />
       </section>
       {
         site && (
           <p class="mt-2">
             <a class="m-all" href={site.href} target="_blank" rel="noopener noreferrer">
-              Visit {site.host} ↗
+              Visitar {site.host} ↗
             </a>
           </p>
         )
@@ -93,8 +91,8 @@ if (company.website) {
 
   {
     others.length > 0 && (
-      <Row label="more" as="section" aria-labelledby="work-more">
-        <SectionHead id="work-more" title="More work" href="/work" linkLabel="See all work" />
+      <Row label="más" as="section" aria-labelledby="work-more">
+        <SectionHead id="work-more" title="Otros sitios donde trabajé" href="/work" linkLabel="Ver toda la trayectoria" />
         <ul class="m-list">
           {others.map((job) => (
             <ListRow

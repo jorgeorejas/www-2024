@@ -10,7 +10,7 @@ type PatternKey = "glider" | "blinker" | "pulsar" | "lwss" | "gosper";
 
 const PATTERNS: Record<PatternKey, { label: string; cells: [number, number][] }> = {
   glider: {
-    label: "Glider",
+    label: "Planeador",
     cells: [
       [0, 1],
       [1, 2],
@@ -20,7 +20,7 @@ const PATTERNS: Record<PatternKey, { label: string; cells: [number, number][] }>
     ],
   },
   blinker: {
-    label: "Blinker",
+    label: "Parpadeador",
     cells: [
       [0, 0],
       [0, 1],
@@ -28,7 +28,7 @@ const PATTERNS: Record<PatternKey, { label: string; cells: [number, number][] }>
     ],
   },
   pulsar: {
-    label: "Pulsar",
+    label: "Púlsar",
     cells: [
       [0, 2], [0, 3], [0, 4], [0, 8], [0, 9], [0, 10],
       [2, 0], [3, 0], [4, 0], [2, 5], [3, 5], [4, 5],
@@ -41,7 +41,7 @@ const PATTERNS: Record<PatternKey, { label: string; cells: [number, number][] }>
     ],
   },
   lwss: {
-    label: "Lightweight Spaceship",
+    label: "Nave ligera",
     cells: [
       [0, 1], [0, 4],
       [1, 0],
@@ -50,7 +50,7 @@ const PATTERNS: Record<PatternKey, { label: string; cells: [number, number][] }>
     ],
   },
   gosper: {
-    label: "Gosper Glider Gun",
+    label: "Cañón de Gosper",
     cells: [
       [5, 1], [5, 2], [6, 1], [6, 2],
       [5, 11], [6, 11], [7, 11],
@@ -197,7 +197,7 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ className = "" }) => {
     <div className={`flex flex-col items-center space-y-4 ${className}`}>
       <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
         <div className="flex items-center space-x-2">
-          <label className="font-mono">Grid Size:</label>
+          <label className="font-mono">Tamaño:</label>
           <select
             value={gridSize}
             onChange={(e) => setGridSize(Number(e.target.value) as GridSize)}
@@ -212,7 +212,7 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ className = "" }) => {
         </div>
 
         <div className="flex items-center space-x-2">
-          <label className="font-mono">Speed (ms):</label>
+          <label className="font-mono">Velocidad (ms):</label>
           <input
             type="range"
             min="50"
@@ -229,7 +229,7 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ className = "" }) => {
           data-generation={generation}
           className="font-mono text-xs tabular-nums text-flexoki-base-600 dark:text-flexoki-base-400"
         >
-          gen {generation}
+          gen. {generation}
         </div>
       </div>
 
@@ -238,7 +238,7 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ className = "" }) => {
           onClick={toggleRunning}
           className="px-4 py-2 font-mono text-flexoki-ink dark:text-flexoki-base-50 border border-flexoki-ink dark:border-flexoki-base-100 font-semibold hover:border-flexoki-ink dark:hover:border-flexoki-base-50 transition-colors"
         >
-          {isRunning ? "Pause" : "Start"}
+          {isRunning ? "Pausa" : "Empezar"}
         </button>
 
         <button
@@ -246,7 +246,7 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ className = "" }) => {
           disabled={isRunning}
           className="px-4 py-2 font-mono border border-flexoki-base-200 dark:border-flexoki-base-800 text-flexoki-base-700 dark:text-flexoki-base-300 hover:text-flexoki-ink dark:hover:text-flexoki-base-100 transition-colors disabled:opacity-40"
         >
-          Step
+          Paso
         </button>
 
         <button
@@ -254,7 +254,7 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ className = "" }) => {
           disabled={isRunning}
           className="px-4 py-2 font-mono border border-flexoki-base-200 dark:border-flexoki-base-800 text-flexoki-base-700 dark:text-flexoki-base-300 hover:text-flexoki-ink dark:hover:text-flexoki-base-100 transition-colors disabled:opacity-40"
         >
-          Random
+          Aleatorio
         </button>
 
         <button
@@ -262,12 +262,12 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ className = "" }) => {
           disabled={isRunning}
           className="px-4 py-2 font-mono border border-flexoki-base-200 dark:border-flexoki-base-800 text-flexoki-base-700 dark:text-flexoki-base-300 hover:text-flexoki-ink dark:hover:text-flexoki-base-100 transition-colors disabled:opacity-40"
         >
-          Clear
+          Borrar
         </button>
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-2 text-xs">
-        <span className="font-mono text-flexoki-base-600 dark:text-flexoki-base-400">Patterns:</span>
+        <span className="font-mono text-flexoki-base-600 dark:text-flexoki-base-400">Patrones:</span>
         {(Object.keys(PATTERNS) as PatternKey[]).map((key) => {
           const pattern = PATTERNS[key];
           const maxRow = Math.max(...pattern.cells.map(([r]) => r));
@@ -278,7 +278,7 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ className = "" }) => {
               key={key}
               onClick={() => loadPattern(key)}
               disabled={isRunning || !fits}
-              title={!fits ? `Needs a larger grid` : pattern.label}
+              title={!fits ? "Necesita una cuadrícula más grande" : pattern.label}
               className="px-3 py-1 font-mono border border-flexoki-base-200 dark:border-flexoki-base-800 text-flexoki-base-600 dark:text-flexoki-base-400 hover:text-flexoki-ink dark:hover:text-flexoki-base-100 transition-colors disabled:opacity-40"
             >
               {pattern.label}
@@ -321,8 +321,8 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ className = "" }) => {
       </div>
 
       <div className="text-xs font-mono text-flexoki-base-500 dark:text-flexoki-base-500 text-center max-w-md">
-        <p className="mb-1">Click cells to toggle • Try a pattern or hit Random</p>
-        <p>Live cells with 2-3 neighbors survive; dead cells with 3 neighbors come alive.</p>
+        <p className="mb-1">Toca una casilla para darle vida o quitársela • Prueba un patrón o dale a Aleatorio</p>
+        <p>Una célula viva con 2 o 3 vecinas sobrevive; una muerta con 3 vecinas revive.</p>
       </div>
     </div>
   );

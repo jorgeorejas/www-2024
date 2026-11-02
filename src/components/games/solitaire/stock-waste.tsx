@@ -40,7 +40,7 @@ export default function StockWaste() {
     <>
       <div className="flex flex-col items-center gap-2">
         <div className="text-xs text-flexoki-base-700 dark:text-flexoki-base-300 font-medium font-mono select-none">
-          Stock
+          Mazo
         </div>
         <div
           data-testid="stock"
@@ -62,7 +62,7 @@ export default function StockWaste() {
       </div>
       <div className="flex flex-col items-center gap-2">
         <div className="text-xs text-flexoki-base-700 dark:text-flexoki-base-300 font-medium font-mono select-none">
-          Waste
+          Descarte
         </div>
         <div
           data-testid="waste"

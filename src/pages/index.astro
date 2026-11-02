@@ -38,21 +38,18 @@ cachePage(
 
 const games = [
   {
-    title: "Klondike Solitaire",
-    description:
-      "Classic Klondike Solitaire with Easy (1 card) and Hard (3 cards) difficulty modes.",
+    title: "Solitario Klondike",
+    description: "El solitario de toda la vida, con modo fácil (1 carta) y difícil (3 cartas).",
     href: "/games/solitaire",
   },
   {
-    title: "Conway's Game of Life",
-    description:
-      "A mesmerizing cellular automaton where simple rules create complex, beautiful patterns.",
+    title: "El juego de la vida de Conway",
+    description: "Un autómata celular hipnótico: con cuatro reglas muy simples salen patrones complejos y preciosos.",
     href: "/games/game-of-life",
   },
   {
-    title: "Minesweeper",
-    description:
-      "The classic logic puzzle. Reveal every safe square without detonating a mine.",
+    title: "Buscaminas",
+    description: "El clásico de lógica. Destapa todas las casillas sin pisar ninguna mina.",
     href: "/games/minesweeper",
   },
 ];
@@ -74,18 +71,18 @@ type HomeSection = { path: string; title: string; link?: string };
 const layout: HomeSection[] = homeSections.length
   ? homeSections.map((s) => ({ path: s.path, title: s.homeTitle ?? s.title ?? s.name, link: s.homeLink }))
   : [
-      { path: "/blog", title: "Latest posts", link: "See all posts" },
-      { path: "/projects", title: "Recent projects", link: "See all projects" },
-      { path: "/work", title: "Work Experience", link: "See all work" },
+      { path: "/blog", title: "Lo último que escribí", link: "Ver todos los posts" },
+      { path: "/projects", title: "Últimos proyectos", link: "Ver todos los proyectos" },
+      { path: "/work", title: "Dónde trabajé", link: "Ver toda la trayectoria" },
     ];
 
 // Vertical label in the margin of each section
 const LABELS: Record<string, string> = {
-  "/blog": "writing",
-  "/projects": "projects",
-  "/work": "work",
-  "/cocina": "kitchen",
-  "/games": "games",
+  "/blog": "blog",
+  "/projects": "proyectos",
+  "/work": "trabajo",
+  "/cocina": "cocina",
+  "/games": "juegos",
 };
 const headingId = (path: string) => `home-${path.replace(/[^a-z0-9]+/gi, "") || "section"}`;
 
@@ -100,10 +97,10 @@ const postsHaveMarkers = posts.some((p) => p.data.pick || isNew(p.data.date));
 const projectsHaveMarkers = recentProjects.some((p) => p.data.pick || isNew(p.data.date));
 const recipesHavePick = homeRecipes.some((r) => r.data.pick);
 
-/** "2024 – now", "2022 – 2024", or one year when it started and ended the same year */
+/** "2024 – hoy", "2022 – 2024", or one year when it started and ended the same year */
 const years = (start: Date, end: Date | string) => {
   const from = formatYear(start);
-  const to = end instanceof Date ? formatYear(end) : "now";
+  const to = end instanceof Date ? formatYear(end) : "hoy";
   return from === to ? from : `${from} – ${to}`;
 };
 
@@ -200,12 +197,12 @@ const personSchema = generatePersonSchema(Astro.site!.toString());
                   value={formatMinutes(totalMinutes(recipe.data))}
                   description={recipe.data.description}
                   pick={recipe.data.pick}
-                  pickLabel="the favourite"
+                  pickLabel="la favorita"
                   note={recipe.data.note}
                 />
               ))}
             </ul>
-            {recipesHavePick && <Legend text="◆ the favourite" />}
+            {recipesHavePick && <Legend text="◆ la favorita" />}
           </>
         )}
 

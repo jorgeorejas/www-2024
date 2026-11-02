@@ -11,12 +11,12 @@ export type NavItem = {
 };
 
 export const NAV_ITEMS: NavItem[] = [
-  { key: "home", n: "00", label: "Index", href: "/" },
-  { key: "projects", n: "01", label: "Projects", href: "/projects" },
-  { key: "blog", n: "02", label: "Writing", href: "/blog" },
-  { key: "work", n: "03", label: "Work", href: "/work" },
-  { key: "games", n: "04", label: "Games", href: "/games", outward: true },
-  { key: "cocina", n: "05", label: "Kitchen", href: "/cocina" },
+  { key: "home", n: "00", label: "Inicio", href: "/" },
+  { key: "projects", n: "01", label: "Proyectos", href: "/projects" },
+  { key: "blog", n: "02", label: "Blog", href: "/blog" },
+  { key: "work", n: "03", label: "Trayectoria", href: "/work" },
+  { key: "games", n: "04", label: "Juegos", href: "/games", outward: true },
+  { key: "cocina", n: "05", label: "Cocina", href: "/cocina" },
 ];
 
 /** The nav section a path belongs to, or null (e.g. /wishlist) */

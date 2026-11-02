@@ -62,6 +62,7 @@ export type BlogPostingSchema = {
   };
   url: string;
   image?: string;
+  inLanguage?: string;
 };
 
 export type BreadcrumbListSchema = {

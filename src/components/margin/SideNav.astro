@@ -14,7 +14,7 @@ const active = current === undefined ? navKeyFor(Astro.url.pathname) : current;
 const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
 ---
 
-<nav class:list={["m-nav", `m-nav--${variant}`, className]} aria-label="Site">
+<nav class:list={["m-nav", `m-nav--${variant}`, className]} aria-label="Secciones">
   <ul>
     {
       NAV_ITEMS.map((item) => (

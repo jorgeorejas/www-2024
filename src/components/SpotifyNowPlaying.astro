@@ -27,7 +27,7 @@ const isDev = import.meta.env.DEV;
     >
       <span class="np-dot" aria-hidden="true" />
       <span class="np-l" data-sp="status">
-        Now playing
+        Escuchando
       </span>
       <span class="np-sep" aria-hidden="true">
         ·
@@ -66,7 +66,7 @@ const isDev = import.meta.env.DEV;
         <SpotifyAlbumArt />
         <div class="flex flex-col gap-0.5 min-w-0 flex-1">
           <span data-sp="status" class="opacity-60">
-            Last played
+            Última canción
           </span>
           <a
             data-sp="link"
@@ -76,7 +76,7 @@ const isDev = import.meta.env.DEV;
             class="truncate decoration-flexoki-base-300 dark:decoration-flexoki-base-700 hover:decoration-flexoki-base-500 text-current hover:text-flexoki-ink hover:dark:text-flexoki-base-50 transition-colors duration-300 ease-in-out underline underline-offset-2"
           >
             <span data-sp="title" />
-            <span class="opacity-60"> by </span>
+            <span class="opacity-60"> de </span>
             <span data-sp="artist" />
           </a>
           <a
@@ -119,7 +119,8 @@ const isDev = import.meta.env.DEV;
   const widgets = [...document.querySelectorAll<HTMLElement>("[data-spotify]")];
   const isDev = widgets.some((w) => w.dataset.dev === "true");
 
-  const es = document.documentElement.lang === "es";
+  // Spanish unless the page opted into English
+  const es = document.documentElement.lang !== "en";
   const rtf = new Intl.RelativeTimeFormat("es", { numeric: "auto" });
 
   function formatRelative(iso: string): string {
@@ -190,8 +191,14 @@ const isDev = import.meta.env.DEV;
 
     if (album && albumLink) {
       if (data.album && data.album !== data.title && data.albumUrl) {
+        const ALBUM_TYPE_ES: Record<string, string> = {
+          album: "Álbum",
+          single: "Single",
+          compilation: "Recopilatorio",
+        };
         const type = data.albumType
-          ? data.albumType.charAt(0).toUpperCase() + data.albumType.slice(1)
+          ? (es && ALBUM_TYPE_ES[data.albumType]) ||
+            data.albumType.charAt(0).toUpperCase() + data.albumType.slice(1)
           : "";
         album.textContent = type ? `${type} · ${data.album}` : `${data.album}`;
         albumLink.href = data.albumUrl;
