@@ -1,3 +1,5 @@
+import { HAND_ARROW_SVG, TRAILING_ARROW } from "@components/margin/hand-arrow";
+import { isHighlight } from "./annotations";
 import type { NotionBlock, RichText } from "./client";
 import { blockImage, externalImage, imageSrcset } from "./images";
 
@@ -5,7 +7,8 @@ import { blockImage, externalImage, imageSrcset } from "./images";
  * Notion blocks → Markdown. The Markdown then goes through the same remark
  * pipeline as the old .md files, so the ~~typo~~(fix) correction syntax and
  * code highlighting keep working: in Notion you strike a word and type the
- * correction in parentheses right after it.
+ * correction in parentheses right after it. Yellow highlights become <mark>
+ * and, with a comment on them, margin notes (see ./annotations.ts).
  */
 
 type Segment = RichText[number];
@@ -26,7 +29,8 @@ const sameStyle = (a: Segment, b: Segment) =>
   a.annotations.bold === b.annotations.bold &&
   a.annotations.italic === b.annotations.italic &&
   a.annotations.strikethrough === b.annotations.strikethrough &&
-  a.annotations.code === b.annotations.code;
+  a.annotations.code === b.annotations.code &&
+  isHighlight(a) === isHighlight(b);
 
 /** Rich text → inline Markdown */
 export function richTextToMarkdown(rich: RichText | undefined): string {
@@ -57,6 +61,7 @@ export function richTextToMarkdown(rich: RichText | undefined): string {
       if (bold) text = `**${text}**`;
       const href = segment.href ? safeHref(segment.href) : undefined;
       if (href) text = `[${text}](${encodeHref(href)})`;
+      if (isHighlight(segment)) text = `<mark>${text}</mark>`;
       return lead + text + trail;
     })
     .join("");
@@ -108,7 +113,20 @@ function youtubeId(url: string) {
 export type MarkdownOptions = {
   /** Image block to leave out, e.g. the one already shown as the hero */
   skipBlockId?: string;
+  /** Margin notes by block id (Notion comments on highlighted text) */
+  notes?: Map<string, string>;
 };
+
+/** A margin note as inline HTML, first thing in its block so phones show it above */
+function noteHtml(note: string | undefined) {
+  if (!note) return "";
+  // A trailing "→" becomes the same pen arrow as the other margin notes
+  const arrow = TRAILING_ARROW.test(note);
+  const text = escapeHtml(arrow ? note.replace(TRAILING_ARROW, "") : note)
+    .replace(/[\\`*_[\]|~]/g, (c) => `&#${c.charCodeAt(0)};`)
+    .replaceAll("\n", "<br>");
+  return `<span class="hn m-anno">${text}${arrow ? HAND_ARROW_SVG : ""}</span>`;
+}
 
 /** A list of sibling blocks → Markdown, with blank lines between blocks */
 export function blocksToMarkdown(blocks: NotionBlock[], options: MarkdownOptions = {}): string {
@@ -138,6 +156,7 @@ function childrenMarkdown(block: NotionBlock, options: MarkdownOptions) {
 }
 
 function blockToMarkdown(block: NotionBlock, options: MarkdownOptions, index: number): string | null {
+  const note = noteHtml(options.notes?.get(block.id));
   const text = richTextToMarkdown(blockRich(block));
   const children = childrenMarkdown(block, options);
 
@@ -145,7 +164,7 @@ function blockToMarkdown(block: NotionBlock, options: MarkdownOptions, index: nu
     case "paragraph": {
       if (!text && !children) return null;
       // A paragraph that starts like a heading or list would change meaning
-      const safe = text.replace(/^(#{1,6}\s|\d+\.\s|[-+]\s)/, "\\$1");
+      const safe = note + text.replace(/^(#{1,6}\s|\d+\.\s|[-+]\s)/, "\\$1");
       return children ? `${safe}\n\n${children}` : safe;
     }
     case "heading_1":
@@ -167,11 +186,11 @@ function blockToMarkdown(block: NotionBlock, options: MarkdownOptions, index: nu
             ? `- [${(block.to_do as { checked: boolean }).checked ? "x" : " "}]`
             : "-";
       const pad = " ".repeat(marker.length + 1);
-      const line = `${marker} ${text || "&nbsp;"}`;
+      const line = `${marker} ${note}${text || "&nbsp;"}`;
       return children ? `${line}\n${indent(children, pad)}` : line;
     }
     case "quote": {
-      const body = children ? `${text}\n\n${children}` : text;
+      const body = children ? `${note}${text}\n\n${children}` : note + text;
       return body
         .split("\n")
         .map((line) => (line ? `> ${line}` : ">"))

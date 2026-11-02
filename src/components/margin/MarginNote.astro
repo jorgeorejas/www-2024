@@ -15,6 +15,7 @@
  */
 import type { HTMLAttributes } from "astro/types";
 import HandArrow from "./HandArrow.astro";
+import { TRAILING_ARROW } from "./hand-arrow";
 
 type Props = HTMLAttributes<"aside"> & {
   /** Plain text; line breaks are kept */
@@ -30,7 +31,6 @@ const { text, placement = "margin", heading, as: Tag = "aside", class: className
 const hasSlot = Astro.slots.has("default");
 const lines = (text ?? "").trim().split(/\r?\n/).map((line) => line.trim());
 // A trailing "→" typed in Notion becomes a pen-drawn arrow
-const TRAILING_ARROW = /\s*(?:→|->)\s*$/;
 const arrow = lines.length > 0 && TRAILING_ARROW.test(lines[lines.length - 1]);
 if (arrow) lines[lines.length - 1] = lines[lines.length - 1].replace(TRAILING_ARROW, "");
 const content = lines.some(Boolean);

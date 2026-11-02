@@ -915,14 +915,15 @@
 
   /* ---------- facts grid: ruled cells of small caps labels and values ---------- */
   .m-meta {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 1px;
     margin: 0;
     padding: 1px;
   }
-  /* each cell draws its own rules, so a half-empty last row stays blank paper */
+  /* cells wrap and the ones left on the last row stretch to the full width */
   .m-meta > div {
+    flex: 1 1 150px;
     min-width: 0;
     padding: 8px 11px;
     outline: 1px solid var(--color-rule);
@@ -955,6 +956,27 @@
     margin-left: 0.3em;
     font-size: 0.85em;
     color: var(--color-mute);
+  }
+  /* architect's pen (src/lib/sketch-rules.ts) redraws the rules by hand;
+     the flat outline above is only the no-JS fallback */
+  .m-meta[data-sketch] {
+    position: relative;
+  }
+  @media (scripting: enabled) {
+    .m-meta[data-sketch] > div {
+      outline-color: transparent;
+    }
+  }
+  .m-meta .sketch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    fill: none;
+    stroke: var(--color-flexoki-base-600);
+    stroke-linecap: round;
   }
 
   /* ---------- now playing, one line ---------- */
@@ -1235,6 +1257,68 @@
     transform: rotate(-3deg);
   }
 
+  /* ---------- annotations: Notion highlights + comments (src/lib/annotate.ts) ---------- */
+  /* plain highlight without JavaScript; with it, a marker stroke is drawn instead */
+  .m-prose mark {
+    padding: 0 0.1em;
+    border-radius: 2px;
+    color: inherit;
+    background: var(--color-flexoki-yellow-150);
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+  /* with JavaScript the marker is drawn instead, so no flash of flat yellow */
+  @media (scripting: enabled) {
+    .m-prose mark {
+      background: none;
+    }
+  }
+  .anno-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    fill: none;
+  }
+  .anno-marks {
+    mix-blend-mode: multiply;
+  }
+  .anno-mark {
+    stroke: var(--color-flexoki-yellow-150);
+    stroke-opacity: 0.9;
+  }
+  .anno-mark--2 {
+    stroke: var(--color-flexoki-yellow-200);
+    stroke-opacity: 0.4;
+  }
+  .anno-pen {
+    stroke: var(--color-pen);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* the block that carries a note anchors it */
+  .m-prose :is(p, li, blockquote):has(> .m-anno) {
+    position: relative;
+  }
+  /* the comment, in the margin at the height of the highlighted lines */
+  .m-anno {
+    position: absolute;
+    right: calc(100% + var(--m-gap) + var(--anno-x, 0px));
+    top: var(--anno-y, 50%);
+    width: var(--m-mw);
+    text-align: right;
+    text-wrap: balance;
+    transform: translateY(-50%) rotate(-3deg);
+  }
+  /* with motion, the note waits for its block to scroll into view */
+  @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+    .m-anno:not([data-in]) {
+      clip-path: inset(-20% 100% -20% 0);
+    }
+  }
+
   /* recipe bodies (optional helpers) */
   .m-ingr li {
     display: flex;
@@ -1372,6 +1456,17 @@
       margin: 1em 0 0;
       text-align: left;
     }
+    /* phones: the note goes just above its block */
+    .m-anno {
+      position: static;
+      display: block;
+      width: auto;
+      max-width: 260px;
+      margin: 0 0 2px;
+      text-align: left;
+      transform: rotate(-2deg);
+      transform-origin: left center;
+    }
     .m-crumbs [aria-current] {
       max-width: 24ch;
     }
@@ -1402,4 +1497,41 @@
   50% {
     opacity: 0.35;
   }
+}
+
+/* ---------- preview badge (?preview=true, src/lib/preview.ts) ---------- */
+.preview-badge {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px 6px 9px;
+  border: 1px solid var(--color-signal);
+  border-radius: 999px;
+  background: var(--color-flexoki-paper);
+  color: var(--color-signal-ink);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 0 1px 0 rgb(16 15 15 / 0.06);
+}
+.preview-badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-signal);
+}
+.preview-badge-x {
+  margin-left: 2px;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--color-mute);
+}
+.preview-badge:hover .preview-badge-x {
+  color: var(--color-signal-ink);
 }
