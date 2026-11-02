@@ -75,7 +75,7 @@ test.describe("Notion blocks → Markdown", () => {
 
   test("images carry width and height when the size is known", () => {
     const image = block("image", { type: "external", external: { url: "https://example.com/a.webp" }, caption: [] }, "img-1");
-    expect(blocksToMarkdown([image], { sizes: new Map([["img-1", { width: 1600, height: 900 }]]) })).toContain('width="1600" height="900"');
+    expect(blocksToMarkdown([image], { sizes: new Map([["img-1", { width: 1600, height: 900 }]]) })).toContain("width=\"1600\" height=\"900\"");
     expect(blocksToMarkdown([image])).not.toContain("width=");
   });
 });
@@ -106,8 +106,8 @@ test.describe("recipes", () => {
     expect(parseQuantity("1,5")).toBe(1.5);
     expect(parseQuantity("3/4")).toBe(0.75);
     const line = tagQuantities("200 g de harina a 180º, 2-3 huevos");
-    expect(line).toContain('<span class="qty" data-qty="200">200</span>');
-    expect(line).not.toContain('data-qty="180"');
-    expect(line).not.toContain('data-qty="3"');
+    expect(line).toContain("<span class=\"qty\" data-qty=\"200\">200</span>");
+    expect(line).not.toContain("data-qty=\"180\"");
+    expect(line).not.toContain("data-qty=\"3\"");
   });
 });

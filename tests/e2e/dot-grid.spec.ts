@@ -60,6 +60,8 @@ async function linesOffGrid(page: Page) {
 }
 
 test.describe("dot grid", () => {
+  // Playwright needs a destructuring pattern here, even an empty one
+  // eslint-disable-next-line no-empty-pattern
   test.beforeEach(({}, testInfo) => {
     test.skip(!["chromium", "Mobile Chrome"].includes(testInfo.project.name), "layout checked in Chrome, desktop and phone");
   });
