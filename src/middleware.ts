@@ -1,6 +1,8 @@
 import { applySections, applySettings } from "@consts";
+import type { APIContext, MiddlewareNext } from "astro";
 import { getLiveCollection } from "astro:content";
 import { defineMiddleware } from "astro:middleware";
+import { isPreviewUrl, withPreview } from "@lib/preview";
 
 const OLD_COCINA_HOST = "cocina.jorgeorejas.com";
 
@@ -24,6 +26,20 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   if (SKIP.test(context.url.pathname)) return next();
 
+  const preview = isPreviewUrl(context.url);
+  context.locals.preview = preview;
+  const response = await withPreview(preview, () => render(context, next));
+  if (preview) {
+    // Drafts never reach the CDN or a search engine
+    response.headers.set("Cache-Control", "private, no-store");
+    response.headers.delete("Vercel-Cache-Tag");
+    response.headers.set("X-Robots-Tag", "noindex, nofollow");
+  }
+  return response;
+});
+
+/** Applies Notion settings and sections, then renders the page */
+async function render(context: APIContext, next: MiddlewareNext) {
   const [settings, sections] = await Promise.all([
     getLiveCollection("settings"),
     getLiveCollection("sections"),
@@ -40,4 +56,4 @@ export const onRequest = defineMiddleware(async (context, next) => {
     response.headers.set("Cache-Control", "no-store");
   }
   return response;
-});
+}
