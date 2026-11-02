@@ -83,7 +83,12 @@ async function getAccessToken(): Promise<string> {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to get access token");
+    // Spotify says why (invalid_grant = the refresh token was revoked or
+    // expired, invalid_client = wrong id/secret); no secret goes in the log
+    const body = (await response.json().catch(() => ({}))) as { error?: string; error_description?: string };
+    throw new Error(
+      `Failed to get access token: ${response.status} ${body.error ?? ""} ${body.error_description ?? ""}`.trim(),
+    );
   }
 
   const data: SpotifyTokenResponse = await response.json();
