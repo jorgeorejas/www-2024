@@ -1,40 +1,32 @@
 # Spotify "now playing"
 
-The footer (and the line under the home bio) shows what's playing on Spotify, or the last track played. `src/pages/api/spotify/now-playing.ts` turns a long-lived **refresh token** into an access token on each request and asks Spotify for the current or last track; `src/components/margin/NowPlayingMini.astro` polls it.
+The footer (and the line under the home bio) shows what's playing on Spotify, or the last track played. `src/pages/api/spotify/now-playing.ts` asks Spotify for the current or last track; `src/components/margin/NowPlayingMini.astro` polls it.
 
-## Environment variables (Vercel: Production, Preview and Development)
+## How it gets a token: Vercel Connect
+
+The Spotify grant lives in **Vercel Connect** (connector `spotify/www`, attached to the `www` project), not in env vars. Vercel keeps the OAuth client, stores Jorge's grant and refreshes the access token itself, rotated refresh tokens included. `src/lib/spotify.ts` asks for a token with `getToken("spotify/www", { subject: { type: "user", id: "jorge" } })`. The SDK caches it in memory until it's about to expire, so Connect sees about one request per instance per hour.
 
 | Variable | What it is |
 |---|---|
-| `SPOTIFY_CLIENT_ID` | Client ID of the app in the Spotify Developer Dashboard |
-| `SPOTIFY_CLIENT_SECRET` | Client secret of that app |
-| `SPOTIFY_REFRESH_TOKEN` | Refresh token for Jorge's account, from `/spotify-auth` |
-| `SPOTIFY_REDIRECT_URI` | Optional. Defaults to `<origin>/spotify-auth` |
+| `SPOTIFY_CONNECT_KEY` | Secret that opens `/api/spotify/connect`. Without it the route is a 404 |
+| `SPOTIFY_CONNECTOR` | Optional, defaults to `spotify/www` |
+| `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, `SPOTIFY_REFRESH_TOKEN` | Optional fallback, only used when Connect can't give a token (local development has no Vercel OIDC token). Safe to delete from Vercel once Connect works |
+
+## Authorizing (once, or whenever Spotify cuts access)
+
+1. Set the key, any long random string, in Production: `vcp env add SPOTIFY_CONNECT_KEY production`. Env changes need a deploy to apply.
+2. Open `https://www.jorgeorejas.com/api/spotify/connect?key=<the key>`, log in to Spotify and accept. Vercel Connect finishes the OAuth handshake and sends you back to the home page.
+3. Check `https://www.jorgeorejas.com/api/spotify/now-playing` returns a track.
+
+No code change, env change or deploy is needed when re-authorizing later: just step 2.
 
 ## When the line disappears
-
-The endpoint logs why Spotify refused the token:
 
 ```bash
 vcp logs -e production -q 'requestPath:"/api/spotify/now-playing"'
 ```
 
-- `400 invalid_grant Refresh token revoked`: the token was revoked (access removed from the account, password change, app changes). Get a new one, below.
-- `400 invalid_client`: the client ID or secret is wrong.
+- `UserAuthorizationRequiredError` / `no_token`: the grant is missing or was revoked. Authorize again (step 2).
+- `Spotify refused the refresh token: 400 invalid_grant`: the fallback env token was revoked. It doesn't matter once Connect works.
 
-## Getting a new refresh token
-
-1. **Redirect URI.** In the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard), open the app → Settings → Redirect URIs and add `http://127.0.0.1:4321/spotify-auth`. Spotify no longer accepts `localhost`, only the loopback IP.
-2. **Local credentials.** Put `SPOTIFY_CLIENT_ID` and `SPOTIFY_CLIENT_SECRET` in your local `.env` (same values as in Vercel).
-3. **Authorize.** Run `pnpm dev`, open `http://127.0.0.1:4321/spotify-auth` (the IP, not `localhost`, so the redirect matches), click the button and accept. The page shows the new refresh token. It only works in development.
-4. **Save it in Vercel**, for each environment:
-
-   ```bash
-   vcp env rm SPOTIFY_REFRESH_TOKEN production
-   vcp env add SPOTIFY_REFRESH_TOKEN production
-   # same for preview and development
-   ```
-
-5. **Redeploy** production so it picks up the new value (`vcp redeploy <production url>` or push to `main`), then check `https://www.jorgeorejas.com/api/spotify/now-playing` returns a track.
-
-Scopes requested: `user-read-currently-playing user-read-playback-state user-read-recently-played`.
+Scopes come from the connector: `user-read-currently-playing user-read-playback-state user-read-recently-played` is what the site needs.

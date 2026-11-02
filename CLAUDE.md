@@ -95,15 +95,13 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 ### Spotify Integration
 The site displays currently playing Spotify tracks in the footer via:
 
-1. **API Route**: `src/pages/api/spotify/now-playing.ts` - Server-side endpoint that uses OAuth refresh tokens to fetch current playback
+1. **API Route**: `src/pages/api/spotify/now-playing.ts` - Server-side endpoint that fetches current playback with a token from Vercel Connect (connector `spotify/www`, `src/lib/spotify.ts`); `/api/spotify/connect?key=<SPOTIFY_CONNECT_KEY>` re-authorizes Jorge's account
 2. **Component**: `src/components/SpotifyNowPlaying.astro` - Client-side component that polls the API every 30 seconds
-3. **Auth Flow**: `src/pages/spotify-auth.astro` - OAuth callback page for initial setup
+3. **Legacy auth page**: `src/pages/spotify-auth.astro` - dev-only page that mints an env refresh token (the fallback when Connect isn't available, e.g. locally)
 
-**Required Environment Variables** (see `.env.example`; Notion reads `NOTION_TOKEN`, and Vercel Connect connector `notion/notion-www` delivers the webhooks):
-- `SPOTIFY_CLIENT_ID`
-- `SPOTIFY_CLIENT_SECRET`
-- `SPOTIFY_REFRESH_TOKEN`
-- `SPOTIFY_REDIRECT_URI` (for initial auth only)
+**Environment Variables** (see `.env.example`; Notion reads `NOTION_TOKEN`, and Vercel Connect connector `notion/notion-www` delivers the webhooks):
+- `SPOTIFY_CONNECT_KEY` (opens `/api/spotify/connect`; without it the route is a 404)
+- Optional fallback for local development: `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, `SPOTIFY_REFRESH_TOKEN`, `SPOTIFY_REDIRECT_URI`
 
 Setup instructions are in `SPOTIFY_SETUP.md`.
 

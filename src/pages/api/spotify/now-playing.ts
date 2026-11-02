@@ -1,21 +1,10 @@
 import type { APIRoute } from "astro";
+import { spotifyAccessToken } from "@lib/spotify";
 
-const SPOTIFY_TOKEN_URL = "https://accounts.spotify.com/api/token";
 const SPOTIFY_NOW_PLAYING_URL =
   "https://api.spotify.com/v1/me/player/currently-playing";
 const SPOTIFY_RECENTLY_PLAYED_URL =
   "https://api.spotify.com/v1/me/player/recently-played?limit=1";
-
-const client_id = import.meta.env.SPOTIFY_CLIENT_ID;
-const client_secret = import.meta.env.SPOTIFY_CLIENT_SECRET;
-const refresh_token = import.meta.env.SPOTIFY_REFRESH_TOKEN;
-
-interface SpotifyTokenResponse {
-  access_token: string;
-  token_type: string;
-  expires_in: number;
-  scope: string;
-}
 
 interface SpotifyImage {
   url: string;
@@ -67,33 +56,8 @@ function smallestImage(images: SpotifyImage[] | undefined): string | undefined {
   return images.reduce((a, b) => (a.width <= b.width ? a : b)).url;
 }
 
-async function getAccessToken(): Promise<string> {
-  const basic = btoa(`${client_id}:${client_secret}`);
-
-  const response = await fetch(SPOTIFY_TOKEN_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${basic}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams({
-      grant_type: "refresh_token",
-      refresh_token: refresh_token,
-    }),
-  });
-
-  if (!response.ok) {
-    // Spotify says why (invalid_grant = the refresh token was revoked or
-    // expired, invalid_client = wrong id/secret); no secret goes in the log
-    const body = (await response.json().catch(() => ({}))) as { error?: string; error_description?: string };
-    throw new Error(
-      `Failed to get access token: ${response.status} ${body.error ?? ""} ${body.error_description ?? ""}`.trim(),
-    );
-  }
-
-  const data: SpotifyTokenResponse = await response.json();
-  return data.access_token;
-}
+/** Spotify rejected the token (revoked in the meantime): worth one fresh try */
+class ExpiredToken extends Error {}
 
 async function getNowPlaying(accessToken: string) {
   const response = await fetch(SPOTIFY_NOW_PLAYING_URL, {
@@ -102,6 +66,7 @@ async function getNowPlaying(accessToken: string) {
     },
   });
 
+  if (response.status === 401) throw new ExpiredToken();
   if (response.status === 204 || response.status > 400) {
     return null;
   }
@@ -160,26 +125,16 @@ async function getRecentlyPlayed(accessToken: string) {
 }
 
 export const GET: APIRoute = async () => {
-  // Check if Spotify credentials are configured
-  if (!client_id || !client_secret || !refresh_token) {
-    return new Response(
-      JSON.stringify({
-        isPlaying: false,
-        error: "Spotify credentials not configured",
-      }),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "no-cache, no-store, must-revalidate",
-        },
-      }
-    );
-  }
-
   try {
-    const accessToken = await getAccessToken();
-    const nowPlaying = await getNowPlaying(accessToken);
+    let accessToken = await spotifyAccessToken();
+    let nowPlaying;
+    try {
+      nowPlaying = await getNowPlaying(accessToken);
+    } catch (error) {
+      if (!(error instanceof ExpiredToken)) throw error;
+      accessToken = await spotifyAccessToken(true);
+      nowPlaying = await getNowPlaying(accessToken);
+    }
 
     // If nothing is currently playing, fetch the last played track
     if (!nowPlaying) {
