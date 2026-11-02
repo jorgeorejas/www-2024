@@ -14,6 +14,7 @@
  * On phones "item" and "beside" become inline, just above their element.
  */
 import type { HTMLAttributes } from "astro/types";
+import HandArrow from "./HandArrow.astro";
 
 type Props = HTMLAttributes<"aside"> & {
   /** Plain text; line breaks are kept */
@@ -28,6 +29,10 @@ type Props = HTMLAttributes<"aside"> & {
 const { text, placement = "margin", heading, as: Tag = "aside", class: className, ...rest } = Astro.props;
 const hasSlot = Astro.slots.has("default");
 const lines = (text ?? "").trim().split(/\r?\n/).map((line) => line.trim());
+// A trailing "→" typed in Notion becomes a pen-drawn arrow
+const TRAILING_ARROW = /\s*(?:→|->)\s*$/;
+const arrow = lines.length > 0 && TRAILING_ARROW.test(lines[lines.length - 1]);
+if (arrow) lines[lines.length - 1] = lines[lines.length - 1].replace(TRAILING_ARROW, "");
 const content = lines.some(Boolean);
 ---
 
@@ -36,6 +41,7 @@ const content = lines.some(Boolean);
     <Tag class:list={["hn", "m-note", `m-note--${placement}`, className]} {...rest}>
       {heading && <span class="hn-h">{heading}</span>}
       {content && lines.map((line, i) => (i ? [<br />, line] : line))}
+      {arrow && <HandArrow />}
       <slot />
     </Tag>
   )

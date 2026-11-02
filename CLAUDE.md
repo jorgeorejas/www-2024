@@ -124,6 +124,7 @@ The redesign is called **Margin**: a left margin column (numbered side nav, vert
 - CSS: the `Margin` block at the end of `global.css` (`.m-*` classes, `.hn` hand notes, `.m-prose` for reading views incl. footnotes and corrections) plus tokens `signal` (Flexoki orange-500), `signal-ink` (orange-600), `pen` (blue-600), `rule`, `mute`, and the `mg:` breakpoint. Flexoki colours only; don't use `international-orange` in Margin pages.
 - Classic element rules (`header`, `main`, `article` prose…) skip Margin pages (`body.margin-ui`), so pages not yet migrated keep working with `Container` + `Nav`.
 - Margin notes and picks are content from Notion ("Nota al margen", "Destacado"/"Destacada"), never copy in code.
+- A note that ends in "→" (typed in Notion) gets a pen-drawn arrow instead (`HandArrow.astro`): it points right, at the content, in the margin, and curls down on phones, where the note sits above its item.
 
 ### Code Style
 - ESLint configured for Astro and TypeScript

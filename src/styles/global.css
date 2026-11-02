@@ -707,6 +707,23 @@
     font-size: 16px;
     opacity: 0.75;
   }
+  /* pen arrow at the end of a note (HandArrow.astro): right in the margin, down on phones */
+  .hn-arrow {
+    display: inline-block;
+    width: 1.3em;
+    height: 0.95em;
+    margin-left: 0.12em;
+    vertical-align: -0.14em;
+    overflow: visible;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .hn-arrow-down {
+    display: none;
+  }
 
   /* ---------- list rows: TITLE ____ value ---------- */
   .m-list {
@@ -1330,6 +1347,17 @@
       margin: 0 0 6px 4px;
       text-align: left;
       transform: rotate(-2deg);
+    }
+    /* drops below the line without making it taller */
+    .hn-arrow {
+      position: relative;
+      top: 0.36em;
+    }
+    .hn-arrow-right {
+      display: none;
+    }
+    .hn-arrow-down {
+      display: inline;
     }
     .m-note--beside small {
       display: inline;
