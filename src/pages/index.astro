@@ -115,12 +115,12 @@ const personSchema = generatePersonSchema(Astro.site!.toString());
   footerNowPlaying={false}
   nameAsHeading
 >
-  <div slot="intro" class="mt-11">
+  <div slot="intro" class="mt-[54px]">
     <div class="m-prose">
       {bioBlocks.map((slug) => <ContentBlock slug={slug} as="none" />)}
     </div>
     <NowPlayingMini class="mt-4.5" />
-    <AnimatedSignature client:visible tone="pen" className="w-33 mt-5.5" aria-hidden="true" />
+    <AnimatedSignature client:visible tone="pen" className="mt-(--g) h-[54px] w-33" aria-hidden="true" />
   </div>
 
   {

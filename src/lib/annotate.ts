@@ -244,9 +244,13 @@ export function annotate() {
   });
   proses.forEach((p) => resize.observe(p));
   document.fonts?.ready.then(() => proses.forEach(paint));
+  // the dot grid moved blocks to their rows: redraw where the words are now
+  const onSnap = () => proses.forEach(paint);
+  window.addEventListener("dotgrid:snapped", onSnap);
 
   cleanup = () => {
     seen.disconnect();
     resize.disconnect();
+    window.removeEventListener("dotgrid:snapped", onSnap);
   };
 }

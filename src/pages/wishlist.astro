@@ -115,7 +115,7 @@ const OWNED_LABEL = "ya lo tengo";
   {
     filterGroups.length > 0 && (
       <Row label="filtros" as="section" aria-label="Filtros">
-        <div class="space-y-2 text-sm" id="wishlist-filters">
+        <div class="text-sm" id="wishlist-filters">
           {filterGroups.map((group) => (
             <div
               class="flex flex-wrap gap-2"
@@ -152,7 +152,7 @@ const OWNED_LABEL = "ya lo tengo";
       ) : entries.length === 0 ? (
         <p class="text-mute">Todavía no hay nada por aquí.</p>
       ) : (
-        <div class="space-y-7">
+        <div class="space-y-(--g)">
           <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm">
             <span class="text-mute" id="wishlist-count" aria-live="polite">
               {countLabel(entries.length)}
@@ -168,7 +168,7 @@ const OWNED_LABEL = "ya lo tengo";
           </div>
 
           <ul
-            class="grid grid-cols-2 gap-x-3.5 gap-y-6 mg:grid-cols-3 mg:gap-x-5 mg:gap-y-8"
+            class="grid grid-cols-2 gap-x-3.5 gap-y-(--g) mg:grid-cols-3 mg:gap-x-5"
             data-list="grid"
           >
             {entries.map((item) => {
@@ -179,8 +179,8 @@ const OWNED_LABEL = "ya lo tengo";
                   data-price={item.range ?? ""}
                   data-owned={item.owned ? "yes" : "no"}
                 >
-                  <Tag {...linkProps(item.url)} class="group grid content-start gap-2.5">
-                    <span class="grid aspect-square place-items-center overflow-hidden bg-flexoki-base-50">
+                  <Tag {...linkProps(item.url)} class="group @container grid content-start">
+                    <span class="m-tile-img grid aspect-square place-items-center overflow-hidden bg-flexoki-base-50">
                       {item.image && (
                         <img
                           src={item.image}
@@ -191,7 +191,7 @@ const OWNED_LABEL = "ya lo tengo";
                         />
                       )}
                     </span>
-                    <span class="grid min-w-0 gap-[3px]">
+                    <span class="grid min-w-0">
                       {item.brand && (
                         <span class="truncate text-[10.5px] uppercase tracking-[0.08em] text-mute">
                           {item.brand}
@@ -229,25 +229,26 @@ const OWNED_LABEL = "ya lo tengo";
                 >
                   <Tag
                     {...linkProps(item.url)}
+                    data-sketch="left"
                     class:list={[
-                      "m-card flex-row items-center gap-3 mg:gap-3.5",
+                      "m-card flex-row items-start gap-3 mg:gap-3.5",
                       !item.url && "hover:bg-transparent pr-4",
                     ]}
                   >
-                    <span class="size-12 shrink-0 bg-flexoki-base-50 mg:size-14">
+                    <span class="size-[54px] shrink-0 bg-flexoki-base-50">
                       {item.image && (
                         <img
                           src={item.image}
                           alt=""
-                          width="56"
-                          height="56"
+                          width="54"
+                          height="54"
                           loading="lazy"
                           decoding="async"
                           class="size-full object-contain p-1.5 mix-blend-multiply"
                         />
                       )}
                     </span>
-                    <span class="flex min-w-0 flex-1 flex-col gap-1">
+                    <span class="flex min-w-0 flex-1 flex-col">
                       <span class="m-card-t">
                         <span class="m-card-title wrap-anywhere">
                           <Markers pick={item.owned} pickLabel={OWNED_LABEL} />

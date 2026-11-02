@@ -53,7 +53,7 @@ const legend = [
           <MarginNote placement="item" text={featured.data.note} />
           <a
             href={`/cocina/${featured.id}`}
-            class="group grid items-center gap-[22px] border-l border-rule p-3.5 transition-colors duration-300 hover:bg-flexoki-base-100 mg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]"
+            class="group grid items-start gap-[22px] border-l border-rule p-3.5 transition-colors duration-300 hover:bg-flexoki-base-100 mg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]"
           >
             <span class="block aspect-square overflow-hidden bg-flexoki-base-50">
               {featured.data.image && (
@@ -114,7 +114,7 @@ const legend = [
 
     {
       tagOptions.length > 0 && (
-        <div id="recipe-tags" class="mb-8 flex flex-wrap gap-2" role="group" aria-label="Filtrar por etiqueta">
+        <div id="recipe-tags" class="mb-(--g) flex flex-wrap gap-2" role="group" aria-label="Filtrar por etiqueta">
           <button type="button" class:list={[squareSelector, "text-sm"]} data-tag="" aria-pressed="true">
             Todas
           </button>
@@ -140,7 +140,7 @@ const legend = [
     <p id="recipe-empty" class="py-[18px] font-mono text-xs text-mute" hidden>
       Ninguna receta coincide. Prueba con otra palabra.
     </p>
-    {legend && <Legend text={legend} class="mt-8" />}
+    {legend && <Legend text={legend} />}
   </Row>
 </MarginPage>
 
