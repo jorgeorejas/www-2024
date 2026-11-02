@@ -1749,11 +1749,13 @@ body.margin-ui .m-lead {
     border-left-color: transparent;
   }
 }
-/* square photo tiles (wishlist grid): the square is cut down to whole rows */
-@supports (height: round(down, 1px, 1px)) {
+/* square photo tiles (wishlist grid): the square rounded to whole rows. The
+   box stays a plain block, so the photo's height: 100% fills it and
+   object-contain keeps the whole product in view, as before the redesign */
+@supports (height: round(nearest, 1px, 1px)) {
   body.margin-ui .m-tile-img {
     aspect-ratio: auto;
-    height: round(down, 100cqi, var(--g));
+    height: round(nearest, 100cqi, var(--g));
   }
 }
 /* boxed buttons (square selectors, servings): 21px tall plus 3px above and

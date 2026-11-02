@@ -35,6 +35,19 @@ function isRowItem(el, root) {
 }
 
 /**
+ * A photo inside a frame (a clipped box, or a grid/flex cell that sizes it):
+ * nudging it would push it inside the frame and crop it, so the text after
+ * the frame moves instead
+ * @param {HTMLElement} media
+ */
+function framed(media) {
+  const parent = media.parentElement;
+  if (!parent) return false;
+  const cs = getComputedStyle(parent);
+  return cs.overflow !== "visible" || cs.display.endsWith("grid") || cs.display.endsWith("flex");
+}
+
+/**
  * Blocks that start lines of text, plus media, in document order
  * @param {HTMLElement} root
  * @returns {HTMLElement[]}
@@ -56,7 +69,7 @@ function blocks(root) {
     found.add(el);
   }
   for (const media of root.querySelectorAll(MEDIA)) {
-    if (media instanceof HTMLElement && !media.closest(".hn") && getComputedStyle(media).position === "static") found.add(media);
+    if (media instanceof HTMLElement && !media.closest(".hn") && getComputedStyle(media).position === "static" && !framed(media)) found.add(media);
   }
   // keep document order (media were added last)
   return [...found].sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));
