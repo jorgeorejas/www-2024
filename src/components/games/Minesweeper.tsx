@@ -14,6 +14,12 @@ const DIFFICULTIES: Record<Difficulty, DifficultyConfig> = {
   Expert: { rows: 16, cols: 30, mines: 99 },
 };
 
+const DIFFICULTY_LABEL: Record<Difficulty, string> = {
+  Beginner: "Principiante",
+  Intermediate: "Intermedio",
+  Expert: "Experto",
+};
+
 interface Cell {
   mine: boolean;
   revealed: boolean;
@@ -375,7 +381,7 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ className = "" }) => {
           onTouchEnd={handleTouchEnd}
           onTouchCancel={handleTouchEnd}
           disabled={status === "won" || status === "lost"}
-          aria-label={cell.flagged ? "Flagged cell" : "Hidden cell"}
+          aria-label={cell.flagged ? "Casilla con bandera" : "Casilla sin destapar"}
           className={`${baseClass} pattern-dots text-flexoki-base-300 dark:text-flexoki-base-700 hover:text-flexoki-base-500 dark:hover:text-flexoki-base-500 active:text-flexoki-base-600 dark:active:text-flexoki-base-400 transition-colors disabled:cursor-not-allowed`}
           style={{ width: cellSize, height: cellSize, fontSize: cellSize * 0.55 }}
         >
@@ -445,7 +451,7 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ className = "" }) => {
                 : "text-flexoki-base-600 dark:text-flexoki-base-400 hover:text-flexoki-ink dark:hover:text-flexoki-base-100"
             }`}
           >
-            {d}
+            {DIFFICULTY_LABEL[d]}
           </button>
         ))}
       </div>
@@ -460,12 +466,12 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ className = "" }) => {
         </div>
         <button
           onClick={() => reset()}
-          aria-label="Reset game"
+          aria-label="Reiniciar partida"
           data-testid="ms-status"
           data-status={status}
           className={`${pillBase} text-flexoki-base-700 dark:text-flexoki-base-300 hover:text-flexoki-ink dark:hover:text-flexoki-base-100`}
         >
-          {statusGlyph} reset
+          {statusGlyph} reiniciar
         </button>
         <div
           data-testid="ms-timer"
@@ -497,19 +503,19 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ className = "" }) => {
           }`}
         >
           {status === "won"
-            ? `Cleared in ${seconds}s. Nice.`
-            : "Boom. Try again."}
+            ? `Despejado en ${seconds} s. ¡Bien hecho!`
+            : "¡Bum! Prueba otra vez."}
         </div>
       )}
 
       <div className="text-xs font-mono text-flexoki-base-500 dark:text-flexoki-base-500 text-center max-w-md space-y-1">
         <p>
-          Click to reveal • Right-click (or shift-click) to flag • Long-press on
-          mobile to flag
+          Clic para destapar • Clic derecho (o mayúsculas + clic) para poner
+          bandera • En el móvil, mantén pulsado para poner bandera
         </p>
         <p>
-          Click a number to chord — reveals all neighbors when its flag count
-          matches
+          Clic en un número para destapar de golpe sus vecinas, si ya tiene
+          puestas todas sus banderas
         </p>
       </div>
     </div>

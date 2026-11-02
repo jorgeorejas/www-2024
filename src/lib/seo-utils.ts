@@ -4,7 +4,10 @@ import type {
   BreadcrumbListSchema,
   BreadcrumbItem,
 } from "@types";
-import { SITE, SOCIALS } from "@consts";
+import { SITE, SITE_ES, SOCIALS } from "@consts";
+
+/** Language of the site's content, for schema.org */
+const IN_LANGUAGE = "es";
 
 /**
  * Generate Person schema for the homepage
@@ -16,7 +19,7 @@ export function generatePersonSchema(baseUrl: string): PersonSchema {
     name: SITE.AUTHOR_NAME,
     url: baseUrl,
     email: SITE.EMAIL,
-    jobTitle: SITE.POSITION,
+    jobTitle: SITE_ES.POSITION,
     sameAs: SOCIALS.map((social) => social.HREF),
   };
 }
@@ -47,6 +50,7 @@ export function generateBlogPostingSchema(
     },
     url: postUrl,
     image: ogImageUrl,
+    inLanguage: IN_LANGUAGE,
   };
 }
 
@@ -92,5 +96,6 @@ export function generateProjectSchema(
       url: baseUrl,
     },
     datePublished: project.data.date.toISOString(),
+    inLanguage: IN_LANGUAGE,
   };
 }

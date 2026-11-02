@@ -17,35 +17,46 @@ export default function Hint() {
 
   const hint = getHint();
 
+  // Short name of each kind of move, shown next to "Pista" while it's closed
+  const KIND_LABEL: Record<MoveHint["kind"], string> = {
+    DRAW: "robar",
+    RECYCLE: "dar la vuelta al mazo",
+    "WASTE→FOUNDATION": "descarte → base",
+    "WASTE→TABLEAU": "descarte → columna",
+    "TABLEAU→FOUNDATION": "columna → base",
+    "TABLEAU→TABLEAU": "columna → columna",
+    "FOUNDATION→TABLEAU": "base → columna",
+  };
+
   const formatHint = (hint: MoveHint): string => {
     switch (hint.kind) {
       case "DRAW":
-        return "💡 Draw cards from the stock pile";
+        return "💡 Roba cartas del mazo";
 
       case "RECYCLE":
-        return "♻️ Recycle the waste pile back to stock";
+        return "♻️ Pasa el descarte otra vez al mazo";
 
       case "WASTE→FOUNDATION":
-        return "⬆️ Move the top waste card to its foundation";
+        return "⬆️ Sube la carta del descarte a su base";
 
       case "WASTE→TABLEAU":
-        return `➡️ Move the top waste card to column ${hint.to! + 1}`;
+        return `➡️ Mueve la carta del descarte a la columna ${hint.to! + 1}`;
 
       case "TABLEAU→FOUNDATION":
-        return `⬆️ Move the top card from column ${hint.from! + 1} to its foundation`;
+        return `⬆️ Sube la última carta de la columna ${hint.from! + 1} a su base`;
 
       case "TABLEAU→TABLEAU": {
-        const cardText = hint.count === 1 ? "card" : `${hint.count} cards`;
-        return `↔️ Move ${cardText} from column ${hint.from! + 1} to column ${hint.to! + 1}`;
+        const cardText = hint.count === 1 ? "la carta" : `${hint.count} cartas`;
+        return `↔️ Mueve ${cardText} de la columna ${hint.from! + 1} a la ${hint.to! + 1}`;
       }
 
       case "FOUNDATION→TABLEAU": {
         const suitSymbol = getSuitSymbol(hint.suit!);
-        return `⬇️ Move the top ${suitSymbol} foundation card to column ${hint.to! + 1}`;
+        return `⬇️ Baja la carta de la base de ${suitSymbol} a la columna ${hint.to! + 1}`;
       }
 
       default:
-        return "❓ Unknown move suggestion";
+        return "❓ Jugada desconocida";
     }
   };
 
@@ -65,9 +76,10 @@ export default function Hint() {
   };
 
   const getScoreText = (score: number): string => {
-    if (score > 0) return `+${score} points`;
-    if (score < 0) return `${score} points`;
-    return "No points";
+    const points = Math.abs(score) === 1 ? "punto" : "puntos";
+    if (score > 0) return `+${score} ${points}`;
+    if (score < 0) return `${score} ${points}`;
+    return "Sin puntos";
   };
 
   const getScoreColor = (score: number): string => {
@@ -132,10 +144,10 @@ export default function Hint() {
       >
         <div className="flex items-center gap-2">
           <span className="text-lg text-flexoki-yellow-600 dark:text-flexoki-yellow-400">◆</span>
-          <span className="text-sm font-medium text-flexoki-ink dark:text-flexoki-base-100">Hint</span>
+          <span className="text-sm font-medium text-flexoki-ink dark:text-flexoki-base-100">Pista</span>
           {hint && !isOpen && (
             <span className="text-xs text-flexoki-base-500 dark:text-flexoki-base-500">
-              ({hint.kind.replace("→", " → ").toLowerCase()})
+              ({KIND_LABEL[hint.kind] ?? hint.kind.toLowerCase()})
             </span>
           )}
         </div>
@@ -150,7 +162,7 @@ export default function Hint() {
         <div className="border-t border-flexoki-base-200 dark:border-flexoki-base-800 p-4">
           {!hint ? (
             <div className="text-center text-flexoki-base-600 dark:text-flexoki-base-400 text-sm py-2">
-              No moves available right now.
+              Ahora mismo no hay ninguna jugada.
             </div>
           ) : (
             <div className="space-y-3">
@@ -158,7 +170,7 @@ export default function Hint() {
                 <div className="text-flexoki-yellow-600 dark:text-flexoki-yellow-400 text-lg">◆</div>
                 <div className="flex-1">
                   <div className="text-flexoki-ink dark:text-flexoki-base-50 font-medium text-sm mb-1">
-                    Suggested Move
+                    Jugada sugerida
                   </div>
                   <div className="text-flexoki-base-700 dark:text-flexoki-base-300 text-sm mb-2">
                     {formatHint(hint)}
@@ -176,7 +188,7 @@ export default function Hint() {
                   onClick={() => applyHint(hint)}
                   className="px-3 py-1 text-flexoki-ink dark:text-flexoki-base-50 border border-flexoki-ink dark:border-flexoki-base-100 font-medium text-sm hover:border-flexoki-ink dark:hover:border-flexoki-base-50 transition-colors"
                 >
-                  Apply Hint
+                  Aplicar pista
                 </button>
               </div>
             </div>

@@ -10,41 +10,39 @@ export const SITE: Site = {
   NUM_GAMES_ON_HOMEPAGE: 3,
   TWITTER_HANDLE: "@jorejasrojo",
   AUTHOR_NAME: "Jorge Orejas",
-  LOCALE: "en_US",
+  LOCALE: "es_ES",
 };
 
 export const HOME: Metadata = {
-  TITLE: "Home",
-  DESCRIPTION:
-    "Jorge Orejas is a software developer and a passionate about technology & entrepreneurship.",
+  TITLE: "Inicio",
+  DESCRIPTION: "Soy Jorge Orejas, desarrollador y emprendedor. Lo mío es la tecnología y montar cosas.",
 };
 
 export const BLOG: Metadata = {
   TITLE: "Blog",
-  DESCRIPTION: "A collection of articles on topics I am passionate about.",
+  DESCRIPTION: "Escribo sobre lo que me tiene enganchado.",
 };
 
 export const WORK: Metadata = {
-  TITLE: "Work",
-  DESCRIPTION: "Where I have worked and what I have done.",
+  TITLE: "Trayectoria",
+  DESCRIPTION: "Dónde trabajé y qué hice en cada sitio.",
 };
 
 export const PROJECTS: Metadata = {
-  TITLE: "Projects",
-  DESCRIPTION:
-    "A collection of my projects, with links to repositories and demos.",
+  TITLE: "Proyectos",
+  DESCRIPTION: "Las cosas que monté, con enlaces al código y a las demos.",
 };
 
 export const WISHLIST: Metadata = {
   TITLE: "Lista de deseos",
   DESCRIPTION:
-    "Ideas por si no sabes qué regalarme. Cada cosa lleva a la tienda donde comprarla, y lo que pone «lo tengo» ya lo tengo.",
+    "Ideas por si no sabes qué regalarme. Cada cosa lleva a la tienda donde comprarla, y lo que está marcado ya lo tengo.",
 };
 
 export const GAMES: Metadata = {
-  TITLE: "Games",
+  TITLE: "Juegos",
   DESCRIPTION:
-    "Simple, ad-free games made for grandma and everyone who just wants to play.",
+    "Juegos sencillos y sin anuncios, hechos para mi abuela y para cualquiera que solo quiera jugar.",
 };
 
 export const COCINA: Metadata = {

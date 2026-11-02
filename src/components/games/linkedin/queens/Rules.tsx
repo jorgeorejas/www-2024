@@ -2,13 +2,13 @@ export function Rules() {
   return (
     <details className="mt-6 text-sm text-flexoki-base-700 dark:text-flexoki-base-300">
       <summary className="cursor-pointer font-serif text-flexoki-ink dark:text-flexoki-base-50">
-        How to play
+        Cómo se juega
       </summary>
       <ul className="mt-2 list-disc pl-5 space-y-1">
-        <li>Place one queen (♛) in every row, every column, and every colored region.</li>
-        <li>No two queens may touch each other diagonally (corner-to-corner).</li>
-        <li>Click a cell to cycle: empty → × (note) → ♛ (queen) → empty.</li>
-        <li>The board outlines conflicts in red as you go. Solve when no conflicts remain.</li>
+        <li>Coloca una reina (♛) en cada fila, en cada columna y en cada región de color.</li>
+        <li>Dos reinas no pueden tocarse en diagonal (esquina con esquina).</li>
+        <li>Toca una casilla para ir cambiándola: vacía → × (nota) → ♛ (reina) → vacía.</li>
+        <li>El tablero marca en rojo los choques según juegas. Está resuelto cuando no queda ninguno.</li>
       </ul>
     </details>
   );

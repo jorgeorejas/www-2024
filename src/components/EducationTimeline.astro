@@ -7,7 +7,7 @@
  * the markup for screen readers (the note is aria-hidden).
  */
 import MarginNote from "@components/margin/MarginNote.astro";
-import { formatDuration, formatEducationDate, formatYear } from "@lib/utils";
+import { PRESENT_LABEL, formatDuration, formatEducationDate, formatYear } from "@lib/utils";
 
 type Education = {
   slug: string;
@@ -37,10 +37,10 @@ const ended = (date: Date | string): date is Date => date instanceof Date;
 
 const isoMonth = (date: Date) => date.toISOString().slice(0, 7);
 
-/** "2016 – 2020", "2024 – now", or a single year when it starts and ends the same year */
+/** "2016 – 2020", "2024 – hoy", or a single year when it starts and ends the same year */
 function noteYears(education: Education) {
   const start = formatYear(education.startDate);
-  if (!ended(education.endDate)) return `${start} – now`;
+  if (!ended(education.endDate)) return `${start} – hoy`;
   const end = formatYear(education.endDate);
   return start === end ? start : `${start} – ${end}`;
 }
@@ -67,7 +67,7 @@ function noteYears(education: Education) {
                 {formatEducationDate(education.endDate)}
               </time>
             ) : (
-              "Present"
+              PRESENT_LABEL
             )}
             {` · ${duration}`}
           </p>
@@ -76,9 +76,9 @@ function noteYears(education: Education) {
           {(education.grade || (education.expectedEnd && !ended(education.endDate))) && (
             <p class="etl-m">
               {education.expectedEnd && !ended(education.endDate) && (
-                <span>Expected {formatEducationDate(education.expectedEnd)}</span>
+                <span>Termino en {formatEducationDate(education.expectedEnd)}</span>
               )}
-              {education.grade && <span>Grade: {education.grade}</span>}
+              {education.grade && <span>Nota: {education.grade}</span>}
             </p>
           )}
         </li>

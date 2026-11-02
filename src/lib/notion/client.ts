@@ -150,6 +150,28 @@ export function getBlock(id: string) {
   return notionRequest<NotionBlock>(`/blocks/${id}`);
 }
 
+export type NotionComment = {
+  id: string;
+  discussion_id: string;
+  created_time: string;
+  created_by: { id: string };
+  rich_text: RichText;
+};
+
+/** Open (unresolved) comments on a block; Notion leaves resolved ones out */
+export async function getComments(blockId: string): Promise<NotionComment[]> {
+  const comments: NotionComment[] = [];
+  let cursor: string | undefined;
+  do {
+    const query = new URLSearchParams({ block_id: blockId, page_size: "100" });
+    if (cursor) query.set("start_cursor", cursor);
+    const res = await notionRequest<ListResponse<NotionComment>>(`/comments?${query}`);
+    comments.push(...res.results);
+    cursor = res.has_more ? (res.next_cursor ?? undefined) : undefined;
+  } while (cursor);
+  return comments;
+}
+
 // Children of these are other pages, not content of this one
 const SKIP_CHILDREN = new Set(["child_page", "child_database"]);
 

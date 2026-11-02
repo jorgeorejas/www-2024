@@ -1,3 +1,4 @@
+import { marginNotes } from "./annotations";
 import { cached, cachedBody } from "./cache";
 import { getBlockTree, queryDatabase, type NotionPage } from "./client";
 import { DATABASES } from "./databases";
@@ -12,13 +13,12 @@ import {
   stepsToMarkdown,
 } from "./recipe";
 import { renderMarkdown } from "./render";
+import { showDrafts } from "../preview";
 
 /*
  * One fetcher per Notion database. Property names are the Spanish ones used
  * in Notion; if you rename a column there, rename it here too.
  */
-
-const isDev = import.meta.env.DEV;
 
 const pages = (name: keyof typeof DATABASES) =>
   cached(`db:${name}`, () => queryDatabase(DATABASES[name]));
@@ -28,8 +28,8 @@ const slugOf = (page: NotionPage) => {
   return p.text("Slug") ?? slugify(p.title());
 };
 
-/** Published, or anything at all when running locally */
-const visible = (page: NotionPage) => isDev || readProperties(page).checkbox("Publicado");
+/** Published, or anything at all locally and in a preview request */
+const visible = (page: NotionPage) => showDrafts() || readProperties(page).checkbox("Publicado");
 
 const startOfToday = () => {
   const today = new Date();
@@ -42,17 +42,32 @@ const startOfToday = () => {
 
 export type Body = { markdown: string; html: string; text: string };
 
+/** Short hash for cache keys */
+function hash(text: string) {
+  let h = 2166136261;
+  for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 16777619);
+  return (h >>> 0).toString(36);
+}
+
 async function pageBody(page: NotionPage, skipBlockId?: string): Promise<Body> {
-  return cachedBody(`body:${page.id}:${page.last_edited_time}:${skipBlockId ?? ""}`, async () => {
-    const blocks = await getBlockTree(page.id);
+  const edited = `${page.id}:${page.last_edited_time}`;
+  const blocks = await cachedBody(`tree:${edited}`, () => getBlockTree(page.id));
+  // Comments don't bump the page's edit time, so notes are read on their own
+  // (one request per highlighted block, none on most pages) and keyed in
+  const notes = await cached(`notes:${page.id}`, () => marginNotes(blocks), 60_000);
+  const notesKey = hash([...notes].flat().join("\u0000"));
+
+  return cachedBody(`body:${edited}:${skipBlockId ?? ""}:${notesKey}`, async () => {
+    // The plain Markdown (llms.txt, .md routes) leaves the margin notes out
     const markdown = blocksToMarkdown(blocks, { skipBlockId });
-    return { markdown, html: await renderMarkdown(markdown), text: blocksToPlainText(blocks) };
+    const annotated = notes.size ? blocksToMarkdown(blocks, { skipBlockId, notes }) : markdown;
+    return { markdown, html: await renderMarkdown(annotated), text: blocksToPlainText(blocks) };
   });
 }
 
 export function readingTime(text: string) {
   const words = text.split(/\s+/).filter(Boolean).length;
-  return `${Math.max(1, Math.round(words / 200 + 1))} min read`;
+  return `${Math.max(1, Math.round(words / 200 + 1))} min de lectura`;
 }
 
 // ---------------------------------------------------------------------------
@@ -97,7 +112,7 @@ export async function blogPosts() {
       };
       return { id: slugOf(page), page, data };
     })
-    .filter((entry) => isDev || entry.data.date <= today)
+    .filter((entry) => showDrafts() || entry.data.date <= today)
     .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 }
 
@@ -449,7 +464,8 @@ export async function sections() {
         homeLink: p.text("Enlace en inicio"),
         homeCount: p.number("Elementos en inicio"),
         order: p.number("Orden") ?? 99,
-        lang: p.select("Idioma") === "Español" ? "es" : "en",
+        // Spanish unless the section says otherwise ("Inglés")
+        lang: p.select("Idioma") === "Inglés" ? "en" : "es",
         blocks: p.relation("Bloques").flatMap((id) => blockSlug.get(id) ?? []),
       };
       return { id: path, page, data };

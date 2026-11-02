@@ -30,8 +30,8 @@ test.describe("Klondike Solitaire", () => {
     }
 
     // Score 0, moves 0
-    await expect(page.getByTestId("solitaire-score")).toHaveText("Score: 0");
-    await expect(page.getByTestId("solitaire-moves")).toHaveText("Moves: 0");
+    await expect(page.getByTestId("solitaire-score")).toHaveText("Puntos: 0");
+    await expect(page.getByTestId("solitaire-moves")).toHaveText("Movimientos: 0");
   });
 
   test("clicking stock draws a card to waste", async ({ page }) => {
@@ -68,7 +68,7 @@ test.describe("Klondike Solitaire", () => {
     expect(movesAfterDraw).toMatch(/Moves: [1-9]/);
 
     await page.getByTestId("solitaire-undo").click();
-    await expect(page.getByTestId("solitaire-moves")).toHaveText("Moves: 0");
+    await expect(page.getByTestId("solitaire-moves")).toHaveText("Movimientos: 0");
   });
 
   test("hint panel surfaces a legal move and Apply executes it", async ({
@@ -127,8 +127,8 @@ test.describe("Klondike Solitaire", () => {
   test("new game resets state", async ({ page }) => {
     await page.getByTestId("stock").click();
     await page.getByTestId("solitaire-new-game").click();
-    await expect(page.getByTestId("solitaire-moves")).toHaveText("Moves: 0");
-    await expect(page.getByTestId("solitaire-score")).toHaveText("Score: 0");
+    await expect(page.getByTestId("solitaire-moves")).toHaveText("Movimientos: 0");
+    await expect(page.getByTestId("solitaire-score")).toHaveText("Puntos: 0");
   });
 
   test("desktop visual snapshot of fresh deal", async ({ page }, testInfo) => {

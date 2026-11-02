@@ -9,9 +9,9 @@ export function Status() {
   const elapsed = Math.floor((active.solvedAt - active.startedAt) / 1000);
   return (
     <div className="mt-4 text-center text-sm font-serif text-flexoki-ink dark:text-flexoki-base-50">
-      Solved {mode === "daily" ? "today's puzzle" : "this puzzle"} in{" "}
+      {mode === "daily" ? "Reto de hoy resuelto" : "Tablero resuelto"} en{" "}
       <span className="font-mono">{formatDuration(elapsed)}</span> ·{" "}
-      {active.moveCount} moves.
+      {active.moveCount} {active.moveCount === 1 ? "movimiento" : "movimientos"}.
       <StatsLine gameId="queens" mode={mode} difficulty={active.puzzle.difficulty} />
     </div>
   );

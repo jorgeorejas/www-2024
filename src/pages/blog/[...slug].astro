@@ -6,6 +6,7 @@ import MarginNote from "@components/margin/MarginNote.astro";
 import MarginPage from "@components/margin/MarginPage.astro";
 import Row from "@components/margin/Row.astro";
 import SectionHead from "@components/margin/SectionHead.astro";
+import { BLOG } from "@consts";
 import { cachePage, isNotFound, notionUnavailable } from "@lib/cache-headers";
 import { generateBlogPostingSchema, generateBreadcrumbSchema } from "@lib/seo-utils";
 import { formatDot, formatYear, isNew } from "@lib/utils";
@@ -30,14 +31,14 @@ const related = allProjects.filter((p) => post.data.projects.includes(p.id));
 const more = allPosts.filter((p) => p.id !== post.id).slice(0, 3);
 
 const crumbs = [
-  { href: "/blog", label: "Blog" },
+  { href: "/blog", label: BLOG.TITLE },
   { href: `/blog/${post.id}`, label: post.data.title },
 ];
 
 // Generate structured data for SEO
 const blogPostingSchema = generateBlogPostingSchema(post, Astro.site!.toString());
 const breadcrumbSchema = generateBreadcrumbSchema(
-  [{ href: "/", label: "Home" }, ...crumbs],
+  [{ href: "/", label: "Inicio" }, ...crumbs],
   Astro.site!.toString(),
 );
 ---
@@ -84,8 +85,8 @@ const breadcrumbSchema = generateBreadcrumbSchema(
 
   {
     related.length > 0 && (
-      <Row as="aside" label="projects" aria-labelledby="about-project">
-        <SectionHead id="about-project" title="About the project" />
+      <Row as="aside" label="proyectos" aria-labelledby="about-project">
+        <SectionHead id="about-project" title="Sobre el proyecto" />
         <ul class="m-list">
           {related.map((project) => (
             <ListRow
@@ -105,8 +106,8 @@ const breadcrumbSchema = generateBreadcrumbSchema(
 
   {
     more.length > 0 && (
-      <Row as="aside" label="more" aria-labelledby="more-writing">
-        <SectionHead id="more-writing" title="More writing" href="/blog" linkLabel="See all posts" />
+      <Row as="aside" label="más" aria-labelledby="more-writing">
+        <SectionHead id="more-writing" title="Más cosas que escribí" href="/blog" linkLabel="Ver todos los posts" />
         <ul class="m-more-list">
           {more.map((p) => (
             <li>

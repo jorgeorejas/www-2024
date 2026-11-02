@@ -11,7 +11,7 @@ type Props = {
   newLabel?: string;
 };
 
-const { pick = false, isNew = false, pickLabel = "my pick", newLabel = "NEW" } = Astro.props;
+const { pick = false, isNew = false, pickLabel = "mi favorito", newLabel = "NUEVO" } = Astro.props;
 ---
 
 {isNew && <span class="m-new">{newLabel}</span>}

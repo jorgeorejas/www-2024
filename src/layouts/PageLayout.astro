@@ -4,6 +4,7 @@ import Footer from "@components/Footer.astro";
 import MarginFooter from "@components/margin/MarginFooter.astro";
 import Row from "@components/margin/Row.astro";
 import { SITE } from "@consts";
+import { PREVIEW_PARAM } from "@lib/preview";
 import SpeedInsights from "@vercel/speed-insights/astro";
 import "@fontsource-variable/caveat";
 import "../styles/ioskeley-mono.css";
@@ -17,7 +18,7 @@ type Props = {
   modifiedTime?: Date;
   author?: string;
   structuredData?: Record<string, unknown> | Record<string, unknown>[];
-  /** Page language; the site is English, a few pages (e.g. /wishlist) are Spanish */
+  /** Page language; the site is Spanish, a page can still opt into English */
   lang?: "en" | "es";
   /**
    * "classic": the original single-column layout (Container + Nav).
@@ -37,11 +38,17 @@ const {
   modifiedTime,
   author,
   structuredData,
-  lang = "en",
+  lang = "es",
   variant = "classic",
   footerNowPlaying = true,
 } = Astro.props;
 const margin = variant === "margin";
+
+// ?preview=true (see src/lib/preview.ts): a badge, and a way back out
+const preview = Astro.locals.preview;
+const exit = new URL(Astro.url);
+exit.searchParams.delete(PREVIEW_PARAM);
+const exitHref = exit.pathname + exit.search + exit.hash;
 ---
 
 <!doctype html>
@@ -56,7 +63,7 @@ const margin = variant === "margin";
       modifiedTime={modifiedTime}
       author={author}
       structuredData={structuredData}
-      locale={lang === "es" ? "es_ES" : undefined}
+      locale={lang === "en" ? "en_US" : "es_ES"}
     />
   </head>
   <body class:list={["relative", { "margin-ui": margin }]}>
@@ -64,9 +71,40 @@ const margin = variant === "margin";
       href="#main-content"
       class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-flexoki-ink focus:text-flexoki-paper focus:font-semibold"
     >
-      {lang === "es" ? "Saltar al contenido" : "Skip to main content"}
+      {lang === "en" ? "Skip to main content" : "Saltar al contenido"}
     </a>
     <SpeedInsights />
+    {
+      preview && (
+        <>
+          <a class="preview-badge" href={exitHref} data-preview-exit title="Salir de la vista previa">
+            <span class="preview-badge-dot" aria-hidden="true" />
+            Vista previa
+            <span class="preview-badge-x" aria-hidden="true">×</span>
+          </a>
+          <script is:inline>
+            // Internal links keep ?preview, so drafts stay visible while browsing
+            (() => {
+              const value = new URLSearchParams(location.search).get("preview");
+              if (!value) return;
+              const keep = () => {
+                for (const a of document.querySelectorAll("a[href]")) {
+                  const raw = a.getAttribute("href") || "";
+                  if (a.hasAttribute("data-preview-exit") || raw.startsWith("#")) continue;
+                  const url = new URL(raw, location.href);
+                  if (url.origin !== location.origin || url.searchParams.has("preview")) continue;
+                  if (/^\/(api|og|_astro|img|fonts)\//.test(url.pathname)) continue;
+                  url.searchParams.set("preview", value);
+                  a.setAttribute("href", url.pathname + url.search + url.hash);
+                }
+              };
+              keep();
+              document.addEventListener("astro:page-load", keep);
+            })();
+          </script>
+        </>
+      )
+    }
     <div class="paper-grain fixed inset-0 pointer-events-none" aria-hidden="true"></div>
     {
       margin ? (

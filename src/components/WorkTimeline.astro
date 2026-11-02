@@ -7,7 +7,7 @@
  * in the markup for screen readers (the note is aria-hidden).
  */
 import MarginNote from "@components/margin/MarginNote.astro";
-import { formatDuration, formatYear } from "@lib/utils";
+import { PRESENT_LABEL, formatDuration, formatMonthYear, formatYear } from "@lib/utils";
 
 type Position = {
   title: string;
@@ -47,15 +47,12 @@ const RoleHeading = (showCompany ? `h${headingLevel + 1}` : `h${headingLevel}`) 
 
 const ended = (date: Date | string): date is Date => date instanceof Date;
 
-const monthYear = (date: Date) =>
-  date.toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
-
 const isoMonth = (date: Date) => date.toISOString().slice(0, 7);
 
-/** "2024 – 2025", "2026 – now", or a single year when it starts and ends the same year */
+/** "2024 – 2025", "2026 – hoy", or a single year when it starts and ends the same year */
 function noteYears(position: Position) {
   const start = formatYear(position.startDate);
-  if (!ended(position.endDate)) return `${start} – now`;
+  if (!ended(position.endDate)) return `${start} – hoy`;
   const end = formatYear(position.endDate);
   return start === end ? start : `${start} – ${end}`;
 }
@@ -88,12 +85,12 @@ function noteYears(position: Position) {
                 </MarginNote>
                 <RoleHeading class="wtl-role-t">{position.title}</RoleHeading>
                 <p class="sr-only">
-                  <time datetime={isoMonth(position.startDate)}>{monthYear(position.startDate)}</time>
+                  <time datetime={isoMonth(position.startDate)}>{formatMonthYear(position.startDate)}</time>
                   {" – "}
                   {ended(position.endDate) ? (
-                    <time datetime={isoMonth(position.endDate)}>{monthYear(position.endDate)}</time>
+                    <time datetime={isoMonth(position.endDate)}>{formatMonthYear(position.endDate)}</time>
                   ) : (
-                    "Present"
+                    PRESENT_LABEL
                   )}
                   {` · ${duration}`}
                 </p>

@@ -67,6 +67,7 @@ const recipeSchema = {
   keywords: data.tags.map((t) => t.name).join(", ") || undefined,
   recipeIngredient: body.ingredientLines,
   recipeInstructions: body.stepLines.map((text) => ({ "@type": "HowToStep", text })),
+  inLanguage: "es",
 };
 const breadcrumbSchema = generateBreadcrumbSchema(
   [
@@ -246,7 +247,7 @@ const button =
   {
     related.length > 0 && (
       <Row label="más" as="aside" aria-labelledby="mas-recetas">
-        <SectionHead id="mas-recetas" title="Si te ha gustado" href="/cocina" linkLabel="Ver todas las recetas" />
+        <SectionHead id="mas-recetas" title="Si te gustó, prueba estas" href="/cocina" linkLabel="Ver todas las recetas" />
         <ul class="m-list">
           {related.map((r) => (
             <ListRow
@@ -581,7 +582,7 @@ const button =
         await navigator.clipboard.writeText(text);
         say("Lista copiada. Pégala donde quieras.");
       } catch {
-        say("No he podido copiar la lista.");
+        say("No pude copiar la lista.");
       }
     });
   }

@@ -25,7 +25,7 @@ const projectCount = (projects.entries ?? []).length;
 <MarginPage
   title={WORK.TITLE}
   description={WORK.DESCRIPTION}
-  breadcrumbs={[{ href: "/work", label: "Work" }]}
+  breadcrumbs={[{ href: "/work", label: WORK.TITLE }]}
 >
   <Row>
     <div class="m-article">
@@ -35,10 +35,10 @@ const projectCount = (projects.entries ?? []).length;
     </div>
   </Row>
 
-  <Row label="more" as="section" aria-labelledby="work-more">
-    <SectionHead id="work-more" title="Also" />
+  <Row label="más" as="section" aria-labelledby="work-more">
+    <SectionHead id="work-more" title="Y además" />
     <ul class="m-list">
-      <ListRow href="/cv" title="Curriculum vitae" value="/cv" />
+      <ListRow href="/cv" title="Currículum" value="/cv" />
       <ListRow
         href="/projects"
         title={PROJECTS.TITLE}

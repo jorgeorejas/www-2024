@@ -18,12 +18,12 @@ export default function GameControls() {
     <div className="col-span-7 space-y-4 min-h-[180px]">
       <div>
         <h1 className="font-serif font-bold text-flexoki-ink dark:text-flexoki-base-50 text-2xl">
-          Klondike Solitaire
+          Solitario Klondike
         </h1>
         <div className="flex gap-6 text-sm text-flexoki-base-600 dark:text-flexoki-base-400 font-mono">
-          <span data-testid="solitaire-score">Score: {stats.score}</span>
-          <span data-testid="solitaire-moves">Moves: {stats.moves}</span>
-          <span data-testid="solitaire-time">Time: {formatTime(stats.time)}</span>
+          <span data-testid="solitaire-score">Puntos: {stats.score}</span>
+          <span data-testid="solitaire-moves">Movimientos: {stats.moves}</span>
+          <span data-testid="solitaire-time">Tiempo: {formatTime(stats.time)}</span>
         </div>
       </div>
 
@@ -33,7 +33,7 @@ export default function GameControls() {
           onClick={() => startNewGame()}
           className={btn}
         >
-          New Game
+          Nueva partida
         </button>
 
         <button
@@ -42,7 +42,7 @@ export default function GameControls() {
           disabled={!stats.canUndo}
           className={btn}
         >
-          Undo
+          Deshacer
         </button>
 
         <button
@@ -51,7 +51,7 @@ export default function GameControls() {
           disabled={!canAutoMove}
           className={btn}
         >
-          Auto Move
+          Jugada automática
         </button>
       </div>
 
@@ -60,8 +60,8 @@ export default function GameControls() {
           <div className="relative p-3 border border-flexoki-green-600 dark:border-flexoki-green-400 overflow-hidden">
             <div className="pattern-hatch text-flexoki-green-600/15 dark:text-flexoki-green-400/15 absolute inset-0 pointer-events-none" />
             <div className="relative text-flexoki-green-600 dark:text-flexoki-green-400">
-              <strong>Congratulations!</strong> You won with a score of{" "}
-              {stats.score} in {stats.moves} moves!
+              <strong>¡Enhorabuena!</strong> Ganaste con {stats.score} puntos en{" "}
+              {stats.moves} movimientos.
             </div>
           </div>
         )}
@@ -70,14 +70,14 @@ export default function GameControls() {
           <div className="relative p-3 border border-flexoki-red-600 dark:border-flexoki-red-400 overflow-hidden">
             <div className="pattern-cross text-flexoki-red-600/15 dark:text-flexoki-red-400/15 absolute inset-0 pointer-events-none" />
             <div className="relative text-flexoki-red-600 dark:text-flexoki-red-400">
-              <strong>Game Over</strong> — No more moves available.
+              <strong>Fin de la partida.</strong> No quedan movimientos.
             </div>
           </div>
         )}
       </div>
 
       <div className="text-xs text-flexoki-base-500 dark:text-flexoki-base-500 font-mono">
-        Foundation Progress: {stats.foundationProgress.total}/52 cards
+        Cartas en las bases: {stats.foundationProgress.total}/52
         <div className="flex gap-2 mt-1">
           <span>♠ {stats.foundationProgress.S}</span>
           <span>♥ {stats.foundationProgress.H}</span>

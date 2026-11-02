@@ -2,6 +2,9 @@ import { memo, type PointerEvent } from "react";
 import type { CellState } from "./types";
 import { regionFillClass } from "./palette";
 
+// What a screen reader says for each state
+const STATE_LABEL: Record<CellState, string> = { empty: "vacía", mark: "marcada", queen: "reina" };
+
 interface CellProps {
   row: number;
   col: number;
@@ -74,7 +77,7 @@ function CellImpl({
   return (
     <button
       type="button"
-      aria-label={`Row ${row + 1}, column ${col + 1}, ${state}`}
+      aria-label={`Fila ${row + 1}, columna ${col + 1}, ${STATE_LABEL[state]}`}
       onClick={() => onClick(row, col)}
       onPointerDown={handlePointerDown}
       onPointerEnter={handlePointerEnter}

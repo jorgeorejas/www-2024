@@ -14,15 +14,15 @@ export const GET: APIRoute = async () => {
     return new Response("Error generating content", { status: 503, headers: { "Cache-Control": "no-store" } });
   }
 
-  let content = `# Jorge Orejas - Personal Website
+  let content = `# Jorge Orejas, web personal
 
-> Personal website and blog of Jorge Orejas. Contains blog posts, projects, and work experience. This site is a portfolio and knowledge base for creative engineering, indie hacking, and personal growth.
+> Web personal y blog de Jorge Orejas: posts, proyectos y trayectoria. Es su portfolio y el sitio donde apunta lo que aprende sobre ingeniería creativa, indie hacking y crecimiento personal.
 
-## About Jorge
+## Sobre Jorge
 
-${blocksText(bio.entry?.rendered?.html) || "Bio content not available"}
+${blocksText(bio.entry?.rendered?.html) || "La bio no está disponible ahora mismo."}
 
-Below you'll find links to the main content sections and resources of this site, grouped for LLM-friendly navigation.
+Abajo están los enlaces a las secciones principales de la web, agrupados para que una IA se mueva por ella sin perderse.
 
 ## Blog
 `;
@@ -30,26 +30,26 @@ Below you'll find links to the main content sections and resources of this site,
   for (const post of (blog.entries ?? []).filter((p) => !p.data.draft)) {
     content += `- [${post.data.title}](https://jorgeorejas.com/blog/${post.id}): ${post.data.description}\n`;
   }
-  content += `- [All Blog Posts](https://jorgeorejas.com/blog): List of all blog articles\n`;
-  content += `- [RSS Feed](https://jorgeorejas.com/rss.xml): Machine-readable feed of blog posts\n`;
+  content += `- [Todos los posts](https://jorgeorejas.com/blog): la lista completa del blog\n`;
+  content += `- [Feed RSS](https://jorgeorejas.com/rss.xml): los posts del blog en un feed para máquinas\n`;
 
-  content += `\n## Projects\n`;
+  content += `\n## Proyectos\n`;
   for (const project of (projects.entries ?? []).filter((p) => !p.data.draft)) {
     content += `- [${project.data.title}](https://jorgeorejas.com/projects/${project.id}): ${project.data.description}\n`;
   }
-  content += `- [All Projects](https://jorgeorejas.com/projects): Portfolio of personal and professional projects\n`;
-  content += `- [La Cocina de Jorge](https://jorgeorejas.com/cocina): Family recipes, in Spanish\n`;
+  content += `- [Todos los proyectos](https://jorgeorejas.com/projects): proyectos personales y profesionales\n`;
+  content += `- [La Cocina de Jorge](https://jorgeorejas.com/cocina): las recetas de casa\n`;
 
-  content += `\n## Work\n`;
+  content += `\n## Trayectoria\n`;
   for (const job of (work.entries ?? [])) {
     const latest = job.data.roles[0];
-    content += `- [${latest?.title ?? "Role"} at ${job.data.company}](https://jorgeorejas.com/work/${job.id}): ${job.data.body.trim().split("\n")[0] || "Work experience entry"}\n`;
+    content += `- [${latest?.title ?? "Puesto"} en ${job.data.company}](https://jorgeorejas.com/work/${job.id}): ${job.data.body.trim().split("\n")[0] || `Su etapa en ${job.data.company}`}\n`;
   }
-  content += `- [Work Experience](https://jorgeorejas.com/work): Professional history and roles\n`;
+  content += `- [Trayectoria](https://jorgeorejas.com/work): dónde trabajó y en qué puestos\n`;
 
-  content += `\n## Optional\n`;
-  content += `- [Full Content Dump](https://jorgeorejas.com/llms-full.txt): Complete content of all posts, projects, and work (for LLMs)\n`;
-  content += `\n---\n\n*This file is a summary for LLMs. For the full content, see /llms-full.txt.*`;
+  content += `\n## Opcional\n`;
+  content += `- [Todo el contenido](https://jorgeorejas.com/llms-full.txt): el texto completo de posts, proyectos y trayectoria (para IAs)\n`;
+  content += `\n---\n\n*Este archivo es un resumen para IAs. El contenido completo está en /llms-full.txt.*`;
 
   return new Response(content, {
     headers: { "Content-Type": "text/plain; charset=utf-8", ...cacheHeaders(["blog", "projects", "work"]) },
