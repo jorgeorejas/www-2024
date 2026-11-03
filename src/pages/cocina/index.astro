@@ -79,13 +79,13 @@ const legend = [
             </span>
             <span class="grid gap-0">
               <span class="font-handwritten text-[22px] leading-none font-bold text-signal-ink">la favorita</span>
-              <h2 class="m-0 font-serif text-[clamp(26px,4vw,36px)] leading-[1.04] font-normal text-flexoki-ink text-balance">
+              <h2 class="m-0 font-serif text-title-3 mg:text-title-2 leading-[1.04] font-normal text-flexoki-ink text-balance">
                 <span class="group-hover:pen-underline group-focus-visible:pen-underline">{featured.data.title}</span>
               </h2>
               {featured.data.description && (
-                <span class="text-[14px] leading-[1.7] text-ink-soft">{featured.data.description}</span>
+                <span class="text-body leading-[1.7] text-ink-soft">{featured.data.description}</span>
               )}
-              <span class="font-mono text-[11.5px] text-mute">
+              <span class="font-mono text-meta text-mute">
                 {[
                   formatMinutes(totalMinutes(featured.data)),
                   featured.data.servings && servingsLabel(featured.data.servings),
@@ -104,10 +104,10 @@ const legend = [
   <Row label="recetas" as="section" aria-labelledby="todas">
     <div class="m-sec-h">
       <h2 id="todas">
-        Todas las recetas <span id="recipe-count" class="font-mono text-[12.5px] text-mute">({recipes.length})</span>
+        Todas las recetas <span id="recipe-count" class="font-mono text-meta text-mute">({recipes.length})</span>
       </h2>
       <label
-        class="flex items-center gap-2 border-b border-flexoki-base-300 text-[12.5px] text-ink-soft transition-colors focus-within:border-flexoki-ink"
+        class="flex items-center gap-2 border-b border-flexoki-base-300 text-meta text-ink-soft transition-colors focus-within:border-flexoki-ink"
       >
         <span class="sr-only">Buscar receta</span>
         <svg viewBox="0 0 24 24" class="size-3.5 fill-none stroke-current stroke-2" aria-hidden="true"
@@ -125,11 +125,11 @@ const legend = [
     {
       tagOptions.length > 0 && (
         <div id="recipe-tags" class="mb-(--g) flex flex-wrap gap-2" role="group" aria-label="Filtrar por etiqueta">
-          <button type="button" class:list={[squareSelector, "text-sm"]} data-tag="" aria-pressed="true">
+          <button type="button" class:list={[squareSelector, "text-meta"]} data-tag="" aria-pressed="true">
             Todas
           </button>
           {tagOptions.map((tag) => (
-            <button type="button" class:list={[squareSelector, "text-sm"]} data-tag={tag.id} aria-pressed="false">
+            <button type="button" class:list={[squareSelector, "text-meta"]} data-tag={tag.id} aria-pressed="false">
               {tag.data.emoji && <span aria-hidden="true">{tag.data.emoji} </span>}
               {tag.data.name}
             </button>
@@ -147,7 +147,7 @@ const legend = [
         ))
       }
     </ul>
-    <p id="recipe-empty" class="m-0 font-mono text-xs text-mute" hidden>
+    <p id="recipe-empty" class="m-0 font-mono text-meta text-mute" hidden>
       Ninguna receta coincide. Prueba con otra palabra.
     </p>
     {legend && <Legend text={legend} />}

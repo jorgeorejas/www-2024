@@ -14,7 +14,7 @@ import { isNew } from "@lib/utils";
 
 type Props = {
   recipe: { id: string; data: Recipe };
-  /** "small": smaller title, no description */
+  /** "small": no description */
   size?: "small" | "default";
   /** Heading level of the title; h2 when the grid has no section heading above it */
   headingLevel?: "h2" | "h3";
@@ -53,27 +53,22 @@ const sizes = size === "small" ? "(min-width: 640px) 240px, 50vw" : "(min-width:
     }
     {
       data.draft && (
-        <span class="absolute top-2 left-2 bg-flexoki-paper px-1.5 font-mono text-[10.5px] uppercase tracking-[0.08em] text-mute-ink">
+        <span class="absolute top-2 left-2 bg-flexoki-paper px-1.5 font-mono text-mark uppercase tracking-[0.08em] text-mute-ink">
           borrador
         </span>
       )
     }
   </span>
   <span class="grid min-w-0 gap-0">
-    <Heading
-      class:list={[
-        "m-0 font-serif font-normal leading-[1.1] text-flexoki-ink text-balance",
-        size === "small" ? "text-lg" : "text-[21px]",
-      ]}
-    >
+    <Heading class="m-0 font-serif text-title-4 leading-[1.1] font-normal text-flexoki-ink text-balance">
       <Markers pick={data.pick} isNew={isNew(data.date)} pickLabel="la favorita" newLabel="NUEVA" />
       <span class="group-hover:pen-underline group-focus-visible:pen-underline">{data.title}</span>
     </Heading>
     {
       size === "default" && data.description && (
-        <span class="font-mono text-[13px] leading-[1.65] text-ink-soft">{data.description}</span>
+        <span class="font-mono text-body leading-[1.65] text-ink-soft">{data.description}</span>
       )
     }
-    {meta && <span class="font-mono text-[11px] leading-normal text-mute">{meta}</span>}
+    {meta && <span class="font-mono text-meta leading-normal text-mute">{meta}</span>}
   </span>
 </a>

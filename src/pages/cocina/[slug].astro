@@ -80,7 +80,7 @@ const breadcrumbSchema = generateBreadcrumbSchema(
 
 // Square tool buttons, like the selectors elsewhere on the site
 const button =
-  "inline-flex items-center justify-center gap-1.5 min-w-[30px] px-2.5 py-1 border border-flexoki-base-300 font-mono text-[12.5px] text-flexoki-ink hover:border-flexoki-ink transition-colors aria-pressed:bg-flexoki-ink aria-pressed:text-flexoki-paper aria-pressed:border-flexoki-ink";
+  "inline-flex items-center justify-center gap-1.5 min-w-[30px] px-2.5 py-1 border border-flexoki-base-300 font-mono text-meta text-flexoki-ink hover:border-flexoki-ink transition-colors aria-pressed:bg-flexoki-ink aria-pressed:text-flexoki-paper aria-pressed:border-flexoki-ink";
 ---
 
 <MarginPage
@@ -126,14 +126,14 @@ const button =
           <dl class="m-0 mx-px flex flex-wrap">
             {facts.map((fact) => (
               <div class="min-w-0 flex-[1_1_140px] bg-flexoki-paper px-[11px] py-0 shadow-[0_0_0_1px_var(--color-rule)]">
-                <dt class="font-mono text-[10.5px] tracking-[0.07em] text-mute uppercase">{fact.label}</dt>
-                <dd class="m-0 text-[14px] text-flexoki-ink">{fact.value}</dd>
+                <dt class="font-mono text-mark tracking-[0.07em] text-mute uppercase">{fact.label}</dt>
+                <dd class="m-0 text-body text-flexoki-ink">{fact.value}</dd>
               </div>
             ))}
             {data.tags.length > 0 && (
               <div class="min-w-0 flex-[2_1_200px] bg-flexoki-paper px-[11px] py-0 shadow-[0_0_0_1px_var(--color-rule)]">
-                <dt class="font-mono text-[10.5px] tracking-[0.07em] text-mute uppercase">Etiquetas</dt>
-                <dd class="m-0 text-[14px]">
+                <dt class="font-mono text-mark tracking-[0.07em] text-mute uppercase">Etiquetas</dt>
+                <dd class="m-0 text-body">
                   <ul class="m-0 flex list-none flex-wrap gap-x-3 gap-y-0 p-0">
                     {data.tags.map((tag) => (
                       <li>
@@ -165,7 +165,7 @@ const button =
               <button type="button" class={button} data-scale="-1" aria-label="Menos raciones">
                 −
               </button>
-              <output id="servings-label" class="min-w-24 text-center text-[13px] text-flexoki-ink tabular-nums" aria-live="polite">
+              <output id="servings-label" class="min-w-24 text-center text-meta text-flexoki-ink tabular-nums" aria-live="polite">
                 {servings ? servingsLabel(servings) : "×1"}
               </output>
               <button type="button" class={button} data-scale="1" aria-label="Más raciones">
@@ -188,7 +188,7 @@ const button =
             </button>
           )
         }
-        <span id="tools-status" class="w-full font-mono text-[11px] text-mute sm:w-auto" aria-live="polite"></span>
+        <span id="tools-status" class="w-full font-mono text-meta text-mute sm:w-auto" aria-live="polite"></span>
       </div>
 
       {
@@ -206,7 +206,7 @@ const button =
                   <button
                     type="button"
                     id="reset-ingredients"
-                    class="font-mono text-[11px] text-mute hover:text-flexoki-ink hover:pen-underline"
+                    class="font-mono text-meta text-mute hover:text-flexoki-ink hover:pen-underline"
                     hidden
                   >
                     Desmarcar
@@ -221,7 +221,7 @@ const button =
                 <div class="m-sec-h">
                   <h2 id="preparacion">Preparación</h2>
                 </div>
-                <p class="m-0 font-mono text-[11px] text-mute">Toca un paso para tacharlo.</p>
+                <p class="m-0 font-mono text-meta text-mute">Toca un paso para tacharlo.</p>
                 <div class="recipe-steps m-prose" set:html={body.steps} />
               </section>
             )}
@@ -285,7 +285,7 @@ const button =
     margin: var(--g) 0 0;
     font-family: var(--font-serif);
     font-weight: 400;
-    font-size: 19px;
+    font-size: var(--text-title-4);
     line-height: var(--g);
     color: var(--color-flexoki-ink);
   }
@@ -295,7 +295,7 @@ const button =
   .recipe-ingredients li.ingredient {
     padding: 0;
     background: linear-gradient(to right, var(--color-rule) 50%, transparent 0) left bottom / 6px 1px repeat-x;
-    font-size: 14px;
+    font-size: var(--text-body);
   }
   .recipe-ingredients li.ingredient label {
     display: flex;
@@ -353,7 +353,7 @@ const button =
   #recipe .m-prose ol > li::marker {
     content: counter(list-item, decimal-leading-zero) "\00a0\00a0";
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: var(--text-meta);
     color: var(--color-signal-ink);
   }
   /* one empty row between steps */
@@ -394,10 +394,10 @@ const button =
   }
   /* section titles inside the Notion body read like the recipe's own sections */
   #recipe :is(.recipe-intro, .recipe-extra) :where(h1, h2) {
-    font-size: 26px;
+    font-size: var(--text-title-3);
   }
   #recipe :is(.recipe-intro, .recipe-extra) h3 {
-    font-size: 21px;
+    font-size: var(--text-title-4);
   }
 
   /* ---------- gallery ----------
