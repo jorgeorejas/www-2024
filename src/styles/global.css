@@ -946,8 +946,12 @@
   .m-more-i:hover {
     color: var(--color-signal-ink);
   }
+  /* the 3px under the title for the hover pen underline are always there and
+     hang below it (negative margin), so hovering never makes the row taller */
   .m-more-t {
     min-width: 0;
+    padding-bottom: 3px;
+    margin-bottom: -3px;
     font-family: var(--font-serif);
     font-size: var(--text-title-4);
   }
@@ -957,7 +961,6 @@
     background-size: 100% 7px;
     background-repeat: no-repeat;
     background-position: 0 100%;
-    padding-bottom: 3px;
   }
   .m-more-s {
     font-family: var(--font-mono);
