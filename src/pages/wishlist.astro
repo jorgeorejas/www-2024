@@ -1,6 +1,7 @@
 ---
 import { WISHLIST } from "@consts";
 import { squareSelector } from "@components/margin/classes";
+import { CARD_ARROW_SVG } from "@components/margin/hand-arrow";
 import Legend from "@components/margin/Legend.astro";
 import MarginPage from "@components/margin/MarginPage.astro";
 import Markers from "@components/margin/Markers.astro";
@@ -256,7 +257,7 @@ const OWNED_LABEL = "ya lo tengo";
                         </span>
                         {item.price && (
                           <>
-                            <span class="m-lead" aria-hidden="true" />
+                            <span class="m-lead" data-sketch="under" aria-hidden="true" />
                             <span class="m-val">{item.price}</span>
                           </>
                         )}
@@ -264,9 +265,7 @@ const OWNED_LABEL = "ya lo tengo";
                       {sub && <span class="m-card-d text-mute">{sub}</span>}
                     </span>
                     {item.url && (
-                      <span class="m-arrow" aria-hidden="true">
-                        →
-                      </span>
+                      <span class="m-arrow" aria-hidden="true" set:html={CARD_ARROW_SVG} />
                     )}
                   </Tag>
                 </li>

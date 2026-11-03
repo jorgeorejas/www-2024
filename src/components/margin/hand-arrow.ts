@@ -10,5 +10,14 @@ export const HAND_ARROW_SVG =
   "<g class=\"hn-arrow-down\"><path d=\"M2.6 4.8c7.4-1.9 13.4.3 14.9 5.3.7 2.5.5 5.1.1 8.5\"></path>" +
   "<path d=\"M13.5 15.1c1.5 1.4 2.9 2.9 4.1 4.6 1.2-1.8 2.6-3.4 4.4-4.8\"></path></g></svg>";
 
+/**
+ * The same pen stroke, pointing right, for the → at the end of list cards
+ * (`.m-arrow`), so every arrow on the page is drawn by the same hand
+ */
+export const CARD_ARROW_SVG =
+  "<svg class=\"m-arrow-pen\" viewBox=\"0 0 30 22\" aria-hidden=\"true\" focusable=\"false\">" +
+  "<path d=\"M2.2 12.6c5.4-2.3 11.9-2.7 22.4-1.5\"></path>" +
+  "<path d=\"M19.3 6.5c2.2 1.5 4.1 3 5.8 4.7-2 1.1-3.9 2.6-5.5 4.5\"></path></svg>";
+
 /** A trailing "→" (or "->") typed in Notion */
 export const TRAILING_ARROW = /\s*(?:→|->)\s*$/;
