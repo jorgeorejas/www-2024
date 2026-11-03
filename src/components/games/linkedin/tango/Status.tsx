@@ -10,7 +10,6 @@ export function Status() {
   return (
     <div
       className="mt-4 text-center text-sm font-serif text-flexoki-ink dark:text-flexoki-base-50"
-      data-testid="tango-status"
     >
       {mode === "daily" ? "Reto de hoy resuelto" : "Tablero resuelto"} en{" "}
       <span className="font-mono">{formatDuration(elapsed)}</span> ·{" "}

@@ -85,7 +85,6 @@ export default function Card({
   if (!faceUp) {
     return (
       <div
-        data-testid="card"
         data-card-id={card.id}
         data-rank={rank}
         data-suit={suit}
@@ -107,7 +106,6 @@ export default function Card({
 
   return (
     <div
-      data-testid="card"
       data-card-id={card.id}
       data-rank={rank}
       data-suit={suit}
@@ -133,7 +131,6 @@ export default function Card({
 function EmptyCardStack({ suit }: { suit: keyof typeof suits }) {
   return (
     <div
-      data-testid="foundation-empty"
       data-suit={suit}
       className="w-full aspect-5/7 border border-dashed border-flexoki-base-300 dark:border-flexoki-base-700 rounded-sm flex items-center justify-center select-none"
     >

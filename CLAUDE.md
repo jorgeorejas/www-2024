@@ -43,7 +43,12 @@ pnpm lint
 
 # Auto-fix linting issues
 pnpm lint:fix
+
+# Logic tests (Notion → page, recipes, image sizes, share cards); no browser, ~1 s
+pnpm test
 ```
+
+There are no browser or visual tests on purpose: it's a personal site. Check changes in the browser instead.
 
 **Important**: This project uses **pnpm**, not npm. Always use `pnpm` for package management.
 

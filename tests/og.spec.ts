@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { ogImageFor } from "../../src/lib/og/paths";
+import { ogImageFor } from "../src/lib/og/paths";
 
 /*
  * Which share card each page points at (src/pages/og/[...path].png.ts draws

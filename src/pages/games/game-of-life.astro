@@ -22,7 +22,7 @@ import Row from "@components/margin/Row.astro";
 
 <style>
   /* The 64×64 board is wider than a phone column: scroll the board, not the page */
-  .gol-shell :global([data-testid="gol-grid"]) {
+  .gol-shell :global(.gol-grid) {
     max-width: 100%;
     overflow-x: auto;
   }
