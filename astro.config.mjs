@@ -33,6 +33,9 @@ export default defineConfig({
   redirects: { "/sitemap-0.xml": "/sitemap-index.xml" },
   adapter: vercel({
     webAnalytics: { enabled: true },
+    // A cold render (right after a deploy, nothing in the CDN yet) can wait on
+    // Notion's rate limit for several seconds; 10s cut pages off with a 504
+    maxDuration: 60,
   }),
   vite: {
     plugins: [tailwindcss()],
