@@ -9,7 +9,7 @@ import SectionHead from "@components/margin/SectionHead.astro";
 import { BLOG } from "@consts";
 import { cachePage, isNotFound, notionUnavailable } from "@lib/cache-headers";
 import { generateBlogPostingSchema, generateBreadcrumbSchema } from "@lib/seo-utils";
-import { formatDot, formatYear, isNew } from "@lib/utils";
+import { formatShortDate, formatYear, isNew } from "@lib/utils";
 import { getLiveCollection, getLiveEntry } from "astro:content";
 
 const slug = Astro.params.slug ?? "";
@@ -123,7 +123,7 @@ const breadcrumbSchema = generateBreadcrumbSchema(
                   )}
                 </span>
                 <time class="m-more-s" datetime={p.data.date.toISOString()}>
-                  {formatDot(p.data.date)}
+                  {formatShortDate(p.data.date)}
                 </time>
               </a>
             </li>
