@@ -46,7 +46,6 @@ const breadcrumbSchema = generateBreadcrumbSchema(
 <MarginPage
   title={post.data.title}
   description={post.data.description}
-  ogImage={`/og/${post.id}.png`}
   type="article"
   publishedTime={post.data.date}
   structuredData={[blogPostingSchema, breadcrumbSchema]}

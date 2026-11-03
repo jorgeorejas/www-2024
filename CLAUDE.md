@@ -106,13 +106,14 @@ The site displays currently playing Spotify tracks in the footer via:
 Setup instructions are in `SPOTIFY_SETUP.md`.
 
 ### Dynamic OG Images
-OG (Open Graph) images are generated dynamically using Satori:
+Every page shares a 1200×630 card drawn like the page in the Margin design: dotted paper, the numbered nav with the current section in orange, the ruler, the name as letterhead, the title in Instrument Serif, the "Nota al margen" and the signature in blue pen. A title with "Corrección del título" is struck with the pen correction above it, recipes and projects with a photo show it as a print, and section cards list their latest 3 entries.
 
-- Blog posts: `src/pages/og/blog/[...slug].png.ts`
-- Projects: `src/pages/og/projects/[...slug].png.ts`
-- General pages: Uses `src/components/OG.tsx` for the visual template
-
-Images are generated at build time for static content and on-demand for SSR routes.
+- `src/pages/og/[...path].png.ts` draws them on request from Notion: `/og/home.png`, `/og/blog.png` (a section), `/og/blog/<slug>.png` (an entry; also projects, work, cocina, cocina/etiqueta, games). It's cached and purged by the same tags as the pages, and the old `/og/<post>.png` still works.
+- `PageLayout` points each page at its card (`ogImageFor()` in `src/lib/og/paths.ts`). Pages without one (/cv, /404) share the home card.
+- `src/lib/og/card.tsx` is the layout (satori: flexbox, inline styles), and `src/lib/og/render.ts` rasterizes it with sharp as a 256-colour PNG (~35 KB, ~100 KB with a photo).
+- Satori gotchas: sharp skips SVGs nested as images, so the drawn pieces (paper + ruler, signature, pen arrow) are rasterized first. Fixed-width boxes positioned with `right` land off the canvas, so place everything from the left.
+- Fonts: WOFF copies of the site's fonts in `src/lib/og/fonts/`, inlined with `?inline` (satori can't read WOFF2).
+- In `pnpm dev`, add `?svg` to a card URL to get satori's SVG.
 
 ### Constants & Configuration
 Site-wide configuration lives in `src/consts.ts`:
