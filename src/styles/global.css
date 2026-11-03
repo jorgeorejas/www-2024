@@ -1760,6 +1760,38 @@ body.margin-ui .m-lead {
     border-left-color: transparent;
   }
 }
+/* the card's → is the pen-drawn arrow of the hand notes, sitting in the
+   middle of a cell (between four dots): the card's last whole column and its
+   middle row (the lower of the two middle ones when the rows are even) */
+body.margin-ui .m-arrow {
+  display: block;
+  width: 20px;
+  height: 15px;
+}
+body.margin-ui .m-arrow-pen {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+@supports (top: round(down, 1px, 1px)) {
+  body.margin-ui .m-arrow {
+    top: calc(round(down, 50%, var(--g)) + var(--g-half));
+    right: auto;
+    /* 100% is the padding box, 1px inside the card's left border */
+    left: calc(round(down, 100% + 1px, var(--g)) - var(--g-half) - 1px);
+    transform: translate(-50%, -50%);
+  }
+  /* on hover it nudges towards the next cell, like the card is being pointed at */
+  body.margin-ui .m-card:is(:hover, :focus-visible) .m-arrow {
+    transform: translate(calc(-50% + 4px), -50%);
+  }
+}
 /* square photo tiles (wishlist grid): the square rounded to whole rows. The
    box stays a plain block, so the photo's height: 100% fills it and
    object-contain keeps the whole product in view, as before the redesign */
