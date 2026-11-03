@@ -91,7 +91,15 @@ function topOf(el, grid) {
 
 /** How far past a row of dots a position is, 0–27 */
 const offset = (/** @type {number} */ top) => ((top % G) + G) % G;
-const onGrid = (/** @type {number} */ off) => off < 0.5 || off > G - 0.5;
+/*
+ * Within 2px of a row counts as on it. Padding only ever moves a block down,
+ * so a block 0.5px past a row would drop a whole row (26.5px), and with
+ * subpixel rounding (photos 344.25px tall, retina) the same block could land
+ * at 0.49 one load and 0.51 the next: the page had two stable states, one of
+ * them with most blocks a row lower. 2px is invisible next to the dots.
+ */
+const TOLERANCE = 2;
+const onGrid = (/** @type {number} */ off) => off < TOLERANCE || off > G - TOLERANCE;
 
 /** @param {HTMLElement} root */
 function reset(root) {

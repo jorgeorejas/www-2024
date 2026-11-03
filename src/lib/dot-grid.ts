@@ -3,8 +3,8 @@
  *
  * The snapping itself lives in dot-grid-snap.js. PageLayout inlines it, so
  * the first pass runs before the first paint. This module re-snaps whenever
- * the layout can change afterwards: fonts arriving, the column changing
- * width, an image or video learning its size, and client-side navigations
+ * the layout can change afterwards: any font arriving, the column changing
+ * width, a photo or video changing height, and client-side navigations
  * (right after the swap, before the new page is shown).
  */
 
@@ -35,7 +35,10 @@ export function dotGrid() {
     frame = requestAnimationFrame(run);
   };
   run();
+  // fonts.ready can resolve before a font starts loading; loadingdone fires
+  // for every font that arrives later, and a swap can change widths (68ch)
   document.fonts?.ready.then(schedule);
+  document.fonts?.addEventListener("loadingdone", schedule);
 
   let width = root.offsetWidth;
   const resize = new ResizeObserver(() => {
@@ -45,14 +48,24 @@ export function dotGrid() {
   });
   resize.observe(root);
 
-  // only media without a known size can still move what's below them
-  const media = [...root.querySelectorAll<HTMLImageElement | HTMLVideoElement>("img:not([height]), video:not([height])")];
-  const loaded = (m: HTMLImageElement | HTMLVideoElement) => (m instanceof HTMLVideoElement ? "loadedmetadata" : "load");
-  for (const m of media) m.addEventListener(loaded(m), schedule);
+  // a photo or video whose box changes height (its own size arriving, or its
+  // column getting narrower or wider) moves everything below it
+  const media = [...root.querySelectorAll<HTMLElement>("img, video, iframe")].filter((m) => !m.closest(".hn"));
+  const heights = new WeakMap<Element, number>();
+  const mediaResize = new ResizeObserver((entries) => {
+    let moved = false;
+    for (const { target, contentRect } of entries) {
+      if (heights.get(target) !== contentRect.height) moved ||= heights.has(target);
+      heights.set(target, contentRect.height);
+    }
+    if (moved) schedule();
+  });
+  for (const m of media) mediaResize.observe(m);
 
   cleanup = () => {
     resize.disconnect();
-    for (const m of media) m.removeEventListener(loaded(m), schedule);
+    mediaResize.disconnect();
+    document.fonts?.removeEventListener("loadingdone", schedule);
     cancelAnimationFrame(frame);
   };
 }
