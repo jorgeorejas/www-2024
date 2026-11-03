@@ -810,20 +810,11 @@
   }
 
   /* ---------- markers: ◆ pick, NEW, legend ---------- */
-  /* the gap before the title is the space between the ◆ and its hidden label,
-     one space of the marker's mono font, so it scales with the ◆ everywhere */
   .m-pick {
+    margin-right: 0.45em;
     font-family: var(--font-mono);
     font-size: 0.78em;
     color: var(--color-signal);
-  }
-  /* Ioskeley Mono draws ◆ two cells wide (1.2em) with the diamond in the
-     middle: the box is trimmed to the diamond, centred, so no extra room is
-     left on either side (a fallback font's narrower ◆ stays centred too) */
-  .m-pick > [aria-hidden] {
-    display: inline-flex;
-    justify-content: center;
-    width: 0.75em;
   }
   .m-new {
     margin-right: 0.7em;
@@ -864,17 +855,7 @@
     color: var(--color-pen);
     transform: rotate(-6deg);
   }
-  /* in a list row the struck title flows like any other title, so it wraps
-     right after the markers instead of dropping to the next line as one block.
-     The pen hangs from the top of its first line (7px into the row, as when
-     the title was an inline-block), so a title that wraps doesn't move it */
-  .m-card-title .m-corr {
-    display: inline;
-  }
   .m-card-title .m-corr-new {
-    top: 2px; /* the line's text box starts 5px into the 27px row */
-    bottom: auto;
-    translate: 0 -100%;
     font-size: 1.45em;
   }
   /* a correction on a page title: pen above the first line, wrapping on phones */
@@ -1499,10 +1480,6 @@
       width: max-content;
       max-width: calc(100vw - 96px);
       white-space: normal;
-    }
-    /* after NUEVO and ◆ (about 68px) the pen starts further right */
-    .m-card-title:has(.m-new, .m-pick) .m-corr-new {
-      max-width: calc(100vw - 164px);
     }
     /* the pen goes in the row above the title: under a note, that row is kept free */
     .m-anchor:has(> .m-note--item) > .m-card:has(.m-corr) {
