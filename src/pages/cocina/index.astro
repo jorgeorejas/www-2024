@@ -51,23 +51,33 @@ const legend = [
       featured && (
         <div class="m-anchor">
           <MarginNote placement="item" text={featured.data.note} />
+          {/* The left rule and the hover wash are drawn half a row above and
+              below the card without taking room, so the photo and the text
+              start on a row of dots. The photo takes whole rows (.m-photo);
+              on phones it ends half a row short, for the half-row gap, and
+              the note above gets a row to itself. */}
           <a
             href={`/cocina/${featured.id}`}
-            class="group grid items-start gap-[22px] border-l border-rule p-3.5 transition-colors duration-300 hover:bg-flexoki-base-100 mg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]"
+            class:list={[
+              "group relative grid items-start gap-x-[22px] gap-y-(--g-half) py-0 pr-3.5 pl-[15px] before:absolute before:inset-x-0 before:-inset-y-(--g-half) before:-z-1 before:border-l before:border-rule before:transition-colors before:duration-300 hover:before:bg-flexoki-base-100 mg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]",
+              featured.data.note?.trim() && "max-mg:mt-(--g)",
+            ]}
           >
-            <span class="block aspect-square overflow-hidden bg-flexoki-base-50">
-              {featured.data.image && (
+            <span class="@container block overflow-hidden bg-flexoki-base-50">
+              {featured.data.image ? (
                 <img
                   src={featured.data.image}
                   srcset={imageSrcset(featured.data.image)}
                   sizes="(min-width: 761px) 330px, 100vw"
                   alt=""
                   fetchpriority="high"
-                  class="size-full object-cover motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-out motion-safe:group-hover:scale-[1.03]"
+                  class="m-photo block aspect-square w-full object-cover max-mg:[--trim:var(--g-half)] motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-out motion-safe:group-hover:scale-[1.03]"
                 />
+              ) : (
+                <span class="m-photo block aspect-square max-mg:[--trim:var(--g-half)]" />
               )}
             </span>
-            <span class="grid gap-1.5">
+            <span class="grid gap-0">
               <span class="font-handwritten text-[22px] leading-none font-bold text-signal-ink">la favorita</span>
               <h2 class="m-0 font-serif text-[clamp(26px,4vw,36px)] leading-[1.04] font-normal text-flexoki-ink text-balance">
                 <span class="group-hover:pen-underline group-focus-visible:pen-underline">{featured.data.title}</span>
@@ -92,7 +102,7 @@ const legend = [
   </Row>
 
   <Row label="recetas" as="section" aria-labelledby="todas">
-    <div class="m-sec-h mb-5">
+    <div class="m-sec-h">
       <h2 id="todas">
         Todas las recetas <span id="recipe-count" class="font-mono text-[12.5px] text-mute">({recipes.length})</span>
       </h2>
@@ -107,7 +117,7 @@ const legend = [
           id="recipe-search"
           type="search"
           placeholder="Buscar…"
-          class="w-40 bg-transparent py-1 font-mono outline-none placeholder:text-mute"
+          class="h-[26px] w-40 bg-transparent py-0 font-mono outline-none placeholder:text-mute"
         />
       </label>
     </div>
@@ -128,7 +138,7 @@ const legend = [
       )
     }
 
-    <ul id="recipe-grid" class="m-0 grid list-none grid-cols-2 gap-x-3.5 gap-y-6 p-0 lg:grid-cols-3 lg:gap-x-[22px] lg:gap-y-8">
+    <ul id="recipe-grid" class="m-0 grid list-none grid-cols-2 gap-x-3.5 gap-y-(--g) p-0 lg:grid-cols-3 lg:gap-x-[22px]">
       {
         recipes.map((recipe) => (
           <li>
@@ -137,7 +147,7 @@ const legend = [
         ))
       }
     </ul>
-    <p id="recipe-empty" class="py-[18px] font-mono text-xs text-mute" hidden>
+    <p id="recipe-empty" class="m-0 font-mono text-xs text-mute" hidden>
       Ninguna receta coincide. Prueba con otra palabra.
     </p>
     {legend && <Legend text={legend} />}

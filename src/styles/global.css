@@ -1670,6 +1670,11 @@ body.margin-ui .m-sec-h {
   gap: 0 18px;
   margin-bottom: var(--g);
 }
+/* the "see all" link keeps 3px under it for the hover pen underline; they
+   hang below the row, so a link that wraps onto its own line is one row */
+body.margin-ui .m-sec-h > .m-all {
+  margin-bottom: -3px;
+}
 body.margin-ui .m-more-list {
   margin-top: 0;
 }
@@ -1758,6 +1763,15 @@ body.margin-ui .m-lead {
     height: round(nearest, 100cqi, var(--g));
   }
 }
+/* photos in a fixed shape (cocina cards and hero): the box takes whole rows.
+   It sits inside an @container as wide as it is; --ratio is width / height.
+   --trim: var(--g-half) ends it half a row short, for a half-row gap below. */
+@supports (height: round(nearest, 1px, 1px)) {
+  body.margin-ui .m-photo {
+    aspect-ratio: auto;
+    height: calc(round(nearest, calc(100cqi / (var(--ratio, 1)) + var(--trim, 0px)), var(--g)) - var(--trim, 0px));
+  }
+}
 /* boxed buttons (square selectors, servings): 21px tall plus 3px above and
    below, so each one fills exactly a row and its label sits in the middle */
 body.margin-ui .m-main :is(.py-0\.5, .py-1).border {
@@ -1820,6 +1834,21 @@ body.margin-ui .m-main :where(.hn, .hn *) {
   body.margin-ui .m-vert,
   body.margin-ui .m-vert :where(*) {
     line-height: var(--g);
+  }
+  /* notes drop into the flow here (margin row, or just above their item):
+     one row per line, so whatever follows them stays on the grid */
+  body.margin-ui .m-main :where(.m-note--margin, .m-note--item, .m-note--beside, .m-note .hn-h, .m-note li) {
+    line-height: var(--g);
+  }
+  body.margin-ui .m-note--margin,
+  body.margin-ui .m-note :where(ul, ol) {
+    margin-top: 0;
+  }
+  body.margin-ui .m-note :where(ul, ol) {
+    gap: 0;
+  }
+  body.margin-ui :is(.m-note--item, .m-note--beside) {
+    margin-bottom: 0;
   }
   body.margin-ui .m {
     gap: 54px;

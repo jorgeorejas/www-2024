@@ -73,13 +73,14 @@ if (company.website) {
           </div>
         )
       }
-      <section class="mt-6" aria-labelledby="positions">
+      <section class="mt-(--g)" aria-labelledby="positions">
         <SectionHead id="positions" title="Puestos" />
         <WorkTimeline processedWork={[company]} showCompany={false} headingLevel={3} />
       </section>
       {
         site && (
-          <p class="mt-2">
+          // one row: the ↗ comes from a fallback font and would make the line 1px taller
+          <p class="m-0 h-(--g)">
             <a class="m-all" href={site.href} target="_blank" rel="noopener noreferrer">
               Visitar {site.host} ↗
             </a>
