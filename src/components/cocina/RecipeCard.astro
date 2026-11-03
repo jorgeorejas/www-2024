@@ -3,7 +3,9 @@
  * A recipe in the Cocina photo grid (Margin design): 3:4 photo, serif title
  * with the ◆ / NUEVA markers, description, and "time — tags" in mono.
  * The data attributes drive the search and tag filters on /cocina.
- * Self-contained (Tailwind only) so it also works outside Margin pages.
+ * Self-contained (Tailwind only) so it also works outside Margin pages; on
+ * the dot grid the photo is cut to whole rows minus half a row (.m-photo),
+ * so after the half-row gap every line of text lands on a row.
  */
 import Markers from "@components/margin/Markers.astro";
 import { formatMinutes, imageSrcset, totalMinutes } from "@lib/cocina";
@@ -28,12 +30,12 @@ const sizes = size === "small" ? "(min-width: 640px) 240px, 50vw" : "(min-width:
 
 <a
   href={`/cocina/${recipe.id}`}
-  class="group grid content-start gap-2.5 text-left"
+  class="group @container grid content-start gap-(--g-half) text-left"
   data-recipe
   data-title={data.title.toLowerCase()}
   data-tags={data.tags.map((t) => t.slug).join(" ")}
 >
-  <span class="relative block aspect-[3/4] overflow-hidden bg-flexoki-base-50">
+  <span class="m-photo relative block aspect-[3/4] overflow-hidden bg-flexoki-base-50 [--ratio:3/4] [--trim:var(--g-half)]">
     {
       data.image ? (
         <img
@@ -57,7 +59,7 @@ const sizes = size === "small" ? "(min-width: 640px) 240px, 50vw" : "(min-width:
       )
     }
   </span>
-  <span class="grid min-w-0 gap-[3px]">
+  <span class="grid min-w-0 gap-0">
     <Heading
       class:list={[
         "m-0 font-serif font-normal leading-[1.1] text-flexoki-ink text-balance",

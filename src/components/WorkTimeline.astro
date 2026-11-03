@@ -163,6 +163,20 @@ function noteYears(position: Position) {
     line-height: 1.85;
     color: var(--color-ink-soft);
   }
+  /* on the dot grid (Margin pages): companies two rows apart, roles one row
+     apart, each description on the row right under its title */
+  :global(body.margin-ui) .wtl {
+    gap: calc(var(--g) * 2);
+  }
+  :global(body.margin-ui) .wtl-co-n {
+    margin-bottom: 0;
+  }
+  :global(body.margin-ui) .wtl-roles {
+    gap: var(--g);
+  }
+  :global(body.margin-ui) .wtl-role-d {
+    margin-top: 0;
+  }
   /* outside a Margin page (no margin column) the note just sits above the role */
   :global(body:not(.margin-ui)) .wtl :global(.m-note--beside) {
     position: static;
