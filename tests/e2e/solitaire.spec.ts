@@ -65,7 +65,7 @@ test.describe("Klondike Solitaire", () => {
   }) => {
     await page.getByTestId("stock").click();
     const movesAfterDraw = await page.getByTestId("solitaire-moves").textContent();
-    expect(movesAfterDraw).toMatch(/Moves: [1-9]/);
+    expect(movesAfterDraw).toMatch(/Movimientos: [1-9]/);
 
     await page.getByTestId("solitaire-undo").click();
     await expect(page.getByTestId("solitaire-moves")).toHaveText("Movimientos: 0");

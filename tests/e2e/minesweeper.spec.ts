@@ -190,6 +190,6 @@ test.describe("Minesweeper", () => {
       "data-status",
       "idle",
     );
-    await expect(page.locator("article").first()).toHaveScreenshot("ms-idle.png");
+    await expect(page.getByTestId("ms-game")).toHaveScreenshot("ms-idle.png");
   });
 });
