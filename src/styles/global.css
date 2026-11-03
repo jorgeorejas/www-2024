@@ -17,6 +17,19 @@
     Caveat Variable, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", "Courier New", monospace;
 
+  /* Margin type scale (text-body, text-meta… in templates). Mono 15px is the
+     one size that fits a dot-grid cell exactly: 9px per character, three per
+     27px cell. Meta is everything small (dates, crumbs, nav, values, labels),
+     mark the caps markers (NUEVO, tiny labels). The serif steps are for
+     titles. Handwriting (Caveat) floats over the grid and stays out of it. */
+  --text-body: 15px;
+  --text-meta: 12px;
+  --text-mark: 10.5px;
+  --text-title-1: 44px;
+  --text-title-2: 32px;
+  --text-title-3: 26px;
+  --text-title-4: 20px;
+
   /* Legacy accent. The Margin design does not use it (see "Margin" below). */
   --color-international-orange: #ff4f00;
 
@@ -363,10 +376,10 @@
     @apply my-4 border-l border-flexoki-base-200 pl-4;
   }
   :is(article, .m-prose) details summary {
-    @apply cursor-pointer font-serif text-lg text-flexoki-ink;
+    @apply cursor-pointer font-serif text-title-4 text-flexoki-ink;
   }
   :is(article, .m-prose) figure figcaption {
-    @apply text-center text-sm text-flexoki-base-500;
+    @apply text-center text-meta text-flexoki-base-500;
   }
   :is(article, .m-prose) video,
   :is(article, .m-prose) .video iframe {
@@ -416,7 +429,7 @@
     padding: 54px 20px 72px;
     overflow-x: clip; /* the dot paper (.m::after) spills a viewport wide on each side */
     font-family: var(--font-mono);
-    font-size: 15px;
+    font-size: var(--text-body);
     color: var(--color-ink-soft);
   }
   .m {
@@ -453,7 +466,7 @@
     margin: 0;
     font-family: var(--font-serif);
     font-weight: 400;
-    font-size: 32px;
+    font-size: var(--text-title-2);
     color: var(--color-flexoki-ink);
   }
   .m-name a {
@@ -463,13 +476,13 @@
   .m-role {
     margin: 0;
     font-weight: 500;
-    font-size: 13px;
+    font-size: var(--text-meta);
     letter-spacing: 0.02em;
     color: var(--color-ink-soft);
   }
   .m-crumbs {
     margin-top: var(--g);
-    font-size: 12px;
+    font-size: var(--text-meta);
     color: var(--color-mute);
     min-width: 0;
   }
@@ -516,7 +529,7 @@
     display: flex;
     align-items: baseline;
     gap: 8px;
-    font-size: 12px;
+    font-size: var(--text-meta);
     white-space: nowrap;
     color: var(--color-ink-soft);
     transition: color 0.15s;
@@ -561,12 +574,12 @@
     margin: 0;
     font-family: var(--font-serif);
     font-weight: 400;
-    font-size: 26px;
+    font-size: var(--text-title-3);
     color: var(--color-flexoki-ink);
     text-wrap: balance;
   }
   .m-all {
-    font-size: 12.5px;
+    font-size: var(--text-meta);
     color: var(--color-ink-soft);
     padding-bottom: 3px;
     transition: color 0.15s;
@@ -589,18 +602,18 @@
     margin: 0;
     font-family: var(--font-serif);
     font-weight: 400;
-    font-size: clamp(34px, 5.4vw, 44px);
+    font-size: var(--text-title-1);
     color: var(--color-flexoki-ink);
     text-wrap: balance;
   }
   .m-lede {
     margin: 0;
-    font-size: 15px;
+    font-size: var(--text-body);
     color: var(--color-ink-soft);
   }
   .m-date {
     margin: 0;
-    font-size: 12.5px;
+    font-size: var(--text-meta);
     color: var(--color-mute);
   }
   .m-eyebrow {
@@ -617,7 +630,7 @@
     flex-direction: column;
     align-items: center;
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: var(--text-meta);
     color: var(--color-signal);
     text-transform: uppercase;
   }
@@ -749,7 +762,7 @@
     min-width: 0;
     font-family: var(--font-mono);
     font-weight: 600;
-    font-size: 13.5px;
+    font-size: var(--text-body);
     letter-spacing: 0.07em;
     text-transform: uppercase;
     color: var(--color-flexoki-ink);
@@ -772,13 +785,13 @@
   }
   .m-val {
     font-family: var(--font-mono);
-    font-size: 12.5px;
+    font-size: var(--text-meta);
     color: var(--color-flexoki-ink);
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
   }
   .m-card-d {
-    font-size: 13px;
+    font-size: var(--text-body);
     color: var(--color-ink-soft);
   }
   .m-arrow {
@@ -801,7 +814,7 @@
   .m-pick {
     margin-right: 0.45em;
     font-family: var(--font-mono);
-    font-size: 0.78em;
+    font-size: var(--text-mark);
     color: var(--color-signal);
   }
   .m-new {
@@ -810,14 +823,14 @@
     margin-right: 0.7em;
     font-family: var(--font-mono);
     font-weight: 500;
-    font-size: 10.5px;
+    font-size: var(--text-mark);
     letter-spacing: 0.08em;
     color: var(--color-signal);
   }
   .m-legend {
     margin: var(--g) 0 0;
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: var(--text-meta);
     color: var(--color-mute);
   }
 
@@ -884,7 +897,7 @@
   .m-more-t {
     min-width: 0;
     font-family: var(--font-serif);
-    font-size: 20px;
+    font-size: var(--text-title-4);
   }
   .m-more-i:hover .m-more-t,
   .m-more-i:focus-visible .m-more-t {
@@ -896,7 +909,7 @@
   }
   .m-more-s {
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: var(--text-meta);
     color: var(--color-mute);
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
@@ -917,7 +930,7 @@
     outline: 1px solid var(--color-rule);
   }
   .m-meta dt {
-    font-size: 10.5px;
+    font-size: var(--text-mark);
     letter-spacing: 0.07em;
     text-transform: uppercase;
     color: var(--color-mute);
@@ -925,7 +938,7 @@
   .m-meta dd {
     margin: 0;
     overflow-wrap: anywhere;
-    font-size: 13.5px;
+    font-size: var(--text-body);
     color: var(--color-flexoki-ink);
   }
   .m-meta a {
@@ -942,7 +955,7 @@
   }
   .m-meta-x {
     margin-left: 0.3em;
-    font-size: 0.85em;
+    font-size: var(--text-meta);
     color: var(--color-mute);
   }
   /* architect's pen (src/lib/sketch-rules.ts) redraws the rules by hand;
@@ -975,7 +988,7 @@
     gap: 4px 8px;
     margin: 0;
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: var(--text-meta);
     line-height: 1.6;
     color: var(--color-mute-ink);
     min-width: 0;
@@ -993,7 +1006,7 @@
     animation: none;
   }
   .np-l {
-    font-size: 10.5px;
+    font-size: var(--text-mark);
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--color-mute);
@@ -1025,7 +1038,7 @@
     gap: 18px;
     padding-top: 22px;
     border-top: 1px solid var(--color-rule);
-    font-size: 12px;
+    font-size: var(--text-meta);
     color: var(--color-mute);
   }
   .m-social {
@@ -1059,7 +1072,7 @@
     position: relative;
     max-width: 68ch;
     font-family: var(--font-mono);
-    font-size: 15px;
+    font-size: var(--text-body);
     color: var(--color-ink-soft);
     overflow-wrap: break-word;
   }
@@ -1077,13 +1090,13 @@
     margin-top: 1.6em;
   }
   .m-prose :where(h1, h2) {
-    font-size: 30px;
+    font-size: var(--text-title-2);
   }
   .m-prose h3 {
-    font-size: 25px;
+    font-size: var(--text-title-3);
   }
   .m-prose h4 {
-    font-size: 20px;
+    font-size: var(--text-title-4);
   }
   .m-prose :where(h1, h2, h3, h4) + * {
     margin-top: 0.6em;
@@ -1122,13 +1135,12 @@
   .m-prose :not(pre) > code {
     padding: 0.1em 0.35em;
     background: var(--color-flexoki-base-50);
-    font-size: 0.92em;
     color: var(--color-flexoki-ink);
   }
   .m-prose pre {
     padding: var(--g-half) 18px;
     overflow-x: auto;
-    font-size: 13px;
+    font-size: var(--text-meta);
   }
   .m-prose img {
     display: block;
@@ -1155,7 +1167,7 @@
     max-width: 100%;
     overflow-x: auto;
     border-collapse: collapse;
-    font-size: 13px;
+    font-size: var(--text-meta);
   }
   .m-prose :where(th, td) {
     padding: 0 10px 0 0;
@@ -1194,7 +1206,7 @@
   /* footnotes (remark-gfm) */
   .m-prose sup a[data-footnote-ref] {
     margin-left: 1px;
-    font-size: 0.78em;
+    font-size: var(--text-meta);
     color: var(--color-signal-ink);
     text-decoration: none;
   }
@@ -1202,7 +1214,7 @@
     padding-top: var(--g);
     box-shadow: inset 0 1px var(--color-rule);
     font-style: italic;
-    font-size: 12.5px;
+    font-size: var(--text-meta);
     color: var(--color-mute-ink);
   }
   .m-prose .footnotes > h2 {
@@ -1331,7 +1343,7 @@
     left: 0;
     top: 0.2em;
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: var(--text-meta);
     color: var(--color-signal-ink);
   }
   .m-tips {
@@ -1448,6 +1460,10 @@
     }
     .m-crumbs [aria-current] {
       max-width: 24ch;
+    }
+    /* page titles drop a step on phones */
+    .m-h1 {
+      font-size: var(--text-title-2);
     }
     /* a margin note sits right above the title: leave room for the pen */
     .m-h1:has(.m-corr) {
