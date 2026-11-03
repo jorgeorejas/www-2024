@@ -382,8 +382,10 @@ export async function recipes() {
             ? difficulty
             : undefined,
         tags: p.relation("Etiquetas").flatMap((id) => tagById.get(id) ?? []),
-        // No cover: the first photo in the page (cached per edit) is the card image
-        image: pageImage(page, 1280) ?? (await recipeHeroImage(page)),
+        // The card photo is the page cover (set it in Notion). The index never
+        // reads a recipe's blocks: without a cover the card shows the dotted
+        // placeholder, and only the recipe page falls back to its first photo
+        image: pageImage(page, 1280),
         editedAt: new Date(page.last_edited_time),
       };
       return { id: slugOf(page), page, data };
@@ -392,25 +394,10 @@ export async function recipes() {
   return entries.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 }
 
-/** A recipe's blocks, fetched once per edit */
-function recipeTree(page: NotionPage) {
-  return cachedBody(`recipe-tree:${page.id}:${page.last_edited_time}`, () => getBlockTree(page.id));
-}
-
-/**
- * The card photo of a recipe without a cover: its first image. Only reads the
- * blocks, so the /cocina index doesn't render every recipe (and read the size
- * of every photo) just to find one picture.
- */
-async function recipeHeroImage(page: NotionPage): Promise<string | undefined> {
-  const hero = firstImageBlock(await recipeTree(page));
-  return hero ? blockImage(hero, 1920) : undefined;
-}
-
 /** A recipe page split into its parts, rendered to HTML */
 export async function recipeBody(page: NotionPage, hasCover: boolean): Promise<RecipeBody> {
   return cachedBody(`recipe:${page.id}:${page.last_edited_time}`, async () => {
-    const blocks = await recipeTree(page);
+    const blocks = await getBlockTree(page.id);
     // No cover: the first photo becomes the hero and isn't repeated below
     const hero = hasCover ? undefined : firstImageBlock(blocks);
     const withoutHero = hero ? removeBlock(blocks, hero.id) : blocks;
