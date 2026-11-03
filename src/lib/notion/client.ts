@@ -77,6 +77,7 @@ export async function getNotionToken(): Promise<string> {
  * page that reads several collections doesn't trip the limit on a cold cache.
  */
 const MAX_CONCURRENT = 3;
+const REQUEST_TIMEOUT_MS = 8_000;
 let active = 0;
 const waiting: (() => void)[] = [];
 
@@ -99,19 +100,31 @@ export async function notionRequest<T>(
   retries = 4,
 ): Promise<T> {
   const token = await getNotionToken();
-  const res = await withSlot(() =>
-    fetch(`${NOTION_API}${path}`, {
-      ...init,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Notion-Version": NOTION_VERSION,
-        "Content-Type": "application/json",
-        ...init?.headers,
-      },
-    }),
-  );
+  let res: Response;
+  try {
+    res = await withSlot(() =>
+      fetch(`${NOTION_API}${path}`, {
+        ...init,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Notion-Version": NOTION_VERSION,
+          "Content-Type": "application/json",
+          ...init?.headers,
+        },
+        // a request that hangs would otherwise hold the whole render
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      }),
+    );
+  } catch (error) {
+    if (retries > 0 && error instanceof Error && error.name === "TimeoutError") {
+      console.warn(`[notion] ${path} took over ${REQUEST_TIMEOUT_MS / 1000}s, retrying`);
+      return notionRequest(path, init, retries - 1);
+    }
+    throw error;
+  }
   if ((res.status === 429 || res.status >= 500) && retries > 0) {
     const wait = Number(res.headers.get("Retry-After")) || 1;
+    console.warn(`[notion] ${res.status} on ${path}, retrying in ${wait}s`);
     await new Promise((resolve) => setTimeout(resolve, wait * 1000 + Math.random() * 500));
     return notionRequest(path, init, retries - 1);
   }
