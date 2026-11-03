@@ -24,14 +24,16 @@
      signal = orange-500 (current markers, NEW, ◆, vertical labels),
      signal-ink = orange-600 (small accent text, footnote refs),
      pen = blue-600 (hand notes, corrections, signature, pen underline),
-     rule / rule-soft = base-150 / base-100, mute = base-500, mute-ink = base-600 */
+     rule / rule-soft = base-150 / base-100, mute = base-600, mute-ink = base-700.
+     mute is the lightest grey for text: 4.9:1 on paper, so small dates and
+     labels pass WCAG AA (base-500 only reached 3.5:1) */
   --color-signal: #cb6120;
   --color-signal-ink: #bc5215;
   --color-pen: #205ea6;
   --color-rule: #dad8ce;
   --color-rule-soft: #e6e4d9;
-  --color-mute: #878580;
-  --color-mute-ink: #6f6e69;
+  --color-mute: #6f6e69;
+  --color-mute-ink: #575653;
   --color-ink-soft: #403e3c;
 
   /* Margin layout breakpoint: `mg:` = margin column visible (>= 761px),
