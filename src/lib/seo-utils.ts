@@ -34,7 +34,7 @@ export function generateBlogPostingSchema(
   baseUrl: string,
 ): BlogPostingSchema {
   const postUrl = `${baseUrl}blog/${post.id}`;
-  const ogImageUrl = `${baseUrl}og/${post.id}.png`;
+  const ogImageUrl = `${baseUrl}og/blog/${post.id}.png`;
 
   return {
     "@context": "https://schema.org",

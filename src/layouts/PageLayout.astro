@@ -4,6 +4,7 @@ import Footer from "@components/Footer.astro";
 import MarginFooter from "@components/margin/MarginFooter.astro";
 import Row from "@components/margin/Row.astro";
 import { SITE } from "@consts";
+import { ogImageFor } from "@lib/og/paths";
 import { PREVIEW_PARAM } from "@lib/preview";
 import gridSnapSource from "@lib/dot-grid-snap.js?raw";
 import SpeedInsights from "@vercel/speed-insights/astro";
@@ -63,7 +64,7 @@ const exitHref = exit.pathname + exit.search + exit.hash;
     <Head
       title={`${title} | ${SITE.NAME}`}
       description={description}
-      image={ogImage}
+      image={ogImage ?? ogImageFor(Astro.url.pathname)}
       type={type}
       publishedTime={publishedTime}
       modifiedTime={modifiedTime}
