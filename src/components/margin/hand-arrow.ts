@@ -19,5 +19,19 @@ export const CARD_ARROW_SVG =
   "<path d=\"M2.2 12.6c5.4-2.3 11.9-2.7 22.4-1.5\"></path>" +
   "<path d=\"M19.3 6.5c2.2 1.5 4.1 3 5.8 4.7-2 1.1-3.9 2.6-5.5 4.5\"></path></svg>";
 
+/**
+ * Inline pen arrows for links in running text: right, left (the right one
+ * mirrored in CSS) and out (↗, a link that leaves the page). Same hand as the
+ * notes and the cards. Rendered by PenArrow.astro.
+ */
+export const PEN_ARROW_PATHS = {
+  right:
+    "<path d=\"M2.2 12.6c5.4-2.3 11.9-2.7 22.4-1.5\"></path>" +
+    "<path d=\"M19.3 6.5c2.2 1.5 4.1 3 5.8 4.7-2 1.1-3.9 2.6-5.5 4.5\"></path>",
+  out:
+    "<path d=\"M5.2 21.4c3.7-4.6 8.4-9.6 15.6-15.8\"></path>" +
+    "<path d=\"M12.6 5.2c2.9-.3 5.6-.4 8.4-.2.4 2.6.5 5.3.3 8\"></path>",
+} as const;
+
 /** A trailing "→" (or "->") typed in Notion */
 export const TRAILING_ARROW = /\s*(?:→|->)\s*$/;

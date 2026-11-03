@@ -1,4 +1,5 @@
 ---
+import PenArrow from "@components/margin/PenArrow.astro";
 import FormattedDate from "@components/FormattedDate.astro";
 import { AnimatedSignature } from "@components/AnimatedSignature";
 import ListRow from "@components/margin/ListRow.astro";
@@ -119,7 +120,7 @@ const breadcrumbSchema = generateBreadcrumbSchema(
               <dd>
                 <a href={demoURL} target="_blank" rel="noopener noreferrer">
                   {shortUrl(demoURL, false)}
-                  <span class="m-meta-x" aria-hidden="true">↗</span>
+                  <span class="m-meta-x" aria-hidden="true"><PenArrow dir="out" /></span>
                 </a>
               </dd>
             </div>
@@ -132,7 +133,7 @@ const breadcrumbSchema = generateBreadcrumbSchema(
               <dd>
                 <a href={repoURL} target="_blank" rel="noopener noreferrer">
                   {shortUrl(repoURL)}
-                  <span class="m-meta-x" aria-hidden="true">↗</span>
+                  <span class="m-meta-x" aria-hidden="true"><PenArrow dir="out" /></span>
                 </a>
               </dd>
             </div>
@@ -143,7 +144,7 @@ const breadcrumbSchema = generateBreadcrumbSchema(
             <div>
               <dt>Versión anterior</dt>
               <dd>
-                <a href={`/projects/${previous.id}`}>← {previous.data.titleCorrection ?? previous.data.title}</a>
+                <a href={`/projects/${previous.id}`}><PenArrow dir="left" /> {previous.data.titleCorrection ?? previous.data.title}</a>
               </dd>
             </div>
           )
@@ -153,7 +154,7 @@ const breadcrumbSchema = generateBreadcrumbSchema(
             <div>
               <dt>Versión siguiente</dt>
               <dd>
-                <a href={`/projects/${next.id}`}>{next.data.titleCorrection ?? next.data.title} →</a>
+                <a href={`/projects/${next.id}`}>{next.data.titleCorrection ?? next.data.title} <PenArrow /></a>
               </dd>
             </div>
           )
@@ -168,7 +169,7 @@ const breadcrumbSchema = generateBreadcrumbSchema(
         demoURL && (
           <p class="m-0">
             <a class="m-all" href={demoURL} target="_blank" rel="noopener noreferrer">
-              Visitar {shortUrl(demoURL, false)} ↗
+              Visitar {shortUrl(demoURL, false)} <PenArrow dir="out" />
             </a>
           </p>
         )

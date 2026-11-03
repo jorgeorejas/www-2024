@@ -1,4 +1,5 @@
 ---
+import PenArrow from "@components/margin/PenArrow.astro";
 import ListRow from "@components/margin/ListRow.astro";
 import MarginPage from "@components/margin/MarginPage.astro";
 import Row from "@components/margin/Row.astro";
@@ -79,10 +80,9 @@ if (company.website) {
       </section>
       {
         site && (
-          // one row: the ↗ comes from a fallback font and would make the line 1px taller
           <p class="m-0 h-(--g)">
             <a class="m-all" href={site.href} target="_blank" rel="noopener noreferrer">
-              Visitar {site.host} ↗
+              Visitar {site.host} <PenArrow dir="out" />
             </a>
           </p>
         )
