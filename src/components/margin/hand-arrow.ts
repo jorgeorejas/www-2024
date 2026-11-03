@@ -33,5 +33,13 @@ export const PEN_ARROW_PATHS = {
     "<path d=\"M12.6 5.2c2.9-.3 5.6-.4 8.4-.2.4 2.6.5 5.3.3 8\"></path>",
 } as const;
 
+/**
+ * The ↱ over the vertical section labels, by the same hand: a stroke that
+ * climbs, bends and points right at the section title (viewBox 0 0 18 18)
+ */
+export const HOOK_ARROW_PATHS =
+  "<path d=\"M4.6 16.9c-.4-3.3-.5-6.4.1-8.9.4-1.6 1.5-2.4 3.4-2.5 2.4-.2 4.7 0 7.1.5\"></path>" +
+  "<path d=\"M12.1 2.3c1.4 1 2.7 2.1 3.8 3.4-1.4.9-2.7 2-3.8 3.4\"></path>";
+
 /** A trailing "→" (or "->") typed in Notion */
 export const TRAILING_ARROW = /\s*(?:→|->)\s*$/;
