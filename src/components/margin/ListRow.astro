@@ -78,7 +78,7 @@ const showValue = Boolean(value || date);
       {
         showValue && (
           <>
-            <span class="m-lead" aria-hidden="true" />
+            <span class="m-lead" data-sketch="under" aria-hidden="true" />
             <span class="m-val">
               {value ?? (date && <time datetime={date.toISOString()}>{formatDot(date)}</time>)}
             </span>

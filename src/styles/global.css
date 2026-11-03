@@ -1759,6 +1759,19 @@ body.margin-ui .m-lead {
   body.margin-ui .m-card[data-sketch] {
     border-left-color: transparent;
   }
+  body.margin-ui .m-lead[data-sketch] {
+    border-bottom-color: transparent;
+  }
+}
+/* the leader is written by hand, in the same ink as the old rule */
+body.margin-ui .m-lead[data-sketch] {
+  position: relative;
+}
+body.margin-ui .m-lead > .sketch {
+  top: -4px;
+  bottom: auto;
+  height: 8px;
+  stroke: var(--color-ink-soft);
 }
 /* the card's → is the pen-drawn arrow of the hand notes, sitting in the
    middle of a cell (between four dots): the card's last whole column and its
