@@ -85,6 +85,20 @@ export function imageSrcset(url: string | undefined): string | undefined {
   return IMAGE_WIDTHS.map((w) => `${url.replace(/([?&])w=\d+/, `$1w=${w}`)} ${w}w`).join(", ");
 }
 
+// A cover set to one of the page's own photos, through the image route
+const BLOCK_COVER = /\/api\/notion-image\/block\/([0-9a-f-]{32,36})/i;
+
+/**
+ * The block a page's cover points at, when the cover is one of its own photos
+ * (an external cover like https://www.jorgeorejas.com/api/notion-image/block/<id>),
+ * so the body doesn't show that photo a second time
+ */
+export function coverBlockId(page: NotionPage): string | undefined {
+  const cover = page.cover;
+  if (!cover || cover.type !== "external") return undefined;
+  return cover.external.url.match(BLOCK_COVER)?.[1];
+}
+
 /** First showable image block in a tree, depth first */
 export function firstImageBlock(blocks: NotionBlock[]): NotionBlock | undefined {
   for (const block of blocks) {

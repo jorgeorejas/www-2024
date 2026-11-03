@@ -2,7 +2,7 @@ import { marginNotes } from "./annotations";
 import { cached, cachedBody } from "./cache";
 import { getBlockTree, queryDatabase, type NotionPage } from "./client";
 import { DATABASES } from "./databases";
-import { firstImageBlock, pageImage, blockImage } from "./images";
+import { coverBlockId, firstImageBlock, pageImage, blockImage } from "./images";
 import { imageSizes } from "./image-size";
 import { blocksToMarkdown, blocksToPlainText } from "./markdown";
 import { pageEmoji, readProperties, slugify } from "./properties";
@@ -398,9 +398,11 @@ export async function recipes() {
 export async function recipeBody(page: NotionPage, hasCover: boolean): Promise<RecipeBody> {
   return cachedBody(`recipe:${page.id}:${page.last_edited_time}`, async () => {
     const blocks = await getBlockTree(page.id);
-    // No cover: the first photo becomes the hero and isn't repeated below
+    // No cover: the first photo becomes the hero and isn't repeated below.
+    // A cover that is one of the page's photos isn't repeated either
     const hero = hasCover ? undefined : firstImageBlock(blocks);
-    const withoutHero = hero ? removeBlock(blocks, hero.id) : blocks;
+    const skip = hero?.id ?? coverBlockId(page);
+    const withoutHero = skip ? removeBlock(blocks, skip) : blocks;
     const parts = splitRecipe(withoutHero);
     const sizes = await imageSizes(withoutHero);
     const [intro, ingredients, steps, extra, gallery] = await Promise.all([
