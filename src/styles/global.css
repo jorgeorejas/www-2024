@@ -783,6 +783,27 @@
     margin-top: 18px; /* the leader sits on the title's baseline */
     border-bottom: 1.5px solid var(--color-ink-soft);
   }
+  /* with JavaScript the leader is written by hand (data-sketch="under"), in
+     the same ink as the rule */
+  .m-lead[data-sketch] {
+    position: relative;
+  }
+  .m-lead[data-sketch] > .sketch {
+    top: -4px;
+    bottom: auto;
+    height: 8px;
+    stroke: var(--color-ink-soft);
+  }
+  /* the pen redraws the card's left rule and the leader; the CSS lines are
+     the no-JS fallback */
+  @media (scripting: enabled) {
+    .m-card[data-sketch] {
+      border-left-color: transparent;
+    }
+    .m-lead[data-sketch] {
+      border-bottom-color: transparent;
+    }
+  }
   .m-val {
     font-family: var(--font-mono);
     font-size: var(--text-meta);
@@ -794,10 +815,14 @@
     font-size: var(--text-body);
     color: var(--color-ink-soft);
   }
+  /* the card's → is the pen-drawn arrow of the hand notes (CARD_ARROW_SVG) */
   .m-arrow {
     position: absolute;
     right: 14px;
     top: 50%;
+    display: block;
+    width: 20px;
+    height: 15px;
     transform: translate(-5px, -50%);
     opacity: 0.35;
     transition:
@@ -808,6 +833,33 @@
   .m-card:focus-visible .m-arrow {
     transform: translate(0, -50%);
     opacity: 1;
+  }
+  .m-arrow-pen {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* where round() works, the arrow sits in the middle of a cell (between four
+     dots): the card's last whole column and its middle row (the lower of the
+     two middle ones when the rows are even) */
+  @supports (top: round(down, 1px, 1px)) {
+    .m-arrow {
+      top: calc(round(down, 50%, var(--g)) + var(--g-half));
+      right: auto;
+      /* 100% is the padding box, 1px inside the card's left border */
+      left: calc(round(down, 100% + 1px, var(--g)) - var(--g-half) - 1px);
+      transform: translate(-50%, -50%);
+    }
+    /* on hover it nudges towards the next cell, like the card is being pointed at */
+    .m-card:is(:hover, :focus-visible) .m-arrow {
+      transform: translate(calc(-50% + 4px), -50%);
+    }
   }
 
   /* ---------- markers: ◆ pick, NEW, legend ---------- */
@@ -1638,57 +1690,6 @@ body.margin-ui .m-foot {
   padding-top: var(--g);
   border-top: 0;
   box-shadow: inset 0 1px var(--color-rule);
-}
-/* with JavaScript the architect's pen draws the cards' left rule from dot to dot */
-@media (scripting: enabled) {
-  body.margin-ui .m-card[data-sketch] {
-    border-left-color: transparent;
-  }
-  body.margin-ui .m-lead[data-sketch] {
-    border-bottom-color: transparent;
-  }
-}
-/* the leader is written by hand, in the same ink as the old rule */
-body.margin-ui .m-lead[data-sketch] {
-  position: relative;
-}
-body.margin-ui .m-lead > .sketch {
-  top: -4px;
-  bottom: auto;
-  height: 8px;
-  stroke: var(--color-ink-soft);
-}
-/* the card's → is the pen-drawn arrow of the hand notes, sitting in the
-   middle of a cell (between four dots): the card's last whole column and its
-   middle row (the lower of the two middle ones when the rows are even) */
-body.margin-ui .m-arrow {
-  display: block;
-  width: 20px;
-  height: 15px;
-}
-body.margin-ui .m-arrow-pen {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-@supports (top: round(down, 1px, 1px)) {
-  body.margin-ui .m-arrow {
-    top: calc(round(down, 50%, var(--g)) + var(--g-half));
-    right: auto;
-    /* 100% is the padding box, 1px inside the card's left border */
-    left: calc(round(down, 100% + 1px, var(--g)) - var(--g-half) - 1px);
-    transform: translate(-50%, -50%);
-  }
-  /* on hover it nudges towards the next cell, like the card is being pointed at */
-  body.margin-ui .m-card:is(:hover, :focus-visible) .m-arrow {
-    transform: translate(calc(-50% + 4px), -50%);
-  }
 }
 /* the small pen arrows in links (PenArrow.astro): the notes' stroke at text
    size, sitting on the baseline without making the line taller */
