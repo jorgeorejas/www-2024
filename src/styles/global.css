@@ -1504,6 +1504,10 @@
     .m-card-title:has(.m-new, .m-pick) .m-corr-new {
       max-width: calc(100vw - 164px);
     }
+    /* the pen goes in the row above the title: under a note, that row is kept free */
+    .m-anchor:has(> .m-note--item) > .m-card:has(.m-corr) {
+      margin-top: var(--g);
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
