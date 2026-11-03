@@ -2,7 +2,7 @@ import { marginNotes } from "./annotations";
 import { cached, cachedBody } from "./cache";
 import { getBlockTree, queryDatabase, type NotionPage } from "./client";
 import { DATABASES } from "./databases";
-import { firstImageBlock, pageImage, blockImage } from "./images";
+import { coverBlockId, firstImageBlock, pageImage, blockImage } from "./images";
 import { imageSizes } from "./image-size";
 import { blocksToMarkdown, blocksToPlainText } from "./markdown";
 import { pageEmoji, readProperties, slugify } from "./properties";
@@ -382,8 +382,10 @@ export async function recipes() {
             ? difficulty
             : undefined,
         tags: p.relation("Etiquetas").flatMap((id) => tagById.get(id) ?? []),
-        // No cover: the first photo in the page (cached per edit) is the card image
-        image: pageImage(page, 1280) ?? (await recipeBody(page, false)).heroImage,
+        // The card photo is the page cover (set it in Notion). The index never
+        // reads a recipe's blocks: without a cover the card shows the dotted
+        // placeholder, and only the recipe page falls back to its first photo
+        image: pageImage(page, 1280),
         editedAt: new Date(page.last_edited_time),
       };
       return { id: slugOf(page), page, data };
@@ -396,9 +398,11 @@ export async function recipes() {
 export async function recipeBody(page: NotionPage, hasCover: boolean): Promise<RecipeBody> {
   return cachedBody(`recipe:${page.id}:${page.last_edited_time}`, async () => {
     const blocks = await getBlockTree(page.id);
-    // No cover: the first photo becomes the hero and isn't repeated below
+    // No cover: the first photo becomes the hero and isn't repeated below.
+    // A cover that is one of the page's photos isn't repeated either
     const hero = hasCover ? undefined : firstImageBlock(blocks);
-    const withoutHero = hero ? removeBlock(blocks, hero.id) : blocks;
+    const skip = hero?.id ?? coverBlockId(page);
+    const withoutHero = skip ? removeBlock(blocks, skip) : blocks;
     const parts = splitRecipe(withoutHero);
     const sizes = await imageSizes(withoutHero);
     const [intro, ingredients, steps, extra, gallery] = await Promise.all([
