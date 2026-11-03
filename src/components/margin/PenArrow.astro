@@ -1,0 +1,20 @@
+---
+/*
+ * A small pen-drawn arrow for links in text: → (right), ← (left) or ↗ (out,
+ * a link that leaves the page). Same stroke as the hand notes' arrow; sizes
+ * with the text and never makes its line taller.
+ */
+import { PEN_ARROW_PATHS } from "./hand-arrow";
+
+type Props = { dir?: "right" | "left" | "out"; class?: string };
+const { dir = "right", class: className } = Astro.props;
+const paths = dir === "out" ? PEN_ARROW_PATHS.out : PEN_ARROW_PATHS.right;
+---
+
+<svg
+  class:list={["pen-arrow", `pen-arrow--${dir}`, className]}
+  viewBox={dir === "out" ? "0 0 26 26" : "0 0 30 22"}
+  aria-hidden="true"
+  focusable="false"
+  set:html={paths}
+/>
