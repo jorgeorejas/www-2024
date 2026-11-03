@@ -20,7 +20,7 @@ const isDev = import.meta.env.DEV;
 {
   variant === "mini" ? (
     <p
-      class:list={["np-mini hidden", className]}
+      class:list={["np-mini invisible", className]}
       data-spotify
       data-variant="mini"
       data-dev={isDev ? "true" : "false"}
@@ -154,16 +154,22 @@ const isDev = import.meta.env.DEV;
     return `${Math.round(mo / 12)}y ago`;
   }
 
+  // The one-line variant keeps its row while it waits (and if Spotify fails):
+  // it fills in place instead of pushing the page down when the track arrives
+  function hide(widget: HTMLElement) {
+    widget.classList.add(widget.dataset.variant === "mini" ? "invisible" : "hidden");
+  }
+
   function renderWidget(widget: HTMLElement, data: SpotifyData) {
     const part = (name: string) => widget.querySelector<HTMLElement>(`[data-sp="${name}"]`);
     const mini = widget.dataset.variant === "mini";
 
     if (!data.title || !data.artist || !data.url) {
-      if (!isDev) widget.classList.add("hidden");
+      if (!isDev) hide(widget);
       return;
     }
 
-    widget.classList.remove("hidden");
+    widget.classList.remove("hidden", "invisible");
     const title = part("title");
     const artist = part("artist");
     const link = part("link") as HTMLAnchorElement | null;
@@ -241,7 +247,7 @@ const isDev = import.meta.env.DEV;
       document.dispatchEvent(new CustomEvent("spotify:update", { detail: data }));
     } catch (error) {
       console.error("Failed to fetch Spotify data:", error);
-      if (!isDev) widgets.forEach((widget) => widget.classList.add("hidden"));
+      if (!isDev) widgets.forEach(hide);
       document.dispatchEvent(new CustomEvent("spotify:update", { detail: {} }));
     }
   }
