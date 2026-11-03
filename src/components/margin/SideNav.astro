@@ -1,5 +1,5 @@
 ---
-import { NAV_ITEMS, navKeyFor, type NavKey } from "./nav";
+import { navKeyFor, orderedNav, type NavKey } from "./nav";
 
 type Props = {
   /** Section to mark as current; defaults to the one matching the URL */
@@ -12,12 +12,14 @@ type Props = {
 const { current, variant = "side", class: className } = Astro.props;
 const active = current === undefined ? navKeyFor(Astro.url.pathname) : current;
 const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
+// Same order as the home page's sections (Notion's Secciones)
+const items = orderedNav(Astro.locals.sections ?? []);
 ---
 
 <nav class:list={["m-nav", `m-nav--${variant}`, className]} aria-label="Secciones">
   <ul>
     {
-      NAV_ITEMS.map((item) => (
+      items.map((item) => (
         <li>
           <a
             class="m-nav-i"
