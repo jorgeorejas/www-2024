@@ -1759,6 +1759,19 @@ body.margin-ui .m-lead {
   body.margin-ui .m-card[data-sketch] {
     border-left-color: transparent;
   }
+  body.margin-ui .m-lead[data-sketch] {
+    border-bottom-color: transparent;
+  }
+}
+/* the leader is written by hand, in the same ink as the old rule */
+body.margin-ui .m-lead[data-sketch] {
+  position: relative;
+}
+body.margin-ui .m-lead > .sketch {
+  top: -4px;
+  bottom: auto;
+  height: 8px;
+  stroke: var(--color-ink-soft);
 }
 /* square photo tiles (wishlist grid): the square rounded to whole rows. The
    box stays a plain block, so the photo's height: 100% fills it and
