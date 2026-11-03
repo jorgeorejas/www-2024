@@ -1,4 +1,5 @@
 ---
+import PenArrow from "@components/margin/PenArrow.astro";
 /*
  * Work timeline, Margin "notas" style: no line, no dots. Roles sit flush
  * with the content column (against the ruler) and each role's dates are a
@@ -67,7 +68,7 @@ function noteYears(position: Position) {
             {linkCompanies ? (
               <a href={`/work/${job.slug}`}>
                 {/* no whitespace before the arrow, so the underline stops at the name */}
-                {job.name}<span class="wtl-co-x" aria-hidden="true">↗</span>
+                {job.name}<span class="wtl-co-x" aria-hidden="true"><PenArrow dir="out" /></span>
               </a>
             ) : (
               job.name

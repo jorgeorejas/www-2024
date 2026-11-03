@@ -1,4 +1,5 @@
 ---
+import PenArrow from "./PenArrow.astro";
 import { navKeyFor, orderedNav, type NavKey } from "./nav";
 
 type Props = {
@@ -30,7 +31,7 @@ const items = orderedNav(Astro.locals.sections ?? []);
             <span class="m-nav-l">{item.label}</span>
             {item.outward && (
               <span class="m-nav-x" aria-hidden="true">
-                ↗
+                <PenArrow dir="out" />
               </span>
             )}
           </a>

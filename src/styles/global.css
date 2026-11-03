@@ -1690,6 +1690,28 @@ body.margin-ui .m-arrow-pen {
     transform: translate(calc(-50% + 4px), -50%);
   }
 }
+/* the small pen arrows in links (PenArrow.astro): the notes' stroke at text
+   size, sitting on the baseline without making the line taller */
+body.margin-ui .pen-arrow {
+  display: inline-block;
+  width: 1.15em;
+  height: 0.85em;
+  vertical-align: -0.08em;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+body.margin-ui .pen-arrow--out {
+  width: 0.95em;
+  height: 0.95em;
+  vertical-align: -0.1em;
+}
+body.margin-ui .pen-arrow--left {
+  transform: scaleX(-1);
+}
 /* square photo tiles (wishlist grid): the square rounded to whole rows. The
    box stays a plain block, so the photo's height: 100% fills it and
    object-contain keeps the whole product in view, as before the redesign */

@@ -1,4 +1,5 @@
 ---
+import PenArrow from "@components/margin/PenArrow.astro";
 import MinesweeperGame from "@components/games/Minesweeper.tsx";
 import MarginPage from "@components/margin/MarginPage.astro";
 import Row from "@components/margin/Row.astro";
@@ -14,7 +15,7 @@ import Row from "@components/margin/Row.astro";
 >
   <Row>
     <header class="grid gap-4">
-      <p class="m-date">Fácil → Difícil · Lógica</p>
+      <p class="m-date">Fácil <PenArrow /> Difícil · Lógica</p>
       <h1 class="m-h1">Buscaminas</h1>
       <p class="m-lede max-w-[52ch]">
         Destapa todas las casillas sin pisar ninguna mina. Cada número te dice
