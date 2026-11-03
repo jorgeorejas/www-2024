@@ -18,6 +18,12 @@ const env = (name: string): string | undefined =>
 export const SPOTIFY_CONNECTOR = env("SPOTIFY_CONNECTOR") ?? "spotify/www";
 /** One owner: the site only ever shows Jorge's music */
 const OWNER = { type: "user", id: "jorge" } as const;
+/**
+ * What the site reads. The connector has no default scopes, so asking for
+ * none would get a grant that can't see the player. The token request asks
+ * for the same scopes as the consent, or Connect won't find the grant.
+ */
+const SCOPES = ["user-read-currently-playing", "user-read-playback-state", "user-read-recently-played"];
 
 async function legacyToken(): Promise<string | undefined> {
   const id = env("SPOTIFY_CLIENT_ID");
@@ -48,7 +54,7 @@ async function legacyToken(): Promise<string | undefined> {
 export async function spotifyAccessToken(fresh = false): Promise<string> {
   try {
     const { getToken } = await import("@vercel/connect");
-    return await getToken(SPOTIFY_CONNECTOR, { subject: OWNER }, { forceRefresh: fresh });
+    return await getToken(SPOTIFY_CONNECTOR, { subject: OWNER, scopes: SCOPES }, { forceRefresh: fresh });
   } catch (error) {
     const { name, message, code } = error as Error & { code?: string };
     console.warn(`[spotify] no token from Vercel Connect (${name} ${code ?? ""}: ${message}), trying the env refresh token`);
@@ -61,7 +67,7 @@ export async function spotifyAccessToken(fresh = false): Promise<string> {
 /** Where to send Jorge to (re)authorize his Spotify account in Vercel Connect */
 export async function spotifyAuthorizationUrl(returnUrl: string): Promise<string> {
   const { startAuthorization } = await import("@vercel/connect");
-  const { url } = await startAuthorization(SPOTIFY_CONNECTOR, { subject: OWNER }, { callbackUrl: returnUrl });
+  const { url } = await startAuthorization(SPOTIFY_CONNECTOR, { subject: OWNER, scopes: SCOPES }, { callbackUrl: returnUrl });
   return url;
 }
 
