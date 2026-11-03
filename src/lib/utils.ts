@@ -5,14 +5,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatDate(date: Date) {
-  return Intl.DateTimeFormat("es-ES", {
-    month: "short",
-    day: "2-digit",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(date);
-}
 
 /** What a role or a degree that hasn't ended shows instead of an end date */
 export const PRESENT_LABEL = "actualidad";
@@ -29,24 +21,6 @@ export function readingTime(html: string = "") {
   return `${readingTimeMinutes} min de lectura`;
 }
 
-export function dateRange(startDate: Date, endDate?: Date | string): string {
-  const startMonth = startDate.toLocaleString("es-ES", { month: "short", timeZone: "UTC" });
-  const startYear = startDate.getFullYear().toString();
-  let endMonth;
-  let endYear;
-
-  if (endDate) {
-    if (typeof endDate === "string") {
-      endMonth = "";
-      endYear = endDate === "Present" ? PRESENT_LABEL : endDate;
-    } else {
-      endMonth = endDate.toLocaleString("es-ES", { month: "short", timeZone: "UTC" });
-      endYear = endDate.getFullYear().toString();
-    }
-  }
-
-  return `${startMonth} ${startYear} ー ${endMonth} ${endYear}`;
-}
 
 export function getWorkDateRange(
   roles: Array<{
@@ -121,17 +95,6 @@ export function processWorkEntry(workEntry: {
   };
 }
 
-export function formatWorkDate(date: Date | string): string {
-  if (typeof date === "string") {
-    return date === "Present" ? PRESENT_LABEL : date;
-  }
-  return date.toLocaleDateString("es-ES", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-}
 
 export function processEducationEntry(educationEntry: {
   id: string;
@@ -176,9 +139,9 @@ export function isNew(date: Date | undefined, days = 60): boolean {
 
 const pad2 = (n: number) => String(n).padStart(2, "0");
 
-/** yy.mm.dd, e.g. 26.10.21 (UTC, Notion dates are date-only) */
-export function formatDot(date: Date): string {
-  return `${String(date.getUTCFullYear()).slice(2)}.${pad2(date.getUTCMonth() + 1)}.${pad2(date.getUTCDate())}`;
+/** Day, month and year the Spanish way, e.g. 02/11/2026 (UTC, Notion dates are date-only) */
+export function formatShortDate(date: Date): string {
+  return `${pad2(date.getUTCDate())}/${pad2(date.getUTCMonth() + 1)}/${date.getUTCFullYear()}`;
 }
 
 /** Four-digit year, e.g. 2026 (UTC) */

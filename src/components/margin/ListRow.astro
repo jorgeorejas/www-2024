@@ -4,7 +4,7 @@
  * right, pen squiggle under the title on hover. Renders an <li>, so put rows
  * inside <ul class="m-list">. A `note` hangs in the margin at the row's height.
  */
-import { formatDot } from "@lib/utils";
+import { formatShortDate } from "@lib/utils";
 import { CARD_ARROW_SVG } from "./hand-arrow";
 import MarginNote from "./MarginNote.astro";
 import Markers from "./Markers.astro";
@@ -18,7 +18,7 @@ type Props = {
   titleCorrection?: string;
   /** Text after the leader line (year, minutes…) */
   value?: string;
-  /** Shown as yy.mm.dd in a <time> when no `value` is given */
+  /** Shown as dd/mm/yyyy in a <time> when no `value` is given */
   date?: Date;
   description?: string;
   pick?: boolean;
@@ -80,7 +80,7 @@ const showValue = Boolean(value || date);
           <>
             <span class="m-lead" data-sketch="under" aria-hidden="true" />
             <span class="m-val">
-              {value ?? (date && <time datetime={date.toISOString()}>{formatDot(date)}</time>)}
+              {value ?? (date && <time datetime={date.toISOString()}>{formatShortDate(date)}</time>)}
             </span>
           </>
         )
