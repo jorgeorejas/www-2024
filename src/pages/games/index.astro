@@ -9,7 +9,6 @@ import { isNew } from "@lib/utils";
 
 const games = GAMES_LIST.map((game) => ({
   ...game,
-  slug: game.href.replace("/games/", ""),
   isNew: isNew(game.date)
 }));
 const anyNew = games.some((game) => game.isNew);
@@ -38,10 +37,7 @@ const anyNew = games.some((game) => game.isNew);
             value={game.category}
             description={`${game.difficulty} · ${game.description}`}
             isNew={game.isNew}
-          >
-            {/* Test hooks (tests/e2e/hub.spec.ts) ride on the title, inside the link */}
-            <span slot="title" data-testid="game-card" data-game={game.slug}>{game.title}</span>
-          </ListRow>
+          />
         ))
       }
     </ul>

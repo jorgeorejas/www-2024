@@ -11,9 +11,7 @@
     "astro": "astro",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "playwright test",
-    "test:ui": "playwright test --ui",
-    "test:update": "playwright test --update-snapshots"
+    "test": "playwright test"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",

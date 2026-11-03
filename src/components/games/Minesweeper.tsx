@@ -370,7 +370,6 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ className = "" }) => {
       return (
         <button
           key={`${r}-${c}`}
-          data-testid="ms-cell"
           data-row={r}
           data-col={c}
           data-state={cell.flagged ? "flagged" : "hidden"}
@@ -399,7 +398,6 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ className = "" }) => {
     return (
       <div
         key={`${r}-${c}`}
-        data-testid="ms-cell"
         data-row={r}
         data-col={c}
         data-state="revealed"
@@ -439,7 +437,7 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ className = "" }) => {
     "px-3 py-1.5 font-mono text-xs transition-colors border border-flexoki-base-200 dark:border-flexoki-base-800";
 
   return (
-    <div data-testid="ms-game" className={`flex flex-col items-center space-y-4 ${className}`}>
+    <div className={`flex flex-col items-center space-y-4 ${className}`}>
       <div className="flex flex-wrap items-center justify-center gap-2 text-sm">
         {(Object.keys(DIFFICULTIES) as Difficulty[]).map((d) => (
           <button
@@ -458,7 +456,6 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ className = "" }) => {
 
       <div className="flex items-center justify-between gap-6 w-full max-w-md font-mono text-sm">
         <div
-          data-testid="ms-mines-remaining"
           data-mines-remaining={minesRemaining}
           className="px-3 py-1.5 border border-flexoki-base-200 dark:border-flexoki-base-800 tabular-nums text-flexoki-red-600 dark:text-flexoki-red-400"
         >
@@ -467,14 +464,12 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ className = "" }) => {
         <button
           onClick={() => reset()}
           aria-label="Reiniciar partida"
-          data-testid="ms-status"
           data-status={status}
           className={`${pillBase} text-flexoki-base-700 dark:text-flexoki-base-300 hover:text-flexoki-ink dark:hover:text-flexoki-base-100`}
         >
           {statusGlyph} reiniciar
         </button>
         <div
-          data-testid="ms-timer"
           data-seconds={seconds}
           className="px-3 py-1.5 border border-flexoki-base-200 dark:border-flexoki-base-800 tabular-nums text-flexoki-base-700 dark:text-flexoki-base-300"
         >

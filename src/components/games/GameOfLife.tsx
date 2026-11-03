@@ -225,7 +225,6 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ className = "" }) => {
         </div>
 
         <div
-          data-testid="gol-generation"
           data-generation={generation}
           className="font-mono text-xs tabular-nums text-flexoki-base-600 dark:text-flexoki-base-400"
         >
@@ -288,9 +287,8 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ className = "" }) => {
       </div>
 
       <div
-        data-testid="gol-grid"
         data-grid-size={gridSize}
-        className="grid border border-flexoki-base-300 dark:border-flexoki-base-700"
+        className="gol-grid grid border border-flexoki-base-300 dark:border-flexoki-base-700"
         style={{
           gridTemplateColumns: `repeat(${gridSize}, ${cellSize}px)`,
           gap: "1px",
@@ -301,7 +299,6 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ className = "" }) => {
           row.map((cell, j) => (
             <div
               key={`${i}-${j}`}
-              data-testid="gol-cell"
               data-row={i}
               data-col={j}
               data-alive={cell ? "1" : "0"}

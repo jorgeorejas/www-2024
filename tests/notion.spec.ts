@@ -1,9 +1,9 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
-import type { NotionBlock, RichText } from "../../src/lib/notion/client";
-import { sizeFromHeader } from "../../src/lib/notion/image-size";
-import { blocksToMarkdown, richTextToMarkdown } from "../../src/lib/notion/markdown";
-import { parseQuantity, splitRecipe, tagQuantities } from "../../src/lib/notion/recipe";
+import type { NotionBlock, RichText } from "../src/lib/notion/client";
+import { sizeFromHeader } from "../src/lib/notion/image-size";
+import { blocksToMarkdown, richTextToMarkdown } from "../src/lib/notion/markdown";
+import { parseQuantity, splitRecipe, tagQuantities } from "../src/lib/notion/recipe";
 
 /*
  * The Notion → page pipeline, without a browser or Notion: image sizes read

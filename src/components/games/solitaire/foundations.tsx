@@ -67,7 +67,6 @@ export default function Foundations() {
           return (
             <div
               key={suit}
-              data-testid="foundation"
               data-suit={suit}
               data-count={gameState.foundations[suit].length}
               className={`cursor-pointer transition-all duration-200 ${

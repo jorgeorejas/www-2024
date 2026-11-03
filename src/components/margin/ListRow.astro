@@ -44,7 +44,6 @@ const {
   class: className,
 } = Astro.props;
 
-const hasTitleSlot = Astro.slots.has("title");
 const showValue = Boolean(value || date);
 ---
 
@@ -61,11 +60,7 @@ const showValue = Boolean(value || date);
       <span class="m-card-title">
         <Markers pick={pick} isNew={isNew} pickLabel={pickLabel} />
         {
-          hasTitleSlot ? (
-            <span class="m-card-text">
-              <slot name="title" />
-            </span>
-          ) : titleCorrection ? (
+          titleCorrection ? (
             <span class="m-corr">
               <s class="m-card-text">{title}</s>
               <span class="m-corr-new">{titleCorrection}</span>

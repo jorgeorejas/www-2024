@@ -43,7 +43,6 @@ export default function StockWaste() {
           Mazo
         </div>
         <div
-          data-testid="stock"
           data-can-draw={canDraw ? "1" : "0"}
           data-can-recycle={canRecycle ? "1" : "0"}
           className="cursor-grab w-full"
@@ -65,7 +64,6 @@ export default function StockWaste() {
           Descarte
         </div>
         <div
-          data-testid="waste"
           className="cursor-grab w-full relative aspect-5/7"
           onClick={handleWasteClick}
         >

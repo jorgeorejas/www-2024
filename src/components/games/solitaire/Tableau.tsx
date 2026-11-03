@@ -113,7 +113,6 @@ export default function Tableau() {
         return (
           <div
             key={columnIndex}
-            data-testid="tableau"
             data-column={columnIndex}
             data-count={tableau.length}
             className="col-span-1 min-h-[400px] md:min-h-[500px] lg:min-h-[600px]"
