@@ -116,7 +116,7 @@ const OWNED_LABEL = "ya lo tengo";
   {
     filterGroups.length > 0 && (
       <Row label="filtros" as="section" aria-label="Filtros">
-        <div class="text-sm" id="wishlist-filters">
+        <div class="text-meta" id="wishlist-filters">
           {filterGroups.map((group) => (
             <div
               class="flex flex-wrap gap-2"
@@ -154,7 +154,7 @@ const OWNED_LABEL = "ya lo tengo";
         <p class="text-mute">Todavía no hay nada por aquí.</p>
       ) : (
         <div class="space-y-(--g)">
-          <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm">
+          <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-meta">
             <span class="text-mute" id="wishlist-count" aria-live="polite">
               {countLabel(entries.length)}
             </span>
@@ -194,11 +194,11 @@ const OWNED_LABEL = "ya lo tengo";
                     </span>
                     <span class="grid min-w-0">
                       {item.brand && (
-                        <span class="truncate text-[10.5px] uppercase tracking-[0.08em] text-mute">
+                        <span class="truncate text-mark uppercase tracking-[0.08em] text-mute">
                           {item.brand}
                         </span>
                       )}
-                      <span class="line-clamp-2 font-serif text-lg leading-[1.15] text-flexoki-ink">
+                      <span class="line-clamp-2 font-serif text-title-4 leading-[1.15] text-flexoki-ink">
                         <Markers pick={item.owned} pickLabel={OWNED_LABEL} />
                         <span
                           class:list={[
@@ -210,7 +210,7 @@ const OWNED_LABEL = "ya lo tengo";
                           {item.name}
                         </span>
                       </span>
-                      {item.meta && <span class="text-xs text-mute">{item.meta}</span>}
+                      {item.meta && <span class="text-meta text-mute">{item.meta}</span>}
                     </span>
                   </Tag>
                 </li>
@@ -232,7 +232,7 @@ const OWNED_LABEL = "ya lo tengo";
                     {...linkProps(item.url)}
                     data-sketch="left"
                     class:list={[
-                      "m-card flex-row items-start gap-3 mg:gap-3.5",
+                      "m-card flex-row items-start gap-x-3 mg:gap-x-3.5",
                       !item.url && "hover:bg-transparent pr-4",
                     ]}
                   >

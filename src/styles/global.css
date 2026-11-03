@@ -17,6 +17,19 @@
     Caveat Variable, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", "Courier New", monospace;
 
+  /* Margin type scale (text-body, text-meta… in templates). Mono 15px is the
+     one size that fits a dot-grid cell exactly: 9px per character, three per
+     27px cell. Meta is everything small (dates, crumbs, nav, values, labels),
+     mark the caps markers (NUEVO, tiny labels). The serif steps are for
+     titles. Handwriting (Caveat) floats over the grid and stays out of it. */
+  --text-body: 15px;
+  --text-meta: 12px;
+  --text-mark: 10.5px;
+  --text-title-1: 44px;
+  --text-title-2: 32px;
+  --text-title-3: 26px;
+  --text-title-4: 20px;
+
   /* Legacy accent. The Margin design does not use it (see "Margin" below). */
   --color-international-orange: #ff4f00;
 
@@ -363,10 +376,10 @@
     @apply my-4 border-l border-flexoki-base-200 pl-4;
   }
   :is(article, .m-prose) details summary {
-    @apply cursor-pointer font-serif text-lg text-flexoki-ink;
+    @apply cursor-pointer font-serif text-title-4 text-flexoki-ink;
   }
   :is(article, .m-prose) figure figcaption {
-    @apply text-center text-sm text-flexoki-base-500;
+    @apply text-center text-meta text-flexoki-base-500;
   }
   :is(article, .m-prose) video,
   :is(article, .m-prose) .video iframe {
@@ -385,11 +398,12 @@
    src/components/margin/. Everything is light-only and Flexoki.
    ========================================================================== */
 
+/* Sizes are whole cells of the dot grid (27px, see "Dot grid" at the end) */
 :root {
-  --m-mw: 190px; /* margin column */
-  --m-gap: 56px; /* gap between margin and content (the ruler lives here) */
-  --m-col: 728px; /* content column */
-  --m-lane: 30px; /* lane for vertical labels, next to the content */
+  --m-mw: 189px; /* margin column: 7 cells */
+  --m-gap: 54px; /* gap between margin and content, 2 cells (the ruler lives here) */
+  --m-col: 729px; /* content column: 27 cells, 81 characters */
+  --m-lane: 27px; /* lane for vertical labels, next to the content: 1 cell */
   --m-pen-underline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 8' preserveAspectRatio='none'%3E%3Cpath d='M1 5.5C18 3 30 6.8 48 4.6S82 2.8 98 5.2 112 4 119 3.6' fill='none' stroke='%23205ea6' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
@@ -409,36 +423,22 @@
 
 @layer components {
   /* ---------- page grid ---------- */
+  /* the body is 15px mono: 9px per character, one line per 27px row */
   .m-main {
     flex: 1 0 auto;
-    padding: 56px 20px 72px;
+    padding: 54px 20px 72px;
+    overflow-x: clip; /* the dot paper (.m::after) spills a viewport wide on each side */
     font-family: var(--font-mono);
-    font-size: 14px;
-    line-height: 1.7;
+    font-size: var(--text-body);
     color: var(--color-ink-soft);
   }
   .m {
     position: relative;
+    isolation: isolate; /* keeps the dot paper (z-index: -1) inside the page */
     display: grid;
-    gap: 72px;
+    gap: 81px;
     max-width: calc(var(--m-mw) + var(--m-gap) + var(--m-col));
     margin: 0 auto;
-  }
-  /* the ruler between margin and content: short tick every 8px, long every 40px */
-  .m::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: calc(var(--m-mw) + 21px);
-    width: 14px;
-    pointer-events: none;
-    background-image:
-      repeating-linear-gradient(to bottom, var(--color-flexoki-base-400) 0 1px, transparent 1px 40px),
-      repeating-linear-gradient(to bottom, var(--color-flexoki-base-200) 0 1px, transparent 1px 8px);
-    background-size: 14px 100%, 7px 100%;
-    background-repeat: no-repeat;
-    background-position: right top, right top;
   }
   .m-row {
     display: grid;
@@ -448,10 +448,8 @@
   }
   .m-mar {
     display: grid;
-    gap: 14px;
     justify-items: end;
     text-align: right;
-    padding-top: 6px;
     min-width: 0;
   }
   .m-col {
@@ -459,18 +457,16 @@
     max-width: var(--m-col);
   }
 
-  /* ---------- head: name, role, nav, crumbs ---------- */
+  /* ---------- head: name (two rows), role, nav and crumbs, one row each ---------- */
   .m-head {
     display: grid;
-    gap: 6px;
   }
   .m-name {
     justify-self: start;
     margin: 0;
     font-family: var(--font-serif);
     font-weight: 400;
-    font-size: 32px;
-    line-height: 1.05;
+    font-size: var(--text-title-2);
     color: var(--color-flexoki-ink);
   }
   .m-name a {
@@ -480,13 +476,13 @@
   .m-role {
     margin: 0;
     font-weight: 500;
-    font-size: 13px;
+    font-size: var(--text-meta);
     letter-spacing: 0.02em;
     color: var(--color-ink-soft);
   }
   .m-crumbs {
-    margin-top: 18px;
-    font-size: 12px;
+    margin-top: var(--g);
+    font-size: var(--text-meta);
     color: var(--color-mute);
     min-width: 0;
   }
@@ -522,7 +518,7 @@
     max-width: 40ch;
   }
 
-  /* ---------- numbered nav ---------- */
+  /* ---------- numbered nav: one section per row ---------- */
   .m-nav ul {
     display: flex;
     margin: 0;
@@ -533,9 +529,7 @@
     display: flex;
     align-items: baseline;
     gap: 8px;
-    padding: 3px 0;
-    font-size: 12px;
-    line-height: 1.5;
+    font-size: var(--text-meta);
     white-space: nowrap;
     color: var(--color-ink-soft);
     transition: color 0.15s;
@@ -559,7 +553,6 @@
   .m-nav--side ul {
     flex-direction: column;
     align-items: flex-end;
-    gap: 1px;
   }
   .m-nav--side .m-nav-i {
     flex-direction: row-reverse;
@@ -568,26 +561,25 @@
     display: none;
   }
 
-  /* ---------- section heads ---------- */
+  /* ---------- section heads: the link sits on the title's lower row, an empty row below ---------- */
   .m-sec-h {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 28px;
+    gap: 0 18px;
+    margin-bottom: var(--g);
   }
   .m-sec-h > :is(h1, h2, h3) {
     margin: 0;
     font-family: var(--font-serif);
     font-weight: 400;
-    font-size: 26px;
-    line-height: 1.1;
+    font-size: var(--text-title-3);
     color: var(--color-flexoki-ink);
     text-wrap: balance;
   }
   .m-all {
-    font-size: 12.5px;
+    font-size: var(--text-meta);
     color: var(--color-ink-soft);
     padding-bottom: 3px;
     transition: color 0.15s;
@@ -599,26 +591,29 @@
     background-repeat: no-repeat;
     background-position: 0 100%;
   }
+  /* the 3px kept under the link for the hover pen underline hang below the
+     row, so a link that wraps onto its own line is still one row */
+  .m-sec-h > .m-all {
+    margin-bottom: -3px;
+  }
 
   /* ---------- page titles (reading views, indexes) ---------- */
   .m-h1 {
     margin: 0;
     font-family: var(--font-serif);
     font-weight: 400;
-    font-size: clamp(34px, 5.4vw, 44px);
-    line-height: 1.04;
+    font-size: var(--text-title-1);
     color: var(--color-flexoki-ink);
     text-wrap: balance;
   }
   .m-lede {
     margin: 0;
-    font-size: 15px;
-    line-height: 1.7;
+    font-size: var(--text-body);
     color: var(--color-ink-soft);
   }
   .m-date {
     margin: 0;
-    font-size: 12.5px;
+    font-size: var(--text-meta);
     color: var(--color-mute);
   }
   .m-eyebrow {
@@ -626,33 +621,30 @@
     font-family: var(--font-handwritten);
     font-weight: 700;
     font-size: 21px;
-    line-height: 1;
     color: var(--color-pen);
   }
 
-  /* ---------- vertical section labels: ↱ above, letters stacked ---------- */
+  /* ---------- vertical section labels: ↱ above, letters stacked (line heights in "Dot grid") ---------- */
   .m-vert {
     display: flex;
     flex-direction: column;
     align-items: center;
     font-family: var(--font-mono);
-    font-size: 13px;
-    line-height: 1.32;
+    font-size: var(--text-meta);
     color: var(--color-signal);
     text-transform: uppercase;
   }
   .m-vert-up {
     display: block;
-    margin: 0 0 4px 9px;
+    margin: 0 0 0 9px;
     color: var(--color-signal);
   }
 
-  /* ---------- hand notes (Caveat, pen blue) ---------- */
+  /* ---------- hand notes (Caveat, pen blue; line height in "Dot grid") ---------- */
   .hn {
     font-family: var(--font-handwritten);
     font-weight: 500;
     font-size: 21px;
-    line-height: 1.02;
     color: var(--color-pen);
   }
   .hn-h {
@@ -700,7 +692,6 @@
     width: max-content;
     max-width: var(--m-mw);
     text-align: right;
-    line-height: 1;
     transform: rotate(-3deg);
   }
   .m-note small {
@@ -727,11 +718,14 @@
     display: none;
   }
 
-  /* ---------- list rows: TITLE ____ value ---------- */
+  /* ---------- list rows: TITLE ____ value ----------
+     Each line of a card is a row and cards are one empty row apart. The left
+     rule is drawn with the architect's pen from dot to dot (data-sketch="left",
+     src/lib/sketch-rules.ts); the border is the no-JS fallback. */
   .m-list {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: 14px;
+    row-gap: var(--g);
     margin: 0;
     padding: 0;
     list-style: none;
@@ -740,20 +734,26 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 6px;
     width: 100%;
-    padding: 9px 42px 9px 16px;
+    padding: 0 42px 0 16px;
     border-left: 1px solid var(--color-rule);
     color: inherit;
+  }
+  /* the hover wash spills half a row above and below without taking any room */
+  .m-card::before {
+    content: "";
+    position: absolute;
+    inset: calc(-1 * var(--g-half)) 0;
+    z-index: -1;
     transition: background-color 0.3s ease;
   }
-  .m-card:hover {
+  a.m-card:hover::before {
     background-color: var(--color-flexoki-base-100);
   }
   .m-card-t {
     display: flex;
     flex-wrap: nowrap;
-    align-items: baseline;
+    align-items: flex-start;
     gap: 10px;
     min-width: 0;
   }
@@ -762,8 +762,7 @@
     min-width: 0;
     font-family: var(--font-mono);
     font-weight: 600;
-    font-size: 13.5px;
-    line-height: 1.4;
+    font-size: var(--text-body);
     letter-spacing: 0.07em;
     text-transform: uppercase;
     color: var(--color-flexoki-ink);
@@ -779,20 +778,20 @@
   }
   .m-lead {
     flex: 1 1 24px;
+    align-self: flex-start;
     min-width: 24px;
+    margin-top: 18px; /* the leader sits on the title's baseline */
     border-bottom: 1.5px solid var(--color-ink-soft);
-    transform: translateY(-5px);
   }
   .m-val {
     font-family: var(--font-mono);
-    font-size: 12.5px;
+    font-size: var(--text-meta);
     color: var(--color-flexoki-ink);
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
   }
   .m-card-d {
-    font-size: 13px;
-    line-height: 1.65;
+    font-size: var(--text-body);
     color: var(--color-ink-soft);
   }
   .m-arrow {
@@ -815,22 +814,23 @@
   .m-pick {
     margin-right: 0.45em;
     font-family: var(--font-mono);
-    font-size: 0.78em;
+    font-size: var(--text-mark);
     color: var(--color-signal);
   }
   .m-new {
+    position: relative;
+    top: -0.18em; /* raised without making its line taller */
     margin-right: 0.7em;
     font-family: var(--font-mono);
     font-weight: 500;
-    font-size: 10.5px;
+    font-size: var(--text-mark);
     letter-spacing: 0.08em;
     color: var(--color-signal);
-    vertical-align: 0.18em;
   }
   .m-legend {
-    margin: 16px 0 0;
+    margin: var(--g) 0 0;
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: var(--text-meta);
     color: var(--color-mute);
   }
 
@@ -850,7 +850,6 @@
     font-family: var(--font-handwritten);
     font-weight: 700;
     font-size: 1.05em;
-    line-height: 1;
     letter-spacing: 0;
     text-transform: none;
     white-space: nowrap;
@@ -873,22 +872,24 @@
   /* ---------- "more" list: serif titles over a rule (More writing, Other projects) ---------- */
   .m-more-list {
     display: grid;
-    margin: -10px 0 0;
+    margin: 0;
     padding: 0;
     list-style: none;
   }
+  /* the rule under each title can't take a pixel of height, or every row below
+     drifts: it is a background, half a row under the text */
   .m-more-i {
     display: flex;
-    align-items: baseline;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 14px;
-    padding: 11px 0;
-    border-bottom: 1px solid var(--color-rule);
+    padding: 0 0 var(--g);
+    background: linear-gradient(var(--color-rule), var(--color-rule)) left bottom var(--g-half) / 100% 1px no-repeat;
     color: var(--color-flexoki-ink);
     transition: color 0.15s;
   }
   .m-more-i:has(.m-corr) {
-    padding-top: 30px;
+    padding-top: var(--g);
   }
   .m-more-i:hover {
     color: var(--color-signal-ink);
@@ -896,8 +897,7 @@
   .m-more-t {
     min-width: 0;
     font-family: var(--font-serif);
-    font-size: 20px;
-    line-height: 1.2;
+    font-size: var(--text-title-4);
   }
   .m-more-i:hover .m-more-t,
   .m-more-i:focus-visible .m-more-t {
@@ -909,29 +909,28 @@
   }
   .m-more-s {
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: var(--text-meta);
     color: var(--color-mute);
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
   }
 
-  /* ---------- facts grid: ruled cells of small caps labels and values ---------- */
+  /* ---------- facts grid: ruled cells of small caps labels and values ----------
+     each cell is two rows, so its pen lines sit on the dots */
   .m-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 1px;
     margin: 0;
-    padding: 1px;
   }
   /* cells wrap and the ones left on the last row stretch to the full width */
   .m-meta > div {
     flex: 1 1 150px;
     min-width: 0;
-    padding: 8px 11px;
+    padding: 0 9px;
     outline: 1px solid var(--color-rule);
   }
   .m-meta dt {
-    font-size: 10.5px;
+    font-size: var(--text-mark);
     letter-spacing: 0.07em;
     text-transform: uppercase;
     color: var(--color-mute);
@@ -939,7 +938,7 @@
   .m-meta dd {
     margin: 0;
     overflow-wrap: anywhere;
-    font-size: 13.5px;
+    font-size: var(--text-body);
     color: var(--color-flexoki-ink);
   }
   .m-meta a {
@@ -956,7 +955,7 @@
   }
   .m-meta-x {
     margin-left: 0.3em;
-    font-size: 0.85em;
+    font-size: var(--text-meta);
     color: var(--color-mute);
   }
   /* architect's pen (src/lib/sketch-rules.ts) redraws the rules by hand;
@@ -989,7 +988,7 @@
     gap: 4px 8px;
     margin: 0;
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: var(--text-meta);
     line-height: 1.6;
     color: var(--color-mute-ink);
     min-width: 0;
@@ -1007,7 +1006,7 @@
     animation: none;
   }
   .np-l {
-    font-size: 10.5px;
+    font-size: var(--text-mark);
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--color-mute);
@@ -1039,7 +1038,7 @@
     gap: 18px;
     padding-top: 22px;
     border-top: 1px solid var(--color-rule);
-    font-size: 12px;
+    font-size: var(--text-meta);
     color: var(--color-mute);
   }
   .m-social {
@@ -1061,43 +1060,43 @@
     text-transform: capitalize;
   }
 
-  /* ---------- reading views ---------- */
+  /* ---------- reading views ----------
+     body text at 15px (9px per character); the rows between blocks are set
+     by the prose rhythm in "Dot grid" */
   .m-article {
     display: grid;
-    gap: 20px;
+    row-gap: var(--g);
     min-width: 0;
   }
   .m-prose {
     position: relative;
     max-width: 68ch;
     font-family: var(--font-mono);
-    font-size: 14.5px;
-    line-height: 1.85;
+    font-size: var(--text-body);
     color: var(--color-ink-soft);
     overflow-wrap: break-word;
   }
   .m-prose > :first-child {
     margin-top: 0;
   }
-  .m-prose :where(p, ul, ol, blockquote, pre, table, figure, hr, details, .video, video) {
-    margin: 1em 0 0;
-  }
   .m-prose :where(h1, h2, h3, h4) {
-    margin: 1.6em 0 0;
     font-family: var(--font-serif);
     font-weight: 400;
-    line-height: 1.15;
     color: var(--color-flexoki-ink);
     text-wrap: balance;
   }
+  /* h2–h4 get their empty row above from the prose rhythm */
+  .m-prose :where(h1) {
+    margin-top: 1.6em;
+  }
   .m-prose :where(h1, h2) {
-    font-size: 30px;
+    font-size: var(--text-title-2);
   }
   .m-prose h3 {
-    font-size: 25px;
+    font-size: var(--text-title-3);
   }
   .m-prose h4 {
-    font-size: 20px;
+    font-size: var(--text-title-4);
   }
   .m-prose :where(h1, h2, h3, h4) + * {
     margin-top: 0.6em;
@@ -1124,15 +1123,8 @@
     padding-left: 1.6em;
     list-style: decimal;
   }
-  .m-prose li + li,
-  .m-prose li > :where(ul, ol) {
-    margin-top: 0.35em;
-  }
   .m-prose li::marker {
     color: var(--color-mute);
-  }
-  .m-prose li > p {
-    margin: 0;
   }
   .m-prose blockquote {
     padding-left: 1em;
@@ -1143,14 +1135,12 @@
   .m-prose :not(pre) > code {
     padding: 0.1em 0.35em;
     background: var(--color-flexoki-base-50);
-    font-size: 0.92em;
     color: var(--color-flexoki-ink);
   }
   .m-prose pre {
-    padding: 14px 16px;
+    padding: var(--g-half) 18px;
     overflow-x: auto;
-    font-size: 13px;
-    line-height: 1.6;
+    font-size: var(--text-meta);
   }
   .m-prose img {
     display: block;
@@ -1159,21 +1149,30 @@
     margin: 1.6em auto 0;
     border-radius: 2px;
   }
+  /* a video's size is only known once it loads: keep a 16:9 box meanwhile */
+  .m-prose video:not([height]) {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: contain;
+  }
+  /* horizontal rules can't take a pixel of height, or every row below drifts:
+     they are drawn as shadows or backgrounds instead. This one fills a row. */
   .m-prose hr {
-    margin: 2.4em 0 0;
+    height: var(--g);
     border: 0;
-    border-top: 1px solid var(--color-rule);
+    background: linear-gradient(var(--color-rule), var(--color-rule)) center / 100% 1px no-repeat;
   }
   .m-prose table {
     display: block;
     max-width: 100%;
     overflow-x: auto;
     border-collapse: collapse;
-    font-size: 13px;
+    font-size: var(--text-meta);
   }
   .m-prose :where(th, td) {
-    padding: 6px 10px 6px 0;
+    padding: 0 10px 0 0;
     border-bottom: 1px solid var(--color-rule);
+    box-shadow: inset 0 1px var(--color-rule);
     text-align: left;
     vertical-align: top;
   }
@@ -1202,26 +1201,20 @@
     font-family: var(--font-handwritten);
     font-weight: 700;
     font-size: 1.3em;
-    line-height: 1;
     color: var(--color-pen);
   }
   /* footnotes (remark-gfm) */
-  .m-prose sup {
-    line-height: 0;
-  }
   .m-prose sup a[data-footnote-ref] {
     margin-left: 1px;
-    font-size: 0.78em;
+    font-size: var(--text-meta);
     color: var(--color-signal-ink);
     text-decoration: none;
   }
   .m-prose .footnotes {
-    margin-top: 2.2em;
-    padding-top: 14px;
-    border-top: 1px solid var(--color-rule);
+    padding-top: var(--g);
+    box-shadow: inset 0 1px var(--color-rule);
     font-style: italic;
-    font-size: 12.5px;
-    line-height: 1.7;
+    font-size: var(--text-meta);
     color: var(--color-mute-ink);
   }
   .m-prose .footnotes > h2 {
@@ -1233,13 +1226,9 @@
     white-space: nowrap;
   }
   .m-prose .footnotes ol {
-    margin: 0;
     padding-left: 1.6em;
     display: grid;
     gap: 5px;
-  }
-  .m-prose .footnotes li + li {
-    margin-top: 0;
   }
   .m-prose .footnotes li::marker {
     font-style: normal;
@@ -1326,7 +1315,7 @@
     display: flex;
     gap: 10px;
     padding: 7px 0;
-    border-bottom: 1px dashed var(--color-rule);
+    background: linear-gradient(to right, var(--color-rule) 50%, transparent 0) bottom / 6px 1px repeat-x;
   }
   .m-qty {
     min-width: 6.5ch;
@@ -1354,7 +1343,7 @@
     left: 0;
     top: 0.2em;
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: var(--text-meta);
     color: var(--color-signal-ink);
   }
   .m-tips {
@@ -1378,26 +1367,20 @@
   /* ---------- collapsed layout (phones, narrow windows) ---------- */
   @media (max-width: 760px) {
     .m-main {
-      padding: 32px 16px 56px;
+      padding: 27px 16px 54px;
     }
     .m {
-      gap: 48px;
-    }
-    .m::before {
-      display: none;
+      gap: 54px;
     }
     .m-row {
       grid-template-columns: minmax(0, 1fr);
       column-gap: 0;
-      row-gap: 12px;
     }
     .m-mar {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       justify-items: start;
-      gap: 8px 16px;
-      padding-top: 0;
       text-align: left;
     }
     .m-mar:not(:has(*)),
@@ -1406,7 +1389,6 @@
     }
     .m-nav--row {
       display: block;
-      margin-top: 10px;
       max-width: 100%;
       overflow-x: auto;
       scrollbar-width: none;
@@ -1421,8 +1403,15 @@
     .m-vert-up {
       display: none;
     }
+    /* notes drop into the flow on phones: no extra space around them, so
+       whatever follows stays on the grid (line heights in "Dot grid") */
     .m-note--margin {
+      margin-top: 0;
       transform: rotate(-2deg);
+    }
+    .m-note :where(ul, ol) {
+      gap: 0;
+      margin-top: 0;
     }
     .m-note--item,
     .m-note--beside {
@@ -1430,7 +1419,7 @@
       display: block;
       width: auto;
       max-width: none;
-      margin: 0 0 6px 4px;
+      margin: 0 0 0 4px;
       text-align: left;
       transform: rotate(-2deg);
     }
@@ -1471,6 +1460,10 @@
     }
     .m-crumbs [aria-current] {
       max-width: 24ch;
+    }
+    /* page titles drop a step on phones */
+    .m-h1 {
+      font-size: var(--text-title-2);
     }
     /* a margin note sits right above the title: leave room for the pen */
     .m-h1:has(.m-corr) {
@@ -1547,30 +1540,19 @@
    One cell = 27px = one line of the 15px mono body = three of its characters
    (9px each). Every line of text sits between two rows of dots, the content
    column starts on a column of dots, and titles take two rows.
-   CSS sets the metrics; src/lib/dot-grid.ts nudges any block that still lands
-   between rows (images, page-specific layouts) back onto the grid, before the
-   first paint, so nothing jumps.
-   Unlayered on purpose, so it wins over the component layer.
+   The Margin components above are sized in rows (var(--g)); this block holds
+   the grid itself and the few rules that have to win over everything else.
+   src/lib/dot-grid.ts nudges any block that still lands between rows
+   (images, page-specific layouts) back onto the grid, before the first
+   paint, so nothing jumps.
+   Unlayered on purpose: it beats the component layer and also Tailwind
+   utilities (@layer utilities), which the rules that override template
+   classes need.
    ========================================================================== */
 :root {
   --g: 27px;
   --g-half: 13.5px;
   --g-dot: rgb(16 15 15 / 0.14);
-}
-body.margin-ui {
-  --m-mw: 189px; /* 7 cells */
-  --m-gap: 54px; /* 2 cells, the ruler lives here */
-  --m-col: 729px; /* 27 cells, 81 characters */
-  --m-lane: 27px;
-}
-body.margin-ui .m-main {
-  overflow-x: clip;
-  padding-top: 54px;
-  font-size: 15px;
-}
-body.margin-ui .m {
-  isolation: isolate;
-  gap: 81px;
 }
 /* the paper: dots on cell corners, full width, anchored to the content column */
 body.margin-ui .m::after {
@@ -1586,14 +1568,25 @@ body.margin-ui .m::after {
   background-size: var(--g) var(--g);
   background-position: calc(100vw + var(--m-mw) + var(--m-gap) - var(--g-half)) calc(-1 * var(--g-half));
 }
-/* the ruler marks the rows: a long tick on every row of dots, short ones per character */
+/* the ruler between margin and content marks the rows: a long tick on every
+   row of dots, a short one every character */
 body.margin-ui .m::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
   left: calc(var(--m-mw) + 20px);
+  width: 14px;
+  pointer-events: none;
   background-image:
     repeating-linear-gradient(to bottom, var(--color-flexoki-base-400) 0 1px, transparent 1px var(--g)),
     repeating-linear-gradient(to bottom, var(--color-flexoki-base-200) 0 1px, transparent 1px 9px);
+  background-size: 14px 100%, 7px 100%;
+  background-repeat: no-repeat;
+  background-position: right top, right top;
 }
-/* one line = one row, everywhere; titles get two rows */
+/* one line = one row, everywhere; titles get two rows. This is why the
+   components above set no line heights: inside a Margin page this wins */
 body.margin-ui .m-main :where(*) {
   line-height: var(--g);
 }
@@ -1609,25 +1602,19 @@ body.margin-ui .m-main :where(sup, sub, small, code, kbd, .m-new, .m-pick, .m-me
 body.margin-ui .m-main :where(sup, sub, small, code, kbd, .m-new, .m-pick, .m-meta-x) * {
   line-height: 0;
 }
-body.margin-ui .m-new {
-  position: relative;
-  top: -0.18em;
-  vertical-align: baseline;
-}
-/* page headers (title, date, lede) stack row after row; an empty row before the body */
+/* page headers (title, date, lede) stack row after row; an empty row before
+   the body. Pages lay them out with utilities (grid gap-3, mb-10), so the
+   grid has to override those here */
 body.margin-ui .m-main header {
   row-gap: 0;
 }
 body.margin-ui .m-main header[class*="mb-"] {
   margin-bottom: var(--g);
 }
-body.margin-ui .m-article {
-  row-gap: var(--g);
-}
-/* body text at 15px: 9px per character */
-body.margin-ui :where(.m-prose, .m-lede) {
-  font-size: 15px;
-}
+/* prose rhythm: blocks stack row after row with an empty row after each one,
+   and headings take the empty row above instead. It has to win over the
+   Notion block rules (callouts, toggles, videos) in the component layer,
+   which classic articles share */
 body.margin-ui .m-prose > * + *,
 body.margin-ui .m-prose :where(p, ul, ol, blockquote, pre, table, figure, hr, details, .video, video) {
   margin-top: 0;
@@ -1642,119 +1629,17 @@ body.margin-ui .m-prose li > :where(ul, ol) {
   margin-top: 0;
   margin-bottom: 0;
 }
-body.margin-ui .m-prose pre {
-  padding: var(--g-half) 18px;
-}
-/* a video's size is only known once it loads: keep a 16:9 box meanwhile */
-body.margin-ui .m-prose video:not([height]) {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: contain;
-}
-/* head: name (two rows), role, nav and crumbs on rows */
-body.margin-ui .m-head {
-  gap: 0;
-}
-body.margin-ui .m-crumbs {
-  margin-top: var(--g);
-}
-body.margin-ui .m-mar {
-  gap: 0;
-  padding-top: 0;
-}
-/* the project meta table: each cell is two rows, so its pen lines sit on the dots */
-body.margin-ui .m-meta {
-  gap: 0;
-  padding: 0;
-}
-body.margin-ui .m-meta > div {
-  padding: 0 9px;
-}
-/* rows that used flex centring or baseline alignment line up by rows instead */
-body.margin-ui .m-sec-h {
-  align-items: flex-end;
-  gap: 0 18px;
-  margin-bottom: var(--g);
-}
-/* the "see all" link keeps 3px under it for the hover pen underline; they
-   hang below the row, so a link that wraps onto its own line is one row */
-body.margin-ui .m-sec-h > .m-all {
-  margin-bottom: -3px;
-}
-body.margin-ui .m-more-list {
-  margin-top: 0;
-}
-body.margin-ui .m-legend {
-  margin-top: var(--g);
-}
-/* horizontal rules can't take a pixel of height, or every row below drifts:
-   they are drawn as shadows or backgrounds instead */
-body.margin-ui .m-more-i {
-  align-items: flex-start;
-  padding: 0 0 var(--g);
-  border-bottom: 0;
-  background: linear-gradient(var(--color-rule), var(--color-rule)) left bottom var(--g-half) / 100% 1px no-repeat;
-}
-body.margin-ui .m-more-i:has(.m-corr) {
-  padding-top: var(--g);
-}
+/* the footer on the grid: its rule is a shadow, so it takes no height, and
+   links and now playing start on a row, one empty row apart when they wrap.
+   Pages still on the classic layout (/cv) show the same footer off the grid */
 body.margin-ui .m-foot {
-  padding-top: var(--g);
-  border-top: 0;
-  box-shadow: inset 0 1px var(--color-rule);
-}
-body.margin-ui .m-prose hr {
-  height: var(--g);
-  border: 0;
-  background: linear-gradient(var(--color-rule), var(--color-rule)) center / 100% 1px no-repeat;
-}
-body.margin-ui .m-prose :where(th, td) {
-  padding-top: 0;
-  padding-bottom: 0;
-  border-top: 0;
-  box-shadow: inset 0 1px var(--color-rule);
-}
-body.margin-ui .m-prose .footnotes {
-  border-top: 0;
-  box-shadow: inset 0 1px var(--color-rule);
-  padding-top: var(--g);
-}
-body.margin-ui .m-ingr li {
-  border-bottom: 0;
-  background: linear-gradient(to right, var(--color-rule) 50%, transparent 0) bottom / 6px 1px repeat-x;
-}
-/* list cards: each line of a card is a row, cards are one empty row apart, and
-   the left rule is drawn with the architect's pen from dot to dot
-   (data-sketch="left", src/lib/sketch-rules.ts). The hover wash spills half a
-   row above and below without taking any room. */
-body.margin-ui .m-list {
-  row-gap: var(--g);
-}
-body.margin-ui .m-card {
-  row-gap: 0;
-  padding-block: 0;
-}
-body.margin-ui .m-card::before {
-  content: "";
-  position: absolute;
-  inset: calc(-1 * var(--g-half)) 0;
-  z-index: -1;
-  transition: background-color 0.3s ease;
-}
-body.margin-ui .m-card:hover {
-  background-color: transparent;
-}
-body.margin-ui a.m-card:hover::before {
-  background-color: var(--color-flexoki-base-100);
-}
-body.margin-ui .m-card-t {
   align-items: flex-start;
+  row-gap: var(--g);
+  padding-top: var(--g);
+  border-top: 0;
+  box-shadow: inset 0 1px var(--color-rule);
 }
-body.margin-ui .m-lead {
-  align-self: flex-start;
-  margin-top: 18px; /* the leader sits on the title's baseline */
-  transform: none;
-}
+/* with JavaScript the architect's pen draws the cards' left rule from dot to dot */
 @media (scripting: enabled) {
   body.margin-ui .m-card[data-sketch] {
     border-left-color: transparent;
@@ -1842,20 +1727,9 @@ body.margin-ui .m-foot :where(ul),
 body.margin-ui .np-mini {
   row-gap: 0;
 }
+/* now playing centres its bits on the row (off the grid, on /cv, they sit on the baseline) */
 body.margin-ui .np-mini {
   align-items: center;
-}
-/* footer: social links and now playing start on a row, one empty row apart when they wrap */
-body.margin-ui .m-foot {
-  align-items: flex-start;
-  row-gap: var(--g);
-}
-/* the numbered nav: one section per row */
-body.margin-ui .m-nav-i {
-  padding-block: 0;
-}
-body.margin-ui .m-nav--side ul {
-  gap: 0;
 }
 /* vertical section labels: the ↱ takes a row, each letter half a row */
 body.margin-ui .m-vert,
@@ -1863,7 +1737,6 @@ body.margin-ui .m-vert :where(*) {
   line-height: var(--g-half);
 }
 body.margin-ui .m-vert-up {
-  margin-bottom: 0;
   line-height: var(--g);
 }
 /* hand notes keep their own handwriting rhythm; they float over the grid */
@@ -1871,16 +1744,6 @@ body.margin-ui .m-main :where(.hn, .hn *) {
   line-height: 1.02;
 }
 @media (max-width: 760px) {
-  body.margin-ui .m-main {
-    padding: 27px 16px 54px;
-  }
-  body.margin-ui .m-row,
-  body.margin-ui .m-mar {
-    row-gap: 0;
-  }
-  body.margin-ui .m-nav--row {
-    margin-top: 0;
-  }
   /* section labels lie down in one row */
   body.margin-ui .m-vert,
   body.margin-ui .m-vert :where(*) {
@@ -1891,18 +1754,8 @@ body.margin-ui .m-main :where(.hn, .hn *) {
   body.margin-ui .m-main :where(.m-note--margin, .m-note--item, .m-note--beside, .m-note .hn-h, .m-note li) {
     line-height: var(--g);
   }
-  body.margin-ui .m-note--margin,
-  body.margin-ui .m-note :where(ul, ol) {
-    margin-top: 0;
-  }
-  body.margin-ui .m-note :where(ul, ol) {
-    gap: 0;
-  }
-  body.margin-ui :is(.m-note--item, .m-note--beside) {
-    margin-bottom: 0;
-  }
-  body.margin-ui .m {
-    gap: 54px;
+  body.margin-ui .m::before {
+    display: none;
   }
   body.margin-ui .m::after {
     background-position: calc(100vw - var(--g-half)) calc(-1 * var(--g-half));
