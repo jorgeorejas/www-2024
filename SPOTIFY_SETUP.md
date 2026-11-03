@@ -15,6 +15,7 @@ The Spotify grant lives in **Vercel Connect** (connector `spotify/www`, attached
 ## Authorizing (once, or whenever Spotify cuts access)
 
 0. Once: in the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard), open the app the connector uses → Settings → Redirect URIs, add `https://connect.vercel.com/callback` and save. Without it Spotify answers "redirect_uri: Not matching configuration".
+   Also once: in the Vercel dashboard, the `spotify/www` connector's **Token Auth Method** must be **none**, with **PKCE** on. Spotify's token exchange rejected the client secret, so the secret stored in the connector isn't used.
 
 1. Set the key, any long random string, in Production: `vcp env add SPOTIFY_CONNECT_KEY production`. Env changes need a deploy to apply.
 2. Open `https://www.jorgeorejas.com/api/spotify/connect?key=<the key>`, log in to Spotify and accept. Vercel Connect finishes the OAuth handshake and sends you back to the home page.

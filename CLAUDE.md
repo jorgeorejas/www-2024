@@ -169,6 +169,6 @@ API routes go in `src/pages/api/` and must return a `Response` object. The site 
 
 - **Node Version**: Requires Node >= 22.22.0 (Astro 7 requirement, specified in `package.json` engines)
 - **Custom Remark Plugin**: The `remarkCorrection` plugin is registered in `markdown.processor` in `astro.config.mjs` and again in `src/lib/notion/render.ts` for Notion bodies. Astro 7 defaults Markdown to the native Sätteri pipeline, so the config opts back into the remark/rehype processor via `unified()` from `@astrojs/markdown-remark` to keep the correction plugin working.
-- **Vercel Configuration**: The site uses Vercel Web Analytics, enabled in the adapter config
+- **Vercel Configuration**: The site uses Vercel Web Analytics, enabled in the adapter config. A push that only changes docs, screenshots, tests or tool settings doesn't deploy: `vercel.json` runs `scripts/vercel-ignore-build.sh` as the Ignored Build Step (each deployment is ~60 MB of storage). Add a path to its `SITE_FREE` list only if it never reaches the site
 - **ngrok Configuration**: Vite server is configured to allow ngrok domains for local testing with Spotify OAuth callbacks
 - **Git Worktrees**: The project uses git worktrees (see `worktree/` directory) - avoid touching these
