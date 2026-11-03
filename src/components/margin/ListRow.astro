@@ -5,6 +5,7 @@
  * inside <ul class="m-list">. A `note` hangs in the margin at the row's height.
  */
 import { formatDot } from "@lib/utils";
+import { CARD_ARROW_SVG } from "./hand-arrow";
 import MarginNote from "./MarginNote.astro";
 import Markers from "./Markers.astro";
 
@@ -77,7 +78,7 @@ const showValue = Boolean(value || date);
       {
         showValue && (
           <>
-            <span class="m-lead" aria-hidden="true" />
+            <span class="m-lead" data-sketch="under" aria-hidden="true" />
             <span class="m-val">
               {value ?? (date && <time datetime={date.toISOString()}>{formatDot(date)}</time>)}
             </span>
@@ -86,6 +87,6 @@ const showValue = Boolean(value || date);
       }
     </span>
     {description && <span class="m-card-d">{description}</span>}
-    <span class="m-arrow" aria-hidden="true">→</span>
+    <span class="m-arrow" aria-hidden="true" set:html={CARD_ARROW_SVG} />
   </a>
 </li>

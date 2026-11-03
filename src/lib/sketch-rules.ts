@@ -8,6 +8,8 @@
  * keeps a plain 1px rule as the fallback and hides it once the sketch is in.
  * `data-sketch="left"` draws only the element's own left rule (list cards):
  * one stroke from the row of dots above it to the row below.
+ * `data-sketch="under"` draws its bottom rule as a handwritten line, a bit
+ * wavier than the architect's (the leader in `TITLE ____ value` rows).
  */
 
 type Segment = { x1: number; y1: number; x2: number; y2: number };
@@ -60,6 +62,9 @@ function merge(edges: Edge[]): Edge[] {
 function segments(grid: HTMLElement): Segment[] {
   // on the card's outer edge, where its 1px border was
   if (grid.dataset.sketch === "left") return [{ x1: -0.5, y1: 0, x2: -0.5, y2: grid.offsetHeight }];
+  // where its bottom border was: the svg is 8px tall from 4px above the
+  // leader (an svg 0px tall isn't painted at all), so the line runs at 4.75
+  if (grid.dataset.sketch === "under") return [{ x1: 0, y1: 4.75, x2: grid.offsetWidth, y2: 4.75 }];
   const box = grid.getBoundingClientRect();
   const across: Edge[] = [];
   const down: Edge[] = [];
@@ -105,6 +110,25 @@ function stroke(seg: Segment, rand: () => number) {
   };
 }
 
+/** A handwritten horizontal line: short overshoot, a gentle wave, a slight slope */
+function handStroke(seg: Segment, rand: () => number) {
+  const length = seg.x2 - seg.x1;
+  const start = seg.x1 - (0.5 + rand() * 2);
+  const end = seg.x2 + 0.5 + rand() * 2;
+  const slope = (rand() - 0.5) * 1.2;
+  const pieces = Math.max(2, Math.round(length / 90));
+  const step = (end - start) / pieces;
+  const y = (x: number) => seg.y1 + slope * ((x - start) / (end - start) - 0.5) + (rand() - 0.5) * 0.9;
+  let d = `M${start.toFixed(2)} ${y(start).toFixed(2)}`;
+  for (let i = 1; i <= pieces; i++) {
+    const x = start + step * i;
+    const cx = x - step / 2;
+    const cy = y(cx) + (rand() - 0.5) * 1.6;
+    d += ` Q${cx.toFixed(2)} ${cy.toFixed(2)} ${x.toFixed(2)} ${y(x).toFixed(2)}`;
+  }
+  return { d, width: (1.3 + rand() * 0.4).toFixed(2), opacity: (0.85 + rand() * 0.15).toFixed(2) };
+}
+
 const SVG = "http://www.w3.org/2000/svg";
 
 function draw(grid: HTMLElement, animate: boolean, delay = 0) {
@@ -113,7 +137,9 @@ function draw(grid: HTMLElement, animate: boolean, delay = 0) {
   svg.setAttribute("class", "sketch");
   svg.setAttribute("aria-hidden", "true");
 
-  const seed = hash(grid.textContent ?? "");
+  // an empty leader takes its seed from its row, so each row draws its own line
+  const hand = grid.dataset.sketch === "under";
+  const seed = hash((hand ? grid.parentElement?.textContent : grid.textContent) ?? "");
   // horizontals top to bottom, then verticals left to right, like a hand would
   const lines = segments(grid).sort((a, b) => {
     const fa = a.y1 === a.y2;
@@ -123,7 +149,8 @@ function draw(grid: HTMLElement, animate: boolean, delay = 0) {
   });
 
   const paths = lines.map((seg, i) => {
-    const { d, width, opacity } = stroke(seg, random(seed + i * 7919));
+    const rand = random(seed + i * 7919);
+    const { d, width, opacity } = hand ? handStroke(seg, rand) : stroke(seg, rand);
     const path = document.createElementNS(SVG, "path");
     path.setAttribute("d", d);
     path.setAttribute("stroke-width", width);
