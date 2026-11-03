@@ -34,6 +34,8 @@ test.describe("Games hub /games", () => {
     );
     await expect(page).toHaveScreenshot("hub-desktop.png", {
       fullPage: true,
+      // the footer's now-playing line changes with whatever is on Spotify
+      mask: [page.locator(".np-mini")],
     });
   });
 
@@ -44,6 +46,7 @@ test.describe("Games hub /games", () => {
     );
     await expect(page).toHaveScreenshot("hub-mobile.png", {
       fullPage: true,
+      mask: [page.locator(".np-mini")],
     });
   });
 });

@@ -80,7 +80,7 @@ The site implements a unique inline correction feature for showing typos and cor
 
 This is processed by a custom remark plugin (`src/lib/remark-correction.mjs`) that transforms the markdown into styled HTML. The strikethrough appears in blue with the correction in a handwritten font next to it.
 
-There's also a `<Correction>` Astro component for titles/headings where the correction appears above the text with rotation.
+Titles get the same joke from the Notion column "Corrección del título": the title is struck through and the correction is written above it in pen (`.m-corr` / `.m-corr-new`, used by `ListRow` and the page titles).
 
 See `docs/markdown-correction-spec.md` for full specification.
 
@@ -95,15 +95,13 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 ### Spotify Integration
 The site displays currently playing Spotify tracks in the footer via:
 
-1. **API Route**: `src/pages/api/spotify/now-playing.ts` - Server-side endpoint that uses OAuth refresh tokens to fetch current playback
+1. **API Route**: `src/pages/api/spotify/now-playing.ts` - Server-side endpoint that fetches current playback with a token from Vercel Connect (connector `spotify/www`, `src/lib/spotify.ts`); `/api/spotify/connect?key=<SPOTIFY_CONNECT_KEY>` re-authorizes Jorge's account
 2. **Component**: `src/components/SpotifyNowPlaying.astro` - Client-side component that polls the API every 30 seconds
-3. **Auth Flow**: `src/pages/spotify-auth.astro` - OAuth callback page for initial setup
+3. **Legacy auth page**: `src/pages/spotify-auth.astro` - dev-only page that mints an env refresh token (the fallback when Connect isn't available, e.g. locally)
 
-**Required Environment Variables** (see `.env.example`; Notion reads `NOTION_TOKEN`, and Vercel Connect connector `notion/notion-www` delivers the webhooks):
-- `SPOTIFY_CLIENT_ID`
-- `SPOTIFY_CLIENT_SECRET`
-- `SPOTIFY_REFRESH_TOKEN`
-- `SPOTIFY_REDIRECT_URI` (for initial auth only)
+**Environment Variables** (see `.env.example`; Notion reads `NOTION_TOKEN`, and Vercel Connect connector `notion/notion-www` delivers the webhooks):
+- `SPOTIFY_CONNECT_KEY` (opens `/api/spotify/connect`; without it the route is a 404)
+- Optional fallback for local development: `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, `SPOTIFY_REFRESH_TOKEN`, `SPOTIFY_REDIRECT_URI`
 
 Setup instructions are in `SPOTIFY_SETUP.md`.
 
@@ -134,7 +132,7 @@ This is the single source of truth for site configuration.
 The redesign is called **Margin**: a left margin column (numbered side nav, vertical section labels with a drawn ↱, handwritten notes), a thin measuring ruler, and a content column (max 728px). Below 760px it collapses to one column (nav becomes a scrolling row, labels go horizontal, notes go inline above their item).
 - Components: `src/components/margin/` — `MarginPage` (page shell, wraps `PageLayout` with `variant="margin"`), `Row` (margin slot + content), `SideNav`, `SectionLabel`, `SectionHead`, `ListRow` (TITLE ____ value rows), `Markers` (◆ pick / NEW), `Legend`, `MarginNote`, `NowNote`, `Crumbs`, `NowPlayingMini`, `MarginFooter`; `classes.ts` has the square selector buttons used on /wishlist.
 - CSS: the `Margin` block at the end of `global.css` (`.m-*` classes, `.hn` hand notes, `.m-prose` for reading views incl. footnotes and corrections) plus tokens `signal` (Flexoki orange-500), `signal-ink` (orange-600), `pen` (blue-600), `rule`, `mute` (base-600, the lightest grey allowed for text: it passes WCAG AA on paper), and the `mg:` breakpoint. Flexoki colours only; don't use `international-orange` in Margin pages.
-- Classic element rules (`header`, `main`, `article` prose…) skip Margin pages (`body.margin-ui`), so pages not yet migrated keep working with `Container` + `Nav`.
+- Classic element rules (`header`, `main`, `article` prose…) skip Margin pages (`body.margin-ui`), so /cv (the only page still on the classic layout) keeps working with `Container` + `Footer`.
 - Margin notes and picks are content from Notion ("Nota al margen", "Destacado"/"Destacada"), never copy in code.
 - Annotations: in a Notion body, give words the yellow background colour and leave a comment on them. The site draws a marker over the words, a pen bracket next to those lines and the comment as a hand note in the margin, animated the first time they scroll into view (`src/lib/notion/annotations.ts` reads the comments, `src/lib/annotate.ts` draws). Only Jorge's open comments show: resolving a comment hides its note, and a highlight without a comment is just the marker. The site's Notion token is read-only, and it only asks for comments on blocks that have a highlight.
 - Dot grid (libreta punteada): faint dots every 27px behind every Margin page. One cell = one line of the 15px mono body = 3 characters (9px each), so every line sits between two rows of dots and titles take two rows. Keep vertical sizes in multiples of 27px (or 13.5px), and draw horizontal rules as shadows or backgrounds, not borders, because a 1px border shifts every row below it. The "Dot grid" block at the end of `global.css` sets the metrics; spacing in Margin templates should be `--g` multiples (`mt-(--g)`, `mt-[54px]`), not Tailwind's 4px steps. `src/lib/dot-grid-snap.js` nudges any block that still lands between rows (images, odd layouts): `PageLayout` inlines it so the first pass runs before the first paint (`rel="expect"` holds rendering), and `src/lib/dot-grid.ts` re-snaps on fonts, resize, media and navigations, then fires `dotgrid:snapped` so overlays redraw. Hand notes, pen corrections and vertical labels float free. Notion images carry `width`/`height` read from their file headers (`src/lib/notion/image-size.ts`), so they never push text when they load.
