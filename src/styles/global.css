@@ -1483,6 +1483,10 @@
       max-width: calc(100vw - 96px);
       white-space: normal;
     }
+    /* the pen goes in the row above the title: under a note, that row is kept free */
+    .m-anchor:has(> .m-note--item) > .m-card:has(.m-corr) {
+      margin-top: var(--g);
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
