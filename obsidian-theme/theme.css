@@ -1,0 +1,859 @@
+/*
+  Margin: Obsidian theme drawn from jorgeorejas.com (the Margin design).
+  Source of truth for the tokens: src/styles/global.css. Fonts are inlined by
+  build.mjs where the @fonts marker sits; this file alone has none.
+
+  The pieces carried over from the site:
+  - Flexoki paper and ink, signal orange for "current", pen blue for hand notes.
+  - Ioskeley Mono body on a 27px dot grid (15px text = 9px per character,
+    one line per row), Instrument Serif titles, Caveat for handwriting.
+  - The measuring ruler beside the text and the faint paper grain.
+  - Numbered nav (file explorer, tabs) with the current number in orange.
+  - Pen corrections (strikethrough), marker highlights, pen ticks on tasks,
+    the "> [!margen]" callout as a hand note in the margin.
+  The grid follows the editor font size: one row = font size × 1.8.
+*/
+
+/* @fonts */
+
+/* @settings
+
+name: Margin
+id: margin-theme
+settings:
+  -
+    id: m-paper
+    title: Libreta
+    type: heading
+    level: 2
+    collapsed: false
+  -
+    id: m-no-dots
+    title: Sin puntos
+    description: Quita la cuadrícula de puntos de las notas
+    type: class-toggle
+  -
+    id: m-no-ruler
+    title: Sin regla
+    description: Quita la regla que va junto al texto
+    type: class-toggle
+  -
+    id: m-no-grain
+    title: Papel liso
+    description: Quita el grano del papel
+    type: class-toggle
+  -
+    id: m-no-numbers
+    title: Sin números
+    description: Quita los números del explorador y de las pestañas
+    type: class-toggle
+*/
+
+/* ==========================================================================
+   Tokens
+   ========================================================================== */
+
+body {
+  --m-mono: "Ioskeley Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --m-serif: "Instrument Serif", ui-serif, Georgia, serif;
+  --m-hand: "Caveat", "Bradley Hand", cursive;
+
+  /* one row of the dot grid: a line of body text */
+  --m-g: calc(var(--font-text-size) * 1.8);
+  /* margin column for hand notes and the gap where the ruler lives */
+  --m-mw: 170px;
+  --m-gap: 64px;
+
+  --font-text-theme: var(--m-mono);
+  --font-interface-theme: var(--m-mono);
+  --font-monospace-theme: var(--m-mono);
+
+  --line-height-normal: 1.8;
+  --line-height-tight: 1.35;
+  --p-spacing: var(--m-g);
+  --p-spacing-empty: 0px;
+  --heading-spacing: calc(var(--m-g) * 2);
+  --list-spacing: 0px;
+
+  --bold-weight: 600;
+  --bold-modifier: 200;
+
+  /* titles: serif, never bold; h5 is a section label, h6 a pen eyebrow */
+  --inline-title-font: var(--m-serif);
+  --inline-title-size: 2.933em;
+  --inline-title-weight: 400;
+  --inline-title-line-height: calc(var(--m-g) * 2);
+  --inline-title-margin-bottom: var(--m-g);
+  --inline-title-color: var(--m-ink);
+
+  --h1-font: var(--m-serif);
+  --h2-font: var(--m-serif);
+  --h3-font: var(--m-serif);
+  --h4-font: var(--m-serif);
+  --h5-font: var(--m-mono);
+  --h6-font: var(--m-hand);
+  --h1-size: 2.133em;
+  --h2-size: 1.733em;
+  --h3-size: 1.333em;
+  --h4-size: 1.333em;
+  --h5-size: 0.8em;
+  --h6-size: 1.4em;
+  --h1-weight: 400;
+  --h2-weight: 400;
+  --h3-weight: 400;
+  --h4-weight: 400;
+  --h5-weight: 500;
+  --h6-weight: 700;
+  --h1-line-height: calc(var(--m-g) * 2);
+  --h2-line-height: var(--m-g);
+  --h3-line-height: var(--m-g);
+  --h4-line-height: var(--m-g);
+  --h5-line-height: var(--m-g);
+  --h6-line-height: var(--m-g);
+  --h1-letter-spacing: 0;
+  --h2-letter-spacing: 0;
+  --h3-letter-spacing: 0;
+  --h4-letter-spacing: 0;
+  --h5-letter-spacing: 0.08em;
+  --h6-letter-spacing: 0;
+  --h4-style: italic;
+  --h1-color: var(--m-ink);
+  --h2-color: var(--m-ink);
+  --h3-color: var(--m-ink);
+  --h4-color: var(--m-ink);
+  --h5-color: var(--m-signal);
+  --h6-color: var(--m-pen);
+
+  --link-color: var(--m-ink);
+  --link-color-hover: var(--m-ink);
+  --link-decoration: underline;
+  --link-decoration-hover: underline;
+  --link-decoration-thickness: 1px;
+  --link-external-color: var(--m-ink);
+  --link-external-color-hover: var(--m-ink);
+  --link-external-decoration: underline;
+  --link-external-decoration-hover: underline;
+  --link-unresolved-color: var(--m-mute);
+  --link-unresolved-opacity: 1;
+  --link-unresolved-filter: none;
+  --link-unresolved-decoration-style: dotted;
+  --link-unresolved-decoration-color: var(--m-tick);
+
+  --blockquote-border-thickness: 2px;
+  --blockquote-border-color: var(--m-tick-soft);
+  --blockquote-font-style: italic;
+  --blockquote-style: italic; /* the name Live Preview reads */
+  --blockquote-color: var(--m-mute-ink);
+
+  --hr-color: var(--m-rule);
+  --hr-thickness: 1px;
+
+  --list-marker-color: var(--m-mute);
+  --list-marker-color-hover: var(--m-ink-soft);
+  --list-marker-color-collapsed: var(--m-signal);
+
+  --checkbox-radius: 0;
+  --checkbox-border-color: var(--m-tick);
+  --checkbox-border-color-hover: var(--m-mute);
+  --checklist-done-decoration: line-through;
+  --checklist-done-color: var(--m-mute);
+
+  --code-size: 0.8em;
+  --code-radius: 2px;
+
+  --tag-size: 0.8em;
+  --tag-color: var(--m-signal-ink);
+  --tag-color-hover: var(--m-signal);
+  --tag-background: transparent;
+  --tag-background-hover: transparent;
+  --tag-border-width: 0px;
+  --tag-padding-x: 0;
+  --tag-padding-y: 0;
+  --tag-radius: 0;
+  --tag-decoration-hover: underline;
+
+  --table-border-width: 0px;
+  --table-border-color: var(--m-rule);
+  --table-header-background: transparent;
+  --table-header-background-hover: transparent;
+  --table-header-weight: 600;
+  --table-header-color: var(--m-ink);
+  --table-text-size: 0.8em;
+
+  --embed-border-start: 2px solid var(--m-rule);
+  --image-radius: 2px;
+
+  --callout-radius: 0;
+  --callout-border-width: 0 0 0 2px;
+  --callout-border-opacity: 1;
+  --callout-padding: calc(var(--m-g) / 2) 18px;
+  --callout-blend-mode: normal;
+  --callout-title-weight: 500;
+
+  --metadata-label-font: var(--m-mono);
+  --metadata-label-font-size: 0.8em;
+  --metadata-label-text-color: var(--m-mute);
+  --metadata-input-font: var(--m-mono);
+  --metadata-input-font-size: 0.8em;
+  --metadata-input-text-color: var(--m-ink-soft);
+  --metadata-input-height: var(--m-g);
+  --metadata-property-radius: 0;
+  --metadata-property-radius-hover: 0;
+  --metadata-property-radius-focus: 0;
+  --metadata-property-padding: 0;
+  --metadata-gap: 0;
+  --metadata-padding: 0;
+  --metadata-border-width: 0;
+  --metadata-divider-width: 0;
+
+  --nav-item-size: 12px;
+  --nav-item-radius: 0;
+  --nav-item-color: var(--m-ink-soft);
+  --nav-item-color-hover: var(--m-ink);
+  --nav-item-color-active: var(--m-ink);
+  --nav-item-color-selected: var(--m-ink);
+  --nav-item-background-active: transparent;
+  --nav-heading-color: var(--m-ink);
+
+  --radius-s: 2px;
+  --radius-m: 4px;
+  --radius-l: 6px;
+  --clickable-icon-radius: 2px;
+
+  --footnote-id-color: var(--m-signal-ink);
+  --footnote-id-color-no-occurrences: var(--m-mute);
+}
+
+/* --------------------------------------------------------------------------
+   Day: the site's paper (Flexoki light, paper a touch paler than spec)
+   (repeated with .is-mobile: Obsidian's phone styles redefine some of these)
+   -------------------------------------------------------------------------- */
+.theme-light,
+.is-mobile.theme-light {
+  --m-paper: #fbfaf6;
+  --m-ink: #100f0f;
+  --m-ink-soft: #403e3c;
+  --m-mute: #6f6e69;
+  --m-mute-ink: #575653;
+  --m-rule: #dad8ce;
+  --m-rule-soft: #e6e4d9;
+  --m-wash: #f2f0e5;
+  --m-tick: #9f9d96;
+  --m-tick-soft: #cecdc3;
+  --m-signal: #cb6120;
+  --m-signal-ink: #bc5215;
+  --m-pen: #205ea6;
+  --m-dot: rgb(16 15 15 / 0.14);
+  --m-pen-underline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 8' preserveAspectRatio='none'%3E%3Cpath d='M1 5.5C18 3 30 6.8 48 4.6S82 2.8 98 5.2 112 4 119 3.6' fill='none' stroke='%23205ea6' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
+  --m-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35  0 0 0 0 .3  0 0 0 0 .22  0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.11'/%3E%3C/svg%3E");
+
+  --color-base-00: #fbfaf6;
+  --color-base-05: #f6f5ee;
+  --color-base-10: #f2f0e5;
+  --color-base-20: #f2f0e5;
+  --color-base-25: #e6e4d9;
+  --color-base-30: #dad8ce;
+  --color-base-35: #cecdc3;
+  --color-base-40: #b7b5ac;
+  --color-base-50: #9f9d96;
+  --color-base-60: #878580;
+  --color-base-70: #6f6e69;
+  --color-base-100: #403e3c;
+
+  --color-red: #af3029;
+  --color-orange: #bc5215;
+  --color-yellow: #ad8301;
+  --color-green: #66800b;
+  --color-cyan: #24837b;
+  --color-blue: #205ea6;
+  --color-purple: #5e409d;
+  --color-pink: #a02f6f;
+  --color-red-rgb: 175, 48, 41;
+  --color-orange-rgb: 188, 82, 21;
+  --color-yellow-rgb: 173, 131, 1;
+  --color-green-rgb: 102, 128, 11;
+  --color-cyan-rgb: 36, 131, 123;
+  --color-blue-rgb: 32, 94, 166;
+  --color-purple-rgb: 94, 64, 157;
+  --color-pink-rgb: 160, 47, 111;
+
+  --accent-h: 23;
+  --accent-s: 73%;
+  --accent-l: 46%;
+
+  --background-primary: var(--m-paper);
+  --background-primary-alt: var(--m-wash);
+  --background-secondary: var(--m-paper);
+  --background-secondary-alt: var(--m-wash);
+  --background-modifier-border: var(--m-rule);
+  --background-modifier-border-hover: var(--m-tick-soft);
+  --background-modifier-border-focus: var(--m-tick);
+  --background-modifier-hover: rgb(16 15 15 / 0.045);
+  --background-modifier-active-hover: rgb(203 97 32 / 0.12);
+  --background-modifier-form-field: #fffefa;
+  --text-normal: var(--m-ink-soft);
+  --text-muted: var(--m-mute);
+  --text-faint: var(--m-tick);
+  --text-accent: var(--m-signal-ink);
+  --text-accent-hover: #9d4310;
+  --text-on-accent: var(--m-paper);
+  --text-selection: rgb(203 97 32 / 0.28);
+  --interactive-accent: var(--m-signal);
+  --interactive-accent-hover: var(--m-signal-ink);
+  --caret-color: var(--m-ink);
+  --tag-background: transparent;
+
+  --highlight-background-red: #fdb2a2;
+  --highlight-background-orange: #fcc192;
+  --highlight-background-yellow: #f1d67e;
+  --highlight-background-green: #cdd597;
+  --highlight-background-blue: #abcfe2;
+  --highlight-background-purple: #d3cae6;
+
+  --code-background: var(--m-wash);
+  --code-normal: var(--m-ink-soft);
+  --code-comment: #878580;
+  --code-function: #bc5215;
+  --code-important: #a02f6f;
+  --code-keyword: #66800b;
+  --code-operator: #6f6e69;
+  --code-property: #205ea6;
+  --code-punctuation: #6f6e69;
+  --code-string: #24837b;
+  --code-tag: #af3029;
+  --code-value: #5e409d;
+
+  --graph-line: var(--m-rule);
+  --graph-node: var(--m-ink-soft);
+  --graph-node-focused: var(--m-signal);
+  --graph-node-unresolved: var(--m-tick);
+  --graph-node-tag: #66800b;
+  --graph-node-attachment: #ad8301;
+  --graph-text: var(--m-ink-soft);
+  --canvas-dot-pattern: var(--m-tick-soft);
+  --scrollbar-thumb-bg: rgb(16 15 15 / 0.12);
+  --scrollbar-active-thumb-bg: rgb(16 15 15 / 0.22);
+}
+
+/* --------------------------------------------------------------------------
+   Night: the same paper with the lights off (Flexoki dark, 400 accents)
+   -------------------------------------------------------------------------- */
+.theme-dark,
+.is-mobile.theme-dark {
+  --m-paper: #100f0f;
+  --m-ink: #e6e4d9;
+  --m-ink-soft: #cecdc3;
+  --m-mute: #878580;
+  --m-mute-ink: #9f9d96;
+  --m-rule: #343331;
+  --m-rule-soft: #282726;
+  --m-wash: #1c1b1a;
+  --m-tick: #575653;
+  --m-tick-soft: #403e3c;
+  --m-signal: #da702c;
+  --m-signal-ink: #da702c;
+  --m-pen: #4385be;
+  --m-dot: rgb(206 205 195 / 0.13);
+  --m-pen-underline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 8' preserveAspectRatio='none'%3E%3Cpath d='M1 5.5C18 3 30 6.8 48 4.6S82 2.8 98 5.2 112 4 119 3.6' fill='none' stroke='%234385be' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
+  --m-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .9  0 0 0 0 .88  0 0 0 0 .8  0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.06'/%3E%3C/svg%3E");
+
+  --color-base-00: #100f0f;
+  --color-base-05: #161514;
+  --color-base-10: #1c1b1a;
+  --color-base-20: #1c1b1a;
+  --color-base-25: #282726;
+  --color-base-30: #343331;
+  --color-base-35: #403e3c;
+  --color-base-40: #575653;
+  --color-base-50: #6f6e69;
+  --color-base-60: #6f6e69;
+  --color-base-70: #878580;
+  --color-base-100: #cecdc3;
+
+  --color-red: #d14d41;
+  --color-orange: #da702c;
+  --color-yellow: #d0a215;
+  --color-green: #879a39;
+  --color-cyan: #3aa99f;
+  --color-blue: #4385be;
+  --color-purple: #8b7ec8;
+  --color-pink: #ce5d97;
+  --color-red-rgb: 209, 77, 65;
+  --color-orange-rgb: 218, 112, 44;
+  --color-yellow-rgb: 208, 162, 21;
+  --color-green-rgb: 135, 154, 57;
+  --color-cyan-rgb: 58, 169, 159;
+  --color-blue-rgb: 67, 133, 190;
+  --color-purple-rgb: 139, 126, 200;
+  --color-pink-rgb: 206, 93, 151;
+
+  --accent-h: 23;
+  --accent-s: 70%;
+  --accent-l: 51%;
+
+  --background-primary: var(--m-paper);
+  --background-primary-alt: var(--m-wash);
+  --background-secondary: var(--m-paper);
+  --background-secondary-alt: var(--m-wash);
+  --background-modifier-border: var(--m-rule);
+  --background-modifier-border-hover: var(--m-tick-soft);
+  --background-modifier-border-focus: var(--m-tick);
+  --background-modifier-hover: rgb(206 205 195 / 0.06);
+  --background-modifier-active-hover: rgb(218 112 44 / 0.16);
+  --background-modifier-form-field: var(--m-wash);
+  --interactive-normal: var(--m-wash);
+  --interactive-hover: var(--m-rule-soft);
+  --text-normal: var(--m-ink-soft);
+  --text-muted: var(--m-mute);
+  --text-faint: var(--m-tick);
+  --text-accent: var(--m-signal-ink);
+  --text-accent-hover: #ec8b49;
+  --text-on-accent: var(--m-paper);
+  --text-selection: rgb(218 112 44 / 0.3);
+  --interactive-accent: var(--m-signal);
+  --interactive-accent-hover: #ec8b49;
+  --caret-color: var(--m-ink);
+  --tag-background: transparent;
+
+  --highlight-background-red: rgb(209 77 65 / 0.32);
+  --highlight-background-orange: rgb(218 112 44 / 0.32);
+  --highlight-background-yellow: rgb(208 162 21 / 0.34);
+  --highlight-background-green: rgb(135 154 57 / 0.32);
+  --highlight-background-blue: rgb(67 133 190 / 0.32);
+  --highlight-background-purple: rgb(139 126 200 / 0.32);
+
+  --code-background: var(--m-wash);
+  --code-normal: var(--m-ink-soft);
+  --code-comment: #6f6e69;
+  --code-function: #da702c;
+  --code-important: #ce5d97;
+  --code-keyword: #879a39;
+  --code-operator: #878580;
+  --code-property: #4385be;
+  --code-punctuation: #878580;
+  --code-string: #3aa99f;
+  --code-tag: #d14d41;
+  --code-value: #8b7ec8;
+
+  --graph-line: var(--m-rule);
+  --graph-node: var(--m-ink-soft);
+  --graph-node-focused: var(--m-signal);
+  --graph-node-unresolved: var(--m-tick);
+  --graph-node-tag: #879a39;
+  --graph-node-attachment: #d0a215;
+  --graph-text: var(--m-ink-soft);
+  --canvas-dot-pattern: var(--m-tick-soft);
+  --scrollbar-thumb-bg: rgb(206 205 195 / 0.12);
+  --scrollbar-active-thumb-bg: rgb(206 205 195 / 0.22);
+}
+
+/* ==========================================================================
+   The page: paper grain, dot grid, ruler
+   Only the note open in a tab gets the grid (not embeds, popovers or canvas
+   cards). The dots hang from the first line of the text, so every line sits
+   between two rows of dots; they spill a viewport wide on each side and the
+   scroller clips them.
+   ========================================================================== */
+
+body:not(.m-no-grain) .workspace-leaf-content[data-type="markdown"] :is(.markdown-source-view.mod-cm6 .cm-scroller, .markdown-preview-view) {
+  background-image: var(--m-grain);
+}
+
+.workspace-leaf-content[data-type="markdown"] .markdown-source-view.mod-cm6 .cm-scroller,
+.workspace-leaf-content[data-type="markdown"] .markdown-reading-view > .markdown-preview-view {
+  overflow-x: hidden;
+}
+
+.workspace-leaf-content[data-type="markdown"] .markdown-source-view.mod-cm6 .cm-contentContainer > .cm-content,
+.workspace-leaf-content[data-type="markdown"] .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer {
+  position: relative;
+  isolation: isolate;
+}
+
+/* the paper: dots on the row lines, a dot column on the text's left edge */
+body:not(.m-no-dots) .workspace-leaf-content[data-type="markdown"] .markdown-source-view.mod-cm6 .cm-contentContainer > .cm-content::before,
+body:not(.m-no-dots) .workspace-leaf-content[data-type="markdown"] .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: calc(var(--m-g) * -40);
+  bottom: 0;
+  left: -100vw;
+  right: -100vw;
+  pointer-events: none;
+  background-image: radial-gradient(circle, var(--m-dot) 0.85px, transparent 1.25px);
+  background-size: var(--m-g) var(--m-g);
+  background-position: calc(100vw - var(--m-g) / 2) calc(var(--m-g) / -2);
+}
+
+/* the ruler: a long tick on every row, a short one every third of a row */
+body:not(.m-no-ruler):not(.is-phone) .workspace-leaf-content[data-type="markdown"] .markdown-source-view.mod-cm6 .cm-contentContainer > .cm-content::after,
+body:not(.m-no-ruler):not(.is-phone) .workspace-leaf-content[data-type="markdown"] .markdown-reading-view > .markdown-preview-view > .markdown-preview-sizer::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  bottom: 0;
+  left: -40px;
+  width: 14px;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(to bottom, var(--m-tick) 0 1px, transparent 1px var(--m-g)),
+    repeating-linear-gradient(to bottom, var(--m-tick-soft) 0 1px, transparent 1px calc(var(--m-g) / 3));
+  background-size: 14px 100%, 7px 100%;
+  background-repeat: no-repeat;
+  background-position: right top, right top;
+}
+
+/* ==========================================================================
+   Text
+   ========================================================================== */
+
+.markdown-rendered :is(strong, b),
+.cm-s-obsidian .cm-strong {
+  color: var(--m-ink);
+}
+
+/* quotes read the same while editing */
+.markdown-source-view.mod-cm6 .HyperMD-quote {
+  font-style: var(--blockquote-font-style);
+  color: var(--blockquote-color);
+}
+
+/* CodeMirror's zero-width cursor helpers sit at text-top; in a serif heading
+   that pokes above the row and makes the line taller than the grid */
+.markdown-source-view.mod-cm6 .HyperMD-header .cm-widgetBuffer {
+  vertical-align: top;
+}
+
+/* section label (h5): mono caps in signal orange, like the site's labels */
+.markdown-rendered h5,
+.HyperMD-header-5 .cm-header-5 {
+  text-transform: uppercase;
+}
+
+/* links: a quiet underline; the pen squiggle on hover */
+.markdown-rendered a:is(.internal-link, .external-link),
+.cm-s-obsidian :is(.cm-hmd-internal-link, .cm-link, .cm-url) .cm-underline {
+  text-decoration-color: var(--m-tick-soft);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s;
+}
+.markdown-rendered a:is(.internal-link, .external-link):hover,
+.cm-s-obsidian :is(.cm-hmd-internal-link, .cm-link, .cm-url) .cm-underline:hover {
+  text-decoration-color: transparent;
+  background-image: var(--m-pen-underline);
+  background-size: 100% 7px;
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+}
+.markdown-rendered a.internal-link.is-unresolved {
+  text-decoration-style: dotted;
+  text-decoration-color: var(--m-tick);
+}
+/* external links get the pen arrow instead of the stock icon */
+.markdown-rendered a.external-link {
+  background-image: none;
+  padding-inline-end: 0;
+}
+.markdown-rendered a.external-link::after {
+  content: "↗";
+  display: inline-block;
+  margin-inline-start: 2px;
+  font-size: 0.8em;
+  color: var(--m-pen);
+}
+.markdown-rendered a.external-link:hover {
+  background-image: var(--m-pen-underline);
+}
+
+/* corrections: struck through in pen, like ~~typo~~(fix) on the site */
+.markdown-rendered :is(del, s),
+.cm-s-obsidian .cm-strikethrough {
+  text-decoration-line: line-through;
+  text-decoration-color: var(--m-pen);
+  text-decoration-thickness: 2px;
+}
+
+/* highlights: a marker stroke, uneven at both ends */
+.markdown-rendered mark,
+.cm-s-obsidian span.cm-highlight {
+  background-color: transparent;
+  background-image: linear-gradient(
+    100deg,
+    color-mix(in srgb, var(--highlight-background) 20%, transparent),
+    var(--highlight-background) 0.3em,
+    color-mix(in srgb, var(--highlight-background) 78%, transparent) calc(100% - 0.4em),
+    color-mix(in srgb, var(--highlight-background) 35%, transparent)
+  );
+  border-radius: 0.55em 0.2em 0.6em 0.25em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.markdown-rendered mark {
+  margin: 0 -0.15em;
+  padding: 0 0.15em;
+}
+
+/* inline code keeps the body size (it's all mono): only the wash marks it */
+.markdown-rendered :not(pre) > code,
+.cm-s-obsidian span.cm-inline-code {
+  font-size: 1em;
+  padding: 0.1em 0.35em;
+  color: var(--m-ink);
+}
+/* code blocks: 12px, still one line per row (as on the site) */
+.markdown-rendered pre,
+.markdown-rendered pre code,
+.markdown-source-view.mod-cm6 .HyperMD-codeblock {
+  line-height: var(--m-g);
+}
+.markdown-rendered pre {
+  margin-block: var(--m-g);
+  padding: calc(var(--m-g) / 2) 18px;
+}
+.markdown-rendered pre > code {
+  display: block;
+}
+
+/* tags: small signal text, no pill */
+.markdown-rendered a.tag,
+.cm-s-obsidian span.cm-hashtag {
+  font-family: var(--m-mono);
+}
+
+/* raised bits (footnote refs) can't make their line taller than a row */
+.markdown-rendered :is(sup, sub),
+.cm-s-obsidian :is(.cm-footref, .cm-superscript, .cm-subscript) {
+  line-height: 0;
+}
+
+/* the rule fills a row instead of adding a pixel */
+.markdown-rendered hr {
+  height: var(--m-g);
+  margin-block: var(--m-g);
+  border: none;
+  background: linear-gradient(var(--hr-color), var(--hr-color)) center / 100% 1px no-repeat;
+}
+
+/* footnotes */
+.markdown-rendered :is(.footnote-link, sup a) {
+  color: var(--m-signal-ink);
+  text-decoration: none;
+}
+.markdown-rendered section.footnotes {
+  font-style: italic;
+  font-size: 0.8em;
+  color: var(--m-mute-ink);
+}
+.markdown-rendered section.footnotes hr {
+  margin: 0;
+}
+
+/* tables: rules between rows only, drawn as shadows so each row is one row */
+.markdown-rendered table :is(th, td),
+.markdown-source-view.mod-cm6 .cm-table-widget :is(th, td) {
+  padding-block: 0;
+  padding-inline: 0 18px;
+  line-height: var(--m-g);
+  box-shadow: inset 0 -1px var(--m-rule);
+}
+.markdown-rendered table th,
+.markdown-source-view.mod-cm6 .cm-table-widget th {
+  box-shadow: inset 0 1px var(--m-rule), inset 0 -1px var(--m-rule);
+}
+
+/* tasks: a square box, the tick and the strike in pen */
+input[type="checkbox"]:is(.task-list-item-checkbox, .metadata-input-checkbox) {
+  --checkbox-color: transparent;
+  --checkbox-color-hover: transparent;
+}
+input[type="checkbox"]:is(.task-list-item-checkbox, .metadata-input-checkbox):checked {
+  overflow: visible;
+}
+input[type="checkbox"]:is(.task-list-item-checkbox, .metadata-input-checkbox):checked::after {
+  top: -45%;
+  inset-inline-start: -5%;
+  width: 135%;
+  height: 135%;
+  background-color: var(--m-pen);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 20'%3E%3Cpath d='M2.6 11.4c1.7 1.1 3.3 3 4.6 5.7C9.8 10.6 13.8 5.5 20.4 1.8' fill='none' stroke='%23000' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  -webkit-mask-size: 100% 100%;
+  -webkit-mask-position: center;
+}
+.markdown-rendered li.task-list-item[data-task="x"],
+.markdown-rendered li.task-list-item[data-task="X"],
+.markdown-source-view.mod-cm6 .HyperMD-task-line:is([data-task="x"], [data-task="X"]) {
+  text-decoration-color: var(--m-pen);
+  text-decoration-thickness: 1.5px;
+}
+
+/* ==========================================================================
+   Callouts: the site's aside (wash, rule on the left)
+   ========================================================================== */
+
+.callout {
+  margin-block: var(--m-g);
+  background-color: var(--m-wash);
+}
+.callout-title {
+  line-height: var(--m-g);
+}
+/* inside a callout the blocks stack row after row, so it ends on the grid */
+.callout-content {
+  line-height: var(--m-g);
+}
+.callout-content > :is(p, ul, ol, blockquote) {
+  margin-block: 0;
+}
+.callout-content > * + * {
+  margin-top: var(--m-g);
+}
+
+/* > [!margen] la nota: a hand note. Inline while editing (like the site on a
+   phone); in reading view it moves into the margin when the pane has room. */
+.callout:is([data-callout="margen"], [data-callout="margin"]) {
+  --callout-color: var(--m-pen);
+  background: none;
+  border: none;
+  padding: 0 0 0 4px;
+  overflow: visible;
+  font-family: var(--m-hand);
+  font-weight: 500;
+  font-size: 1.4em;
+  line-height: var(--m-g);
+  color: var(--m-pen);
+  transform: rotate(-2deg);
+  transform-origin: left center;
+}
+.callout:is([data-callout="margen"], [data-callout="margin"]) .callout-icon {
+  display: none;
+}
+.callout:is([data-callout="margen"], [data-callout="margin"]) .callout-title {
+  color: var(--m-pen);
+  font-weight: 700;
+  line-height: var(--m-g);
+}
+.callout:is([data-callout="margen"], [data-callout="margin"]) .callout-content {
+  line-height: var(--m-g);
+}
+.markdown-source-view.mod-cm6 .cm-embed-block.cm-callout:has(.callout:is([data-callout="margen"], [data-callout="margin"])):hover {
+  box-shadow: none;
+}
+.callout:is([data-callout="margen"], [data-callout="margin"]) .callout-content :is(p, ul, ol) {
+  margin: 0;
+}
+
+.workspace-leaf-content[data-type="markdown"] .markdown-reading-view > .markdown-preview-view {
+  container: m-page / inline-size;
+}
+@container m-page (min-width: 1160px) {
+  .markdown-preview-view.is-readable-line-width > .markdown-preview-sizer > div > .callout:is([data-callout="margen"], [data-callout="margin"]) {
+    position: absolute;
+    right: calc(100% + var(--m-gap));
+    width: var(--m-mw);
+    margin: 0;
+    padding: 0;
+    line-height: 1.05;
+    text-align: right;
+    transform: rotate(-3deg);
+    transform-origin: right center;
+  }
+  .markdown-preview-view.is-readable-line-width > .markdown-preview-sizer > div > .callout:is([data-callout="margen"], [data-callout="margin"]) :is(.callout-title, .callout-content) {
+    line-height: 1.05;
+  }
+  .markdown-preview-view.is-readable-line-width > .markdown-preview-sizer > div > .callout:is([data-callout="margen"], [data-callout="margin"]) .callout-title {
+    justify-content: flex-end;
+  }
+}
+
+/* ==========================================================================
+   Properties: one row each, rules between them
+   ========================================================================== */
+
+.metadata-container {
+  margin-block-end: var(--m-g);
+}
+.metadata-container .metadata-property {
+  box-shadow: inset 0 -1px var(--m-rule);
+}
+.metadata-container .metadata-properties-heading {
+  vertical-align: top;
+  margin: 0;
+  padding-block: 0;
+  line-height: var(--m-g);
+  font-size: 0.8em;
+  color: var(--m-mute);
+}
+.metadata-property-value :is(.metadata-input-longtext, .multi-select-container) {
+  padding-block: 0;
+  min-height: var(--m-g);
+  line-height: var(--m-g);
+}
+.metadata-container .metadata-add-button {
+  vertical-align: top;
+  margin: 0;
+  padding-block: 0;
+  height: var(--m-g);
+}
+
+/* ==========================================================================
+   Chrome: numbered nav, crumbs, tabs
+   ========================================================================== */
+
+/* file explorer: "01 Nota", the current number in signal orange */
+/* the vault's root list is a bare div, folders open a .tree-item-children */
+body:not(.m-no-numbers) .nav-files-container > div,
+body:not(.m-no-numbers) .nav-files-container .tree-item-children {
+  counter-reset: m-nav;
+}
+body:not(.m-no-numbers) .nav-files-container > div > .tree-item,
+body:not(.m-no-numbers) .nav-files-container .tree-item-children > .tree-item {
+  counter-increment: m-nav;
+}
+body:not(.m-no-numbers) .nav-files-container > div > .tree-item > .tree-item-self > .tree-item-inner::before,
+body:not(.m-no-numbers) .nav-files-container .tree-item-children > .tree-item > .tree-item-self > .tree-item-inner::before {
+  content: counter(m-nav, decimal-leading-zero);
+  margin-inline-end: 1ch;
+  color: var(--m-mute);
+  font-variant-numeric: tabular-nums;
+}
+body:not(.m-no-numbers) .nav-files-container .tree-item > .tree-item-self.is-active > .tree-item-inner::before {
+  color: var(--m-signal);
+}
+.nav-files-container .tree-item-self.is-active {
+  color: var(--m-ink);
+}
+
+/* tabs in the main area get numbers too */
+body:not(.m-no-numbers) .mod-root .workspace-tab-header-container-inner {
+  counter-reset: m-tab;
+}
+body:not(.m-no-numbers) .mod-root .workspace-tab-header {
+  counter-increment: m-tab;
+}
+body:not(.m-no-numbers) .mod-root .workspace-tab-header-inner-title::before {
+  content: counter(m-tab, decimal-leading-zero) " ";
+  color: var(--m-mute);
+  font-variant-numeric: tabular-nums;
+}
+body:not(.m-no-numbers) .mod-root .workspace-tab-header.is-active .workspace-tab-header-inner-title::before {
+  color: var(--m-signal);
+}
+.mod-root .workspace-tab-header-inner-title {
+  font-size: 12px;
+}
+
+/* the note's path reads like the site's crumbs */
+.view-header-title-parent,
+.view-header-breadcrumb {
+  color: var(--m-mute);
+}
+.view-header-breadcrumb-separator {
+  color: var(--m-tick-soft);
+}
+
+.status-bar {
+  font-size: 12px;
+  color: var(--m-mute);
+}
