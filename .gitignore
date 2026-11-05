@@ -33,3 +33,6 @@ playwright/.cache/
 # worktrees
 .worktrees/
 .env*.local
+
+# Obsidian theme build (node obsidian-theme/build.mjs)
+obsidian-theme/dist/

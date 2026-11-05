@@ -13,7 +13,7 @@
 set -u
 
 # Paths that never reach the deployed site
-SITE_FREE='^(docs/|tests/|\.agents/|\.claude/|\.cursor/|\.vscode/|[^/]+\.md$|homepage-current\.png$|skills-lock\.json$)'
+SITE_FREE='^(docs/|tests/|obsidian-theme/|\.agents/|\.claude/|\.cursor/|\.vscode/|[^/]+\.md$|homepage-current\.png$|skills-lock\.json$)'
 
 base="${VERCEL_GIT_PREVIOUS_SHA:-}"
 if [ -z "$base" ]; then
