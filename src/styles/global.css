@@ -639,6 +639,13 @@
     margin: 0 0 0 9px;
     color: var(--color-signal);
   }
+  /* a section that opens with a title (two rows): the tip, drawn 5.6px into
+     the 18px box, lands on the title's middle line, one row down, and the
+     letters start on the half row below */
+  .m-row:has(> .m-col > :first-child:is(.m-sec-h, header)) .m-vert-up {
+    margin-top: calc(var(--g) - 5.6px);
+    margin-bottom: 1.1px;
+  }
 
   /* ---------- hand notes (Caveat, pen blue; line height in "Dot grid") ---------- */
   .hn {

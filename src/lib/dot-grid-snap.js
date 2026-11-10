@@ -125,6 +125,20 @@ function nudgeProperty(el, cs) {
 }
 
 /**
+ * What to nudge for a block: the block itself, or its whole row when it opens
+ * a labelled section, so the ↱ in the margin keeps pointing at the title
+ * @param {HTMLElement} el
+ * @returns {HTMLElement}
+ */
+function mover(el) {
+  const col = el.closest(".m-row > .m-col");
+  const row = col?.parentElement;
+  if (!col || !row?.querySelector(":scope > .m-mar .m-vert")) return el;
+  const opens = el.getBoundingClientRect().top - col.getBoundingClientRect().top < 0.5;
+  return opens ? row : el;
+}
+
+/**
  * Puts every text block of one Margin page back on the grid
  * @param {HTMLElement | null} grid the `.m` element
  */
@@ -134,14 +148,15 @@ export function snapDotGrid(grid) {
   for (const el of blocks(grid)) {
     const off = offset(topOf(el, grid));
     if (onGrid(off)) continue;
-    const cs = getComputedStyle(el);
-    const prop = nudgeProperty(el, cs);
-    el.dataset[SNAPPED] = `${prop}|${el.style.getPropertyValue(prop)}`;
+    const target = mover(el);
+    const cs = getComputedStyle(target);
+    const prop = nudgeProperty(target, cs);
+    target.dataset[SNAPPED] = `${prop}|${target.style.getPropertyValue(prop)}`;
     const base = parseFloat(cs.getPropertyValue(prop)) || 0;
-    el.style.setProperty(prop, `${base + (G - off)}px`);
+    target.style.setProperty(prop, `${base + (G - off)}px`);
     // a collapsing margin (or a centring parent) can eat part of the nudge:
     // top it up once
     const left = offset(topOf(el, grid));
-    if (!onGrid(left)) el.style.setProperty(prop, `${base + (G - off) + (G - left)}px`);
+    if (!onGrid(left)) target.style.setProperty(prop, `${base + (G - off) + (G - left)}px`);
   }
 }
